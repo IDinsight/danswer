@@ -16,6 +16,7 @@ from danswer.configs.app_configs import INDEX_BATCH_SIZE
 from danswer.configs.constants import DocumentSource
 from danswer.connectors.google_drive.connector_auth import DB_CREDENTIALS_DICT_KEY
 from danswer.connectors.google_drive.connector_auth import get_drive_tokens
+from danswer.connectors.google_drive.mime_type_loaders import MIME_TYPE_LOADERS
 from danswer.connectors.interfaces import GenerateDocumentsOutput
 from danswer.connectors.interfaces import LoadConnector
 from danswer.connectors.interfaces import PollConnector
@@ -32,12 +33,6 @@ DRIVE_START_TIME_OFFSET = 60 * 10
 SCOPES = [
     "https://www.googleapis.com/auth/drive.readonly",
     "https://www.googleapis.com/auth/drive.metadata.readonly",
-]
-SUPPORTED_DRIVE_DOC_TYPES = [
-    "application/vnd.google-apps.document",
-    "application/vnd.google-apps.spreadsheet",
-    "application/pdf",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]
 DRIVE_FOLDER_TYPE = "application/vnd.google-apps.folder"
 ID_KEY = "id"
@@ -117,7 +112,7 @@ def _get_files(
     time_range_end: SecondsSinceUnixEpoch | None = None,
     folder_id: str | None = None,  # if specified, only fetches files within this folder
     include_shared: bool = GOOGLE_DRIVE_INCLUDE_SHARED,
-    supported_drive_doc_types: list[str] = SUPPORTED_DRIVE_DOC_TYPES,
+    supported_drive_doc_types: list[str] = list(MIME_TYPE_LOADERS.keys()),
     batch_size: int = INDEX_BATCH_SIZE,
 ) -> Generator[GoogleDriveFileType, None, None]:
     query = f"mimeType != '{DRIVE_FOLDER_TYPE}' "
@@ -194,38 +189,22 @@ def get_all_files_batched(
 
 
 def extract_text(file: dict[str, str], service: discovery.Resource) -> str:
-    mime_type = file["mimeType"]
-    if mime_type == "application/vnd.google-apps.document":
-        return (
-            service.files()
-            .export(fileId=file["id"], mimeType="text/plain")
-            .execute()
-            .decode("utf-8")
-        )
-    elif mime_type == "application/vnd.google-apps.spreadsheet":
-        return (
-            service.files()
-            .export(fileId=file["id"], mimeType="text/csv")
-            .execute()
-            .decode("utf-8")
-        )
-    # Default download to PDF since most types can be exported as a PDF
-    elif (
-        mime_type
-        == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ):
-        response = service.files().get_media(fileId=file["id"]).execute()
-        word_stream = io.BytesIO(response)
-        with tempfile.NamedTemporaryFile(delete=False) as temp:
-            temp.write(word_stream.getvalue())
-            temp_path = temp.name
-        return docx2txt.process(temp_path)
+    """
+    Extracts text from a Google Drive file.
 
-    else:
-        response = service.files().get_media(fileId=file["id"]).execute()
-        pdf_stream = io.BytesIO(response)
-        pdf_reader = PdfReader(pdf_stream)
-        return "\n".join(page.extract_text() for page in pdf_reader.pages)
+    Raises:
+    ------
+    ValueError: if the file type is not supported.
+        This should not happens if we are filtering by mimetype
+        before calling this function
+    """
+    mime_type = file["mimeType"]
+
+    loader_function = MIME_TYPE_TO_LOADERS.get(mime_type)
+    if loader_function is None:
+        raise ValueError(f"Unsupported mime type: {mime_type}")
+
+    return loader_function(service, file["id"])
 
 
 class GoogleDriveConnector(LoadConnector, PollConnector):
