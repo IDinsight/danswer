@@ -6,9 +6,7 @@ services:
       context: ../../backend
       dockerfile: Dockerfile
     command: >
-      /bin/sh -c "alembic upgrade head &&
-      echo \"Starting Danswer Api Server\" &&
-      uvicorn danswer.main:app --host 0.0.0.0 --port 8080"
+      /bin/sh -c "alembic upgrade head && echo \"Starting Danswer Api Server\" && uvicorn danswer.main:app --host 0.0.0.0 --port 8080"
     depends_on:
       - relational_db
       - index
@@ -63,6 +61,8 @@ services:
       - INTERNAL_URL=http://api_server:8080
   relational_db:
     image: postgres:15.2-alpine
+    ports:
+      - "5432:5432"
     restart: always
     # POSTGRES_USER and POSTGRES_PASSWORD should be set in .env file
     env_file:
@@ -96,7 +96,7 @@ services:
     # sleep a little bit to allow the web_server / api_server to start up. 
     # Without this we've seen issues where nginx shows no error logs but 
     # does not recieve any traffic
-    command: > 
+    command: >
       /bin/sh -c "sleep 10 &&
         envsubst '$$\{DOMAIN\}' < /etc/nginx/conf.d/app.conf.template > /etc/nginx/conf.d/app.conf &&
         while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\""
@@ -131,7 +131,7 @@ services:
       - model_cache_huggingface:/root/.cache/huggingface/
 volumes:
   local_dynamic_storage:
-  file_connector_tmp_storage:  # used to store files uploaded by the user temporarily while we are indexing them
+  file_connector_tmp_storage: # used to store files uploaded by the user temporarily while we are indexing them
   db_volume:
   vespa_volume:
   model_cache_torch:
