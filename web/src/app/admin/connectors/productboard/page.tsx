@@ -66,8 +66,8 @@ const Main = () => {
   const productboardCredential:
     | Credential<ProductboardCredentialJson>
     | undefined = credentialsData.find(
-    (credential) => credential.credential_json?.productboard_access_token
-  );
+      (credential) => credential.credential_json?.productboard_access_token
+    );
 
   return (
     <>
@@ -75,7 +75,7 @@ const Main = () => {
       <p className="text-sm">
         This connector allows you to sync all your <i>Features</i>,{" "}
         <i>Components</i>, <i>Products</i>, and <i>Objectives</i> from
-        Productboard into Danswer. At this time, the Productboard APIs does not
+        Productboard into HubGPT. At this time, the Productboard APIs does not
         support pulling in <i>Releases</i> or <i>Notes</i>.
       </p>
 

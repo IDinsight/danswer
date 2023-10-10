@@ -320,14 +320,14 @@ const Main = () => {
   const googleDrivePublicCredential:
     | Credential<GoogleDriveCredentialJson>
     | undefined = credentialsData.find(
-    (credential) =>
-      credential.credential_json?.google_drive_tokens && credential.is_admin
-  );
+      (credential) =>
+        credential.credential_json?.google_drive_tokens && credential.is_admin
+    );
   const googleDriveServiceAccountCredential:
     | Credential<GoogleDriveServiceAccountCredentialJson>
     | undefined = credentialsData.find(
-    (credential) => credential.credential_json?.google_drive_service_account_key
-  );
+      (credential) => credential.credential_json?.google_drive_service_account_key
+    );
   const googleDriveConnectorIndexingStatuses: ConnectorIndexingStatus<
     GoogleDriveConfig,
     GoogleDriveCredentialJson
@@ -363,7 +363,7 @@ const Main = () => {
       />
 
       <h2 className="font-bold mb-2 mt-6 ml-auto mr-auto">
-        Step 2: Authenticate with Danswer
+        Step 2: Authenticate with HubGPT
       </h2>
       <DriveOAuthSection
         setPopup={setPopup}

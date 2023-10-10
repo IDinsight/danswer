@@ -52,8 +52,8 @@ export const SlackBotCreationForm = ({
                   ?.respond_team_member_list || ([] as string[]),
               document_sets: existingSlackBotConfig
                 ? existingSlackBotConfig.document_sets.map(
-                    (documentSet) => documentSet.id
-                  )
+                  (documentSet) => documentSet.id
+                )
                 : ([] as number[]),
             }}
             validationSchema={Yup.object().shape({
@@ -92,8 +92,8 @@ export const SlackBotCreationForm = ({
               if (response.ok) {
                 setPopup({
                   message: isUpdate
-                    ? "Successfully updated DanswerBot config!"
-                    : "Successfully created DanswerBot config!",
+                    ? "Successfully updated HubGPTBot config!"
+                    : "Successfully created HubGPTBot config!",
                   type: "success",
                 });
                 onClose();
@@ -102,8 +102,8 @@ export const SlackBotCreationForm = ({
                 const errorMsg = responseJson.detail || responseJson.message;
                 setPopup({
                   message: isUpdate
-                    ? `Error updating DanswerBot config - ${errorMsg}`
-                    : `Error creating DanswerBot config - ${errorMsg}`,
+                    ? `Error updating HubGPTBot config - ${errorMsg}`
+                    : `Error creating HubGPTBot config - ${errorMsg}`,
                   type: "error",
                 });
               }
@@ -113,8 +113,8 @@ export const SlackBotCreationForm = ({
               <Form>
                 <h2 className="text-xl font-bold mb-3 border-b border-gray-600 pt-4 pb-3 bg-gray-700 px-6">
                   {isUpdate
-                    ? "Update a DanswerBot Config"
-                    : "Create a new DanswerBot Config"}
+                    ? "Update a HubGPTBot Config"
+                    : "Create a new HubGPTBot Config"}
                 </h2>
                 <div className="px-6 pb-6">
                   <TextArrayField

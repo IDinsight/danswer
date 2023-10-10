@@ -71,7 +71,7 @@ const Main = () => {
     <>
       {popup}
       <p className="text-sm">
-        This connector allows you to sync all your Guru Cards into Danswer.
+        This connector allows you to sync all your Guru Cards into HubGPT.
       </p>
 
       <h2 className="font-bold mb-2 mt-6 ml-auto mr-auto">
