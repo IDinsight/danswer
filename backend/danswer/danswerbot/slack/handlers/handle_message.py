@@ -283,7 +283,7 @@ def handle_message(
             client=client,
             channel=channel,
             receiver_ids=send_to,
-            text="Hello! Danswer has some results for you!",
+            text="Hello! HubGPT has some results for you!",
             blocks=restate_question_block + answer_blocks + document_blocks,
             thread_ts=message_ts_to_respond_to,
             # don't unfurl, since otherwise we will have 5+ previews which makes the message very long

@@ -72,32 +72,14 @@ const Page = async ({
       <div className="absolute top-10x w-full">
         <HealthCheckBanner />
       </div>
+
       <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-200">
-              HubGPT 🤖
-            </h2>
-          </div>
-          <div className="flex">
-            {authUrl ? (
-              <a
-                href={authUrl || ""}
-                className={
-                  BUTTON_STYLE +
-                  " focus:outline-none focus:ring-2 hover:bg-red-700 focus:ring-offset-2 focus:ring-red-500"
-                }
-              >
-                Sign in with {OAUTH_NAME}
-              </a>
-            ) : (
-              <button className={BUTTON_STYLE + " cursor-default"}>
-                Sign in with {OAUTH_NAME}
-              </button>
-            )}
+        <div>
+          <div className="h-16 w-16 mx-auto">
+            <Image src="/logo.png" alt="Logo" width="1419" height="1520" />
           </div>
           <h2 className="text-center text-xl font-bold mt-4">
-            Log In to Danswer
+            Log In to HubGPT 🤖
           </h2>
           {authUrl && authTypeMetadata && (
             <SignInButton

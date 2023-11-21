@@ -228,7 +228,7 @@ def process_model_tokens(
             found_answer_start = True
 
             # Prevent heavy cases of hallucinations where model is not even providing a json until later
-            if is_json_prompt and len(model_output) > 20:
+            if is_json_prompt and len(model_output) > 40:
                 logger.warning("LLM did not produce json as prompted")
                 found_answer_end = True
 
@@ -256,6 +256,10 @@ def process_model_tokens(
     # since that is what `extract_quotes_from_completed_token_stream` expects
     if is_json_prompt:
         try:
+            if model_output.startswith("```json") and model_output.endswith("```"):
+                model_output = (
+                    model_output.replace("```json", "").replace("```", "").strip()
+                )
             json_answer_ind = model_output.index('{"answer":')
             if json_answer_ind != 0:
                 model_output = model_output[json_answer_ind:]
