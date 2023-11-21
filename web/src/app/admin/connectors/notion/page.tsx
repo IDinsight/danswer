@@ -103,7 +103,7 @@ const Main = () => {
         <>
           <p className="text-sm">
             To get started you&apos;ll need to create an internal integration in
-            Notion for Danswer. Follow the instructions in the&nbsp;
+            Notion for HubGPT. Follow the instructions in the&nbsp;
             <a
               href="https://developers.notion.com/docs/create-a-notion-integration"
               target="_blank"
@@ -113,7 +113,7 @@ const Main = () => {
             &nbsp; on the Notion website, to create a new integration. Once
             you&apos;ve created an integration, copy the integration secret
             token and paste it below. Follow the remaining instructions on the
-            Notion docs to allow Danswer to read Notion Databases and Pages
+            Notion docs to allow HubGPT to read Notion Databases and Pages
             using the new integration.
           </p>
           <div className="border-solid border-gray-600 border rounded-md p-6 mt-2 mb-4">
@@ -127,7 +127,7 @@ const Main = () => {
               }
               validationSchema={Yup.object().shape({
                 notion_integration_token: Yup.string().required(
-                  "Please enter the Notion Integration token for the Danswer integration."
+                  "Please enter the Notion Integration token for the HubGPT integration."
                 ),
               })}
               initialValues={{
@@ -144,17 +144,26 @@ const Main = () => {
         </>
       )}
 
+      <h2 className="font-bold mb-2 mt-6 ml-auto mr-auto">
+        Step 2: Manage Connectors
+      </h2>
       {notionConnectorIndexingStatuses.length > 0 && (
         <>
-          <h2 className="font-bold mb-2 mt-6 ml-auto mr-auto">
-            Notion indexing status
-          </h2>
           <p className="text-sm mb-2">
             The latest page updates are fetched from Notion every 10 minutes.
           </p>
           <div className="mb-2">
             <ConnectorsTable<NotionConfig, NotionCredentialJson>
               connectorIndexingStatuses={notionConnectorIndexingStatuses}
+              specialColumns={[
+                {
+                  header: "Root Page ID",
+                  key: "root_page_id",
+                  getValue: (ccPairStatus) =>
+                    ccPairStatus.connector.connector_specific_config
+                      .root_page_id || "-",
+                },
+              ]}
               liveCredential={notionCredential}
               getCredential={(credential) => {
                 return (
@@ -177,21 +186,43 @@ const Main = () => {
         </>
       )}
 
-      {notionCredential && notionConnectorIndexingStatuses.length === 0 && (
+      {notionCredential && (
         <>
           <div className="border-solid border-gray-600 border rounded-md p-6 mt-4">
-            <h2 className="font-bold mb-3">Create Connection</h2>
+            <h2 className="font-bold mb-1">Create New Connection</h2>
             <p className="text-sm mb-4">
               Press connect below to start the connection to Notion.
             </p>
             <ConnectorForm<NotionConfig>
-              nameBuilder={() => `NotionConnector`}
-              ccPairNameBuilder={() => `Notion`}
+              nameBuilder={(values) =>
+                values.root_page_id
+                  ? `NotionConnector-${values.root_page_id}`
+                  : "NotionConnector"
+              }
+              ccPairNameBuilder={(values) =>
+                values.root_page_id ? `Notion-${values.root_page_id}` : "Notion"
+              }
               source="notion"
               inputType="poll"
-              formBody={<></>}
-              validationSchema={Yup.object().shape({})}
-              initialValues={{}}
+              formBody={
+                <>
+                  <TextFormField
+                    name="root_page_id"
+                    label="[Optional] Root Page ID"
+                    subtext={
+                      "If specified, will only index the specified page + all of its child pages. " +
+                      "If left blank, will index all pages the integration has been given access to."
+                    }
+                    autoCompleteDisabled={true}
+                  />
+                </>
+              }
+              validationSchema={Yup.object().shape({
+                root_page_id: Yup.string(),
+              })}
+              initialValues={{
+                root_page_id: "",
+              }}
               refreshFreq={10 * 60} // 10 minutes
               credentialId={notionCredential.id}
             />

@@ -116,7 +116,25 @@ export interface ZulipConfig {
   realm_url: string;
 }
 
-export interface NotionConfig {}
+export interface NotionConfig {
+  root_page_id?: string;
+}
+
+export interface HubSpotConfig {}
+
+export interface RequestTrackerConfig {}
+
+export interface Document360Config {
+  workspace: string;
+  categories?: string[];
+}
+
+export interface GoogleSitesConfig {
+  zip_path: string;
+  base_url: string;
+}
+
+export interface ZendeskConfig {}
 
 export interface HubSpotConfig {}
 

@@ -11,6 +11,7 @@ import regex
 
 from danswer.configs.app_configs import NUM_DOCUMENT_TOKENS_FED_TO_GENERATIVE_MODEL
 from danswer.configs.app_configs import QUOTE_ALLOWED_ERROR_PERCENT
+from danswer.configs.constants import IGNORE_FOR_QA
 from danswer.direct_qa.interfaces import DanswerAnswer
 from danswer.direct_qa.interfaces import DanswerAnswerPiece
 from danswer.direct_qa.interfaces import DanswerQuote
@@ -227,7 +228,7 @@ def process_model_tokens(
             found_answer_start = True
 
             # Prevent heavy cases of hallucinations where model is not even providing a json until later
-            if is_json_prompt and len(model_output) > 20:
+            if is_json_prompt and len(model_output) > 40:
                 logger.warning("LLM did not produce json as prompted")
                 found_answer_end = True
 
@@ -255,6 +256,10 @@ def process_model_tokens(
     # since that is what `extract_quotes_from_completed_token_stream` expects
     if is_json_prompt:
         try:
+            if model_output.startswith("```json") and model_output.endswith("```"):
+                model_output = (
+                    model_output.replace("```json", "").replace("```", "").strip()
+                )
             json_answer_ind = model_output.index('{"answer":')
             if json_answer_ind != 0:
                 model_output = model_output[json_answer_ind:]
@@ -316,3 +321,58 @@ def get_usable_chunks(
         offset_into_chunks += len(usable_chunks)
 
     return usable_chunks
+
+
+def get_chunks_for_qa(
+    chunks: list[InferenceChunk],
+    llm_chunk_selection: list[bool],
+    token_limit: int = NUM_DOCUMENT_TOKENS_FED_TO_GENERATIVE_MODEL,
+    batch_offset: int = 0,
+) -> list[int]:
+    """
+    Gives back indices of chunks to pass into the LLM for Q&A.
+
+    Only selects chunks viable for Q&A, within the token limit, and prioritize those selected
+    by the LLM in a separate flow (this can be turned off)
+
+    Note, the batch_offset calculation has to count the batches from the beginning each time as
+    there's no way to know which chunks were included in the prior batches without recounting atm,
+    this is somewhat slow as it requires tokenizing all the chunks again
+    """
+    batch_index = 0
+    latest_batch_indices: list[int] = []
+    token_count = 0
+
+    # First iterate the LLM selected chunks, then iterate the rest if tokens remaining
+    for selection_target in [True, False]:
+        for ind, chunk in enumerate(chunks):
+            if llm_chunk_selection[ind] is not selection_target or chunk.metadata.get(
+                IGNORE_FOR_QA
+            ):
+                continue
+
+            # We calculate it live in case the user uses a different LLM + tokenizer
+            chunk_token = check_number_of_tokens(chunk.content)
+            # 50 for an approximate/slight overestimate for # tokens for metadata for the chunk
+            token_count += chunk_token + 50
+
+            # Always use at least 1 chunk
+            if token_count <= token_limit or not latest_batch_indices:
+                latest_batch_indices.append(ind)
+                current_chunk_unused = False
+            else:
+                current_chunk_unused = True
+
+            if token_count >= token_limit:
+                if batch_index < batch_offset:
+                    batch_index += 1
+                    if current_chunk_unused:
+                        latest_batch_indices = [ind]
+                        token_count = chunk_token
+                    else:
+                        latest_batch_indices = []
+                        token_count = 0
+                else:
+                    return latest_batch_indices
+
+    return latest_batch_indices

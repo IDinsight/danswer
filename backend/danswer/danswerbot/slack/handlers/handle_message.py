@@ -232,7 +232,7 @@ def handle_message(
             logger.debug(answer.answer)
         return True
 
-    if not answer.top_ranked_docs:
+    if not answer.top_documents:
         logger.error(f"Unable to answer question: '{msg}' - no documents found")
         # Optionally, respond in thread with the error message, Used primarily
         # for debugging purposes
@@ -265,8 +265,17 @@ def handle_message(
         favor_recent=answer.favor_recent,
     )
 
+    # Get the chunks fed to the LLM only, then fill with other docs
+    top_docs = answer.top_documents
+    llm_doc_inds = answer.llm_chunks_indices or []
+    llm_docs = [top_docs[i] for i in llm_doc_inds]
+    remaining_docs = [
+        doc for idx, doc in enumerate(top_docs) if idx not in llm_doc_inds
+    ]
+    priority_ordered_docs = llm_docs + remaining_docs
     document_blocks = build_documents_blocks(
-        documents=answer.top_ranked_docs, query_event_id=answer.query_event_id
+        documents=priority_ordered_docs,
+        query_event_id=answer.query_event_id,
     )
 
     try:
@@ -274,7 +283,7 @@ def handle_message(
             client=client,
             channel=channel,
             receiver_ids=send_to,
-            text="Hello! Danswer has some results for you!",
+            text="Hello! HubGPT has some results for you!",
             blocks=restate_question_block + answer_blocks + document_blocks,
             thread_ts=message_ts_to_respond_to,
             # don't unfurl, since otherwise we will have 5+ previews which makes the message very long

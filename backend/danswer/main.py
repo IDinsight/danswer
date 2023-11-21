@@ -21,6 +21,7 @@ from danswer.configs.app_configs import AUTH_TYPE
 from danswer.configs.app_configs import DISABLE_GENERATIVE_AI
 from danswer.configs.app_configs import MODEL_SERVER_HOST
 from danswer.configs.app_configs import MODEL_SERVER_PORT
+from danswer.configs.app_configs import MULTILINGUAL_QUERY_EXPANSION
 from danswer.configs.app_configs import OAUTH_CLIENT_ID
 from danswer.configs.app_configs import OAUTH_CLIENT_SECRET
 from danswer.configs.app_configs import SECRET
@@ -29,6 +30,7 @@ from danswer.configs.constants import AuthType
 from danswer.configs.model_configs import ASYM_PASSAGE_PREFIX
 from danswer.configs.model_configs import ASYM_QUERY_PREFIX
 from danswer.configs.model_configs import DOCUMENT_ENCODER_MODEL
+from danswer.configs.model_configs import FAST_GEN_AI_MODEL_VERSION
 from danswer.configs.model_configs import GEN_AI_API_ENDPOINT
 from danswer.configs.model_configs import GEN_AI_MODEL_PROVIDER
 from danswer.configs.model_configs import GEN_AI_MODEL_VERSION
@@ -36,6 +38,7 @@ from danswer.configs.model_configs import SKIP_RERANKING
 from danswer.db.credentials import create_initial_public_credential
 from danswer.direct_qa.factory import get_default_qa_model
 from danswer.document_index.factory import get_default_document_index
+from danswer.llm.factory import get_default_llm
 from danswer.server.cc_pair.api import router as cc_pair_router
 from danswer.server.chat_backend import router as chat_router
 from danswer.server.connector import router as connector_router
@@ -48,6 +51,8 @@ from danswer.server.slack_bot_management import router as slack_bot_management_r
 from danswer.server.state import router as state_router
 from danswer.server.users import router as user_router
 from danswer.utils.logger import setup_logger
+from danswer.utils.telemetry import optional_telemetry
+from danswer.utils.telemetry import RecordType
 from danswer.utils.variable_functionality import fetch_versioned_implementation
 
 
@@ -169,8 +174,17 @@ def get_application() -> FastAPI:
         else:
             logger.info(f"Using LLM Provider: {GEN_AI_MODEL_PROVIDER}")
             logger.info(f"Using LLM Model Version: {GEN_AI_MODEL_VERSION}")
+            if GEN_AI_MODEL_VERSION != FAST_GEN_AI_MODEL_VERSION:
+                logger.info(
+                    f"Using Fast LLM Model Version: {FAST_GEN_AI_MODEL_VERSION}"
+                )
             if GEN_AI_API_ENDPOINT:
                 logger.info(f"Using LLM Endpoint: {GEN_AI_API_ENDPOINT}")
+
+        if MULTILINGUAL_QUERY_EXPANSION:
+            logger.info(
+                f"Using multilingual flow with languages: {MULTILINGUAL_QUERY_EXPANSION}"
+            )
 
         if SKIP_RERANKING:
             logger.info("Reranking step of search flow is disabled")
@@ -195,7 +209,7 @@ def get_application() -> FastAPI:
             warm_up_models()
 
         # This is for the LLM, most LLMs will not need warming up
-        # It logs for itself
+        get_default_llm().log_model_configs()
         get_default_qa_model().warm_up_model()
 
         logger.info("Verifying query preprocessing (NLTK) data is downloaded")
@@ -211,6 +225,10 @@ def get_application() -> FastAPI:
 
         logger.info("Verifying Document Index(s) is/are available.")
         get_default_document_index().ensure_indices_exist()
+
+        optional_telemetry(
+            record_type=RecordType.VERSION, data={"version": __version__}
+        )
 
     application.add_middleware(
         CORSMiddleware,

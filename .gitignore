@@ -3,3 +3,6 @@
 .venv
 .mypy_cache
 secrets.yaml
+*.json
+*.log
+deployment/data/certbot

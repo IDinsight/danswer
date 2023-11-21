@@ -50,7 +50,7 @@ const Main = () => {
       {filesAreUploading && <Spinner />}
       <p className="text-sm mb-2">
         Specify files below, click the <b>Upload</b> button, and the contents of
-        these files will be searchable via Danswer! Currently only <i>.txt</i>,{" "}
+        these files will be searchable via HubGPT! Currently only <i>.txt</i>,{" "}
         <i>.pdf</i> and <i>.zip</i> files (containing only <i>.txt</i> files)
         are supported.
       </p>
@@ -63,7 +63,7 @@ const Main = () => {
           </div>
         </div>{" "}
         where <i>{"<LINK>"}</i> is the link to the file. This will enable
-        Danswer to link users to the original document when they click on the
+        HubGPT to link users to the original document when they click on the
         search result. More details on this can be found in the{" "}
         <a
           href="https://docs.danswer.dev/connectors/file"
