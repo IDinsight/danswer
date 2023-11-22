@@ -125,10 +125,10 @@ export const SlackBotCreationForm = ({
                       <div>
                         The names of the Slack channels you want this
                         configuration to apply to. For example,
-                        &apos;#ask-danswer&apos;.
+                        &apos;#ask-hubgpt&apos;.
                         <br />
                         <br />
-                        <i>NOTE</i>: you still need to add DanswerBot to the
+                        <i>NOTE</i>: you still need to add HubGPT to the
                         channel(s) in Slack itself. Setting this config will not
                         auto-add the bot to the channel.
                       </div>
@@ -149,18 +149,18 @@ export const SlackBotCreationForm = ({
                   <div className="border-t border-gray-600 py-2" />
                   <BooleanFormField
                     name="respond_tag_only"
-                    label="Respond to @DanswerBot Only"
-                    subtext="If set, DanswerBot will only respond when directly tagged"
+                    label="Respond to @HubGPT Only"
+                    subtext="If set, HubGPT will only respond when directly tagged"
                   />
                   <div className="border-t border-gray-600 py-2" />
                   <TextArrayField
                     name="respond_team_member_list"
                     label="Team Members Emails:"
-                    subtext={`If specified, DanswerBot responses will only be 
+                    subtext={`If specified, HubGPT responses will only be 
                   visible to members in this list. This is
-                  useful if you want DanswerBot to operate in an
+                  useful if you want HubGPT to operate in an
                   "assistant" mode, where it helps the team members find
-                  answers, but let's them build on top of DanswerBot's response / throw 
+                  answers, but let's them build on top of HubGPT's response / throw 
                   out the occasional incorrect answer.`}
                     values={values}
                   />
@@ -172,8 +172,8 @@ export const SlackBotCreationForm = ({
                         <div>
                           <p className="font-medium">Document Sets:</p>
                           <div className="text-xs">
-                            The document sets that DanswerBot should search
-                            through. If left blank, DanswerBot will search
+                            The document sets that HubGPT should search
+                            through. If left blank, HubGPT will search
                             through all documents.
                           </div>
                         </div>

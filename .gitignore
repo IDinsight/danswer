@@ -5,4 +5,3 @@
 secrets.yaml
 *.json
 *.log
-deployment/data/certbot

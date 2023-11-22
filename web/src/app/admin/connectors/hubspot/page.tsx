@@ -73,7 +73,7 @@ const Main = () => {
     <>
       {popup}
       <p className="text-sm">
-        This connector allows you to sync all your HubSpot Tickets into Danswer.
+        This connector allows you to sync all your HubSpot Tickets into HubGPT.
       </p>
 
       <h2 className="font-bold mb-2 mt-6 ml-auto mr-auto">
