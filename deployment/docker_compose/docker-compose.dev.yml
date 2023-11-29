@@ -20,6 +20,7 @@ services:
       - GEN_AI_API_KEY=${GEN_AI_API_KEY:-}
       - GEN_AI_API_ENDPOINT=${GEN_AI_API_ENDPOINT:-}
       - GEN_AI_API_VERSION=${GEN_AI_API_VERSION:-}
+      - GEN_AI_LLM_PROVIDER_TYPE=${GEN_AI_LLM_PROVIDER_TYPE:-}
       - NUM_DOCUMENT_TOKENS_FED_TO_GENERATIVE_MODEL=${NUM_DOCUMENT_TOKENS_FED_TO_GENERATIVE_MODEL:-}
       - POSTGRES_HOST=relational_db
       - VESPA_HOST=index
@@ -43,11 +44,14 @@ services:
       - SIM_SCORE_RANGE_HIGH=${SIM_SCORE_RANGE_HIGH:-}
       - ASYM_QUERY_PREFIX=${ASYM_QUERY_PREFIX:-}
       - ASYM_PASSAGE_PREFIX=${ASYM_PASSAGE_PREFIX:-}
-      - SKIP_RERANKING=${SKIP_RERANKING:-}
+      - ENABLE_RERANKING_REAL_TIME_FLOW=${ENABLE_RERANKING_REAL_TIME_FLOW:-}
       - QA_PROMPT_OVERRIDE=${QA_PROMPT_OVERRIDE:-}
       - EDIT_KEYWORD_QUERY=${EDIT_KEYWORD_QUERY:-}
       - MULTILINGUAL_QUERY_EXPANSION=${MULTILINGUAL_QUERY_EXPANSION:-}
       - MODEL_SERVER_HOST=${MODEL_SERVER_HOST:-}
+      - EMBEDDING_MODEL_SERVER_HOST=${EMBEDDING_MODEL_SERVER_HOST:-}
+      - CROSS_ENCODER_MODEL_SERVER_HOST=${CROSS_ENCODER_MODEL_SERVER_HOST:-}
+      - INTENT_MODEL_SERVER_HOST=${INTENT_MODEL_SERVER_HOST:-}
       - MODEL_SERVER_PORT=${MODEL_SERVER_PORT:-}
       # Leave this on pretty please? Nothing sensitive is collected!
       # https://docs.danswer.dev/more/telemetry
@@ -56,6 +60,9 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       # Log all of the prompts to the LLM
       - LOG_ALL_MODEL_INTERACTIONS=${LOG_ALL_MODEL_INTERACTIONS:-info}
+      # If set to `true` will enable additional logs about Vespa query performance
+      # (time spent on finding the right docs + time spent fetching summaries from disk)
+      - LOG_VESPA_TIMING_INFORMATION=${LOG_VESPA_TIMING_INFORMATION:-}
     volumes:
       - local_dynamic_storage:/home/storage
       - file_connector_tmp_storage:/home/file_connector_storage
@@ -79,9 +86,13 @@ services:
       - GEN_AI_API_KEY=${GEN_AI_API_KEY:-}
       - GEN_AI_API_ENDPOINT=${GEN_AI_API_ENDPOINT:-}
       - GEN_AI_API_VERSION=${GEN_AI_API_VERSION:-}
+      - GEN_AI_LLM_PROVIDER_TYPE=${GEN_AI_LLM_PROVIDER_TYPE:-}
+      - DISABLE_LLM_FILTER_EXTRACTION=${DISABLE_LLM_FILTER_EXTRACTION:-}
+      - DISABLE_LLM_CHUNK_FILTER=${DISABLE_LLM_CHUNK_FILTER:-}
       - POSTGRES_HOST=relational_db
       - VESPA_HOST=index
       - NUM_INDEXING_WORKERS=${NUM_INDEXING_WORKERS:-}
+      - DASK_JOB_CLIENT_ENABLED=${DASK_JOB_CLIENT_ENABLED:-}
       # Connector Configs
       - CONTINUE_ON_CONNECTOR_FAILURE=${CONTINUE_ON_CONNECTOR_FAILURE:-}
       - CONFLUENCE_CONNECTOR_LABELS_TO_SKIP=${CONFLUENCE_CONNECTOR_LABELS_TO_SKIP:-}
@@ -112,6 +123,8 @@ services:
       - MULTILINGUAL_QUERY_EXPANSION=${MULTILINGUAL_QUERY_EXPANSION:-}
       - MIN_THREADS_ML_MODELS=${MIN_THREADS_ML_MODELS:-}
       - MODEL_SERVER_HOST=${MODEL_SERVER_HOST:-}
+      - EMBEDDING_MODEL_SERVER_HOST=${EMBEDDING_MODEL_SERVER_HOST:-}
+      - BACKGROUND_JOB_EMBEDDING_MODEL_SERVER_HOST=${BACKGROUND_JOB_EMBEDDING_MODEL_SERVER_HOST:-}
       - MODEL_SERVER_PORT=${MODEL_SERVER_PORT:-}
       # Leave this on pretty please? Nothing sensitive is collected!
       # https://docs.danswer.dev/more/telemetry

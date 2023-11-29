@@ -34,7 +34,12 @@ MIN_THREADS_ML_MODELS = int(os.environ.get("MIN_THREADS_ML_MODELS") or 1)
 
 
 # Cross Encoder Settings
+# This following setting is for non-real-time-flows
 SKIP_RERANKING = os.environ.get("SKIP_RERANKING", "").lower() == "true"
+# This one is for real-time (streaming) flows
+ENABLE_RERANKING_REAL_TIME_FLOW = (
+    os.environ.get("ENABLE_RERANKING_REAL_TIME_FLOW", "").lower() == "true"
+)
 # https://www.sbert.net/docs/pretrained-models/ce-msmarco.html
 CROSS_ENCODER_MODEL_ENSEMBLE = [
     "cross-encoder/ms-marco-MiniLM-L-4-v2",
@@ -85,6 +90,8 @@ GEN_AI_API_KEY = (
 GEN_AI_API_ENDPOINT = os.environ.get("GEN_AI_API_ENDPOINT") or None
 # API Version, such as (for Azure): 2023-09-15-preview
 GEN_AI_API_VERSION = os.environ.get("GEN_AI_API_VERSION") or None
+# LiteLLM custom_llm_provider
+GEN_AI_LLM_PROVIDER_TYPE = os.environ.get("GEN_AI_LLM_PROVIDER_TYPE") or None
 
 # Set this to be enough for an answer + quotes. Also used for Chat
 GEN_AI_MAX_OUTPUT_TOKENS = int(os.environ.get("GEN_AI_MAX_OUTPUT_TOKENS") or 1024)

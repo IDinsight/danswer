@@ -34,7 +34,7 @@ class IndexingPipelineProtocol(Protocol):
         ...
 
 
-def _upsert_documents(
+def upsert_documents_in_db(
     documents: list[Document],
     index_attempt_metadata: IndexAttemptMetadata,
     db_session: Session,
@@ -52,6 +52,7 @@ def _upsert_documents(
             first_link=first_link,
             primary_owners=doc.primary_owners,
             secondary_owners=doc.secondary_owners,
+            from_ingestion_api=doc.from_ingestion_api,
         )
         doc_m_batch.append(db_doc_metadata)
 
@@ -68,6 +69,7 @@ def _indexing_pipeline(
     document_index: DocumentIndex,
     documents: list[Document],
     index_attempt_metadata: IndexAttemptMetadata,
+    ignore_time_skip: bool = False,
 ) -> tuple[int, int]:
     """Takes different pieces of the indexing pipeline and applies it to a batch of documents
     Note that the documents should already be batched at this point so that it does not inflate the
@@ -86,14 +88,18 @@ def _indexing_pipeline(
         }
 
         updatable_docs: list[Document] = []
-        for doc in documents:
-            if (
-                doc.id in id_update_time_map
-                and doc.doc_updated_at
-                and doc.doc_updated_at <= id_update_time_map[doc.id]
-            ):
-                continue
-            updatable_docs.append(doc)
+        if ignore_time_skip:
+            updatable_docs = documents
+        else:
+            for doc in documents:
+                if (
+                    doc.id in id_update_time_map
+                    and doc.doc_updated_at
+                    and doc.doc_updated_at <= id_update_time_map[doc.id]
+                ):
+                    continue
+                updatable_docs.append(doc)
+
         updatable_ids = [doc.id for doc in updatable_docs]
 
         # Acquires a lock on the documents so that no other process can modify them
@@ -101,7 +107,7 @@ def _indexing_pipeline(
 
         # Create records in the source of truth about these documents,
         # does not include doc_updated_at which is also used to indicate a successful update
-        _upsert_documents(
+        upsert_documents_in_db(
             documents=updatable_docs,
             index_attempt_metadata=index_attempt_metadata,
             db_session=db_session,
@@ -174,6 +180,7 @@ def build_indexing_pipeline(
     chunker: Chunker | None = None,
     embedder: Embedder | None = None,
     document_index: DocumentIndex | None = None,
+    ignore_time_skip: bool = False,
 ) -> IndexingPipelineProtocol:
     """Builds a pipline which takes in a list (batch) of docs and indexes them."""
     chunker = chunker or DefaultChunker()
@@ -187,4 +194,5 @@ def build_indexing_pipeline(
         chunker=chunker,
         embedder=embedder,
         document_index=document_index,
+        ignore_time_skip=ignore_time_skip,
     )

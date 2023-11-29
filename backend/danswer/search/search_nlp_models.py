@@ -1,3 +1,6 @@
+import logging
+import os
+
 import numpy as np
 import requests
 import tensorflow as tf  # type: ignore
@@ -6,7 +9,11 @@ from sentence_transformers import SentenceTransformer  # type: ignore
 from transformers import AutoTokenizer  # type: ignore
 from transformers import TFDistilBertForSequenceClassification  # type: ignore
 
-from danswer.configs.app_configs import MODEL_SERVER_HOST
+from danswer.configs.app_configs import BACKGROUND_JOB_EMBEDDING_MODEL_SERVER_HOST
+from danswer.configs.app_configs import CROSS_ENCODER_MODEL_SERVER_HOST
+from danswer.configs.app_configs import CURRENT_PROCESS_IS_AN_INDEXING_JOB
+from danswer.configs.app_configs import EMBEDDING_MODEL_SERVER_HOST
+from danswer.configs.app_configs import INTENT_MODEL_SERVER_HOST
 from danswer.configs.app_configs import MODEL_SERVER_PORT
 from danswer.configs.model_configs import CROSS_EMBED_CONTEXT_SIZE
 from danswer.configs.model_configs import CROSS_ENCODER_MODEL_ENSEMBLE
@@ -15,7 +22,6 @@ from danswer.configs.model_configs import DOCUMENT_ENCODER_MODEL
 from danswer.configs.model_configs import INTENT_MODEL_VERSION
 from danswer.configs.model_configs import NORMALIZE_EMBEDDINGS
 from danswer.configs.model_configs import QUERY_MAX_CONTEXT_SIZE
-from danswer.configs.model_configs import SKIP_RERANKING
 from danswer.utils.logger import setup_logger
 from shared_models.model_server_models import EmbedRequest
 from shared_models.model_server_models import EmbedResponse
@@ -25,6 +31,8 @@ from shared_models.model_server_models import RerankRequest
 from shared_models.model_server_models import RerankResponse
 
 logger = setup_logger()
+# Remove useless info about layer initialization
+logging.getLogger("transformers").setLevel(logging.ERROR)
 
 
 _TOKENIZER: None | AutoTokenizer = None
@@ -38,6 +46,8 @@ def get_default_tokenizer() -> AutoTokenizer:
     global _TOKENIZER
     if _TOKENIZER is None:
         _TOKENIZER = AutoTokenizer.from_pretrained(DOCUMENT_ENCODER_MODEL)
+        if hasattr(_TOKENIZER, "is_fast") and _TOKENIZER.is_fast:
+            os.environ["TOKENIZERS_PARALLELISM"] = "false"
     return _TOKENIZER
 
 
@@ -46,7 +56,8 @@ def get_local_embedding_model(
     max_context_length: int = DOC_EMBEDDING_CONTEXT_SIZE,
 ) -> SentenceTransformer:
     global _EMBED_MODEL
-    if _EMBED_MODEL is None:
+    if _EMBED_MODEL is None or max_context_length != _EMBED_MODEL.max_seq_length:
+        logger.info(f"Loading {model_name}")
         _EMBED_MODEL = SentenceTransformer(model_name)
         _EMBED_MODEL.max_seq_length = max_context_length
     return _EMBED_MODEL
@@ -57,10 +68,13 @@ def get_local_reranking_model_ensemble(
     max_context_length: int = CROSS_EMBED_CONTEXT_SIZE,
 ) -> list[CrossEncoder]:
     global _RERANK_MODELS
-    if _RERANK_MODELS is None:
-        _RERANK_MODELS = [CrossEncoder(model_name) for model_name in model_names]
-        for model in _RERANK_MODELS:
+    if _RERANK_MODELS is None or max_context_length != _RERANK_MODELS[0].max_length:
+        _RERANK_MODELS = []
+        for model_name in model_names:
+            logger.info(f"Loading {model_name}")
+            model = CrossEncoder(model_name)
             model.max_length = max_context_length
+            _RERANK_MODELS.append(model)
     return _RERANK_MODELS
 
 
@@ -76,7 +90,7 @@ def get_local_intent_model(
     max_context_length: int = QUERY_MAX_CONTEXT_SIZE,
 ) -> TFDistilBertForSequenceClassification:
     global _INTENT_MODEL
-    if _INTENT_MODEL is None:
+    if _INTENT_MODEL is None or max_context_length != _INTENT_MODEL.max_seq_length:
         _INTENT_MODEL = TFDistilBertForSequenceClassification.from_pretrained(
             model_name
         )
@@ -84,28 +98,20 @@ def get_local_intent_model(
     return _INTENT_MODEL
 
 
-def warm_up_models(
-    indexer_only: bool = False, skip_cross_encoders: bool = SKIP_RERANKING
-) -> None:
-    warm_up_str = "Danswer is amazing"
-    get_default_tokenizer()(warm_up_str)
-    get_local_embedding_model().encode(warm_up_str)
-
-    if indexer_only:
-        return
-
-    if not skip_cross_encoders:
-        cross_encoders = get_local_reranking_model_ensemble()
-        [
-            cross_encoder.predict((warm_up_str, warm_up_str))
-            for cross_encoder in cross_encoders
-        ]
-
-    intent_tokenizer = get_intent_model_tokenizer()
-    inputs = intent_tokenizer(
-        warm_up_str, return_tensors="tf", truncation=True, padding=True
+def build_model_server_url(
+    model_server_host: str,
+    model_server_port: int | None,
+) -> str:
+    model_server_url = model_server_host + (
+        f":{model_server_port}" if model_server_port else ""
     )
-    get_local_intent_model()(inputs)
+
+    # use protocol if provided
+    if "http" in model_server_url:
+        return model_server_url
+
+    # otherwise default to http
+    return f"http://{model_server_url}"
 
 
 class EmbeddingModel:
@@ -113,13 +119,25 @@ class EmbeddingModel:
         self,
         model_name: str = DOCUMENT_ENCODER_MODEL,
         max_seq_length: int = DOC_EMBEDDING_CONTEXT_SIZE,
-        model_server_host: str | None = MODEL_SERVER_HOST,
+        # `model_server_host` one has to default to `None` since it's
+        # default value is conditional
+        model_server_host: str | None = None,
         model_server_port: int = MODEL_SERVER_PORT,
     ) -> None:
+        if model_server_host is None:
+            model_server_host = (
+                BACKGROUND_JOB_EMBEDDING_MODEL_SERVER_HOST
+                if CURRENT_PROCESS_IS_AN_INDEXING_JOB
+                else EMBEDDING_MODEL_SERVER_HOST
+            )
+
         self.model_name = model_name
         self.max_seq_length = max_seq_length
         self.embed_server_endpoint = (
-            f"http://{model_server_host}:{model_server_port}/encoder/bi-encoder-embed"
+            (
+                build_model_server_url(model_server_host, model_server_port)
+                + "/encoder/bi-encoder-embed"
+            )
             if model_server_host
             else None
         )
@@ -164,13 +182,16 @@ class CrossEncoderEnsembleModel:
         self,
         model_names: list[str] = CROSS_ENCODER_MODEL_ENSEMBLE,
         max_seq_length: int = CROSS_EMBED_CONTEXT_SIZE,
-        model_server_host: str | None = MODEL_SERVER_HOST,
+        model_server_host: str | None = CROSS_ENCODER_MODEL_SERVER_HOST,
         model_server_port: int = MODEL_SERVER_PORT,
     ) -> None:
         self.model_names = model_names
         self.max_seq_length = max_seq_length
         self.rerank_server_endpoint = (
-            f"http://{model_server_host}:{model_server_port}/encoder/cross-encoder-scores"
+            (
+                build_model_server_url(model_server_host, model_server_port)
+                + "/encoder/cross-encoder-scores"
+            )
             if model_server_host
             else None
         )
@@ -216,13 +237,16 @@ class IntentModel:
         self,
         model_name: str = INTENT_MODEL_VERSION,
         max_seq_length: int = QUERY_MAX_CONTEXT_SIZE,
-        model_server_host: str | None = MODEL_SERVER_HOST,
+        model_server_host: str | None = INTENT_MODEL_SERVER_HOST,
         model_server_port: int = MODEL_SERVER_PORT,
     ) -> None:
         self.model_name = model_name
         self.max_seq_length = max_seq_length
         self.intent_server_endpoint = (
-            f"http://{model_server_host}:{model_server_port}/custom/intent-model"
+            (
+                build_model_server_url(model_server_host, model_server_port)
+                + "/custom/intent-model"
+            )
             if model_server_host
             else None
         )
@@ -269,3 +293,28 @@ class IntentModel:
         class_percentages = np.round(probabilities.numpy() * 100, 2)
 
         return list(class_percentages.tolist()[0])
+
+
+def warm_up_models(
+    skip_cross_encoders: bool = False,
+    indexer_only: bool = False,
+) -> None:
+    warm_up_str = (
+        "Danswer is amazing! Check out our easy deployment guide at "
+        "https://docs.danswer.dev/quickstart"
+    )
+    get_default_tokenizer()(warm_up_str)
+
+    EmbeddingModel().encode(texts=[warm_up_str])
+
+    if indexer_only:
+        return
+
+    if not skip_cross_encoders:
+        CrossEncoderEnsembleModel().predict(query=warm_up_str, passages=[warm_up_str])
+
+    intent_tokenizer = get_intent_model_tokenizer()
+    inputs = intent_tokenizer(
+        warm_up_str, return_tensors="tf", truncation=True, padding=True
+    )
+    get_local_intent_model()(inputs)
