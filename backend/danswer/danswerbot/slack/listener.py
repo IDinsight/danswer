@@ -222,7 +222,7 @@ def process_message(
     respond_every_channel: bool = DANSWER_BOT_RESPOND_EVERY_CHANNEL,
     notify_no_answer: bool = NOTIFY_SLACKBOT_NO_ANSWER,
 ) -> None:
-    logger.debug(f"Received Slack request of type: '{req.type}'")
+    logger.info(f"Received Slack request of type: '{req.type}'")
 
     # Throw out requests that can't or shouldn't be handled
     if not prefilter_requests(req, client):
