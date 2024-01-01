@@ -4,7 +4,6 @@ import { adminSearch } from "./lib";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { useState, useEffect } from "react";
 import { DanswerDocument } from "@/lib/search/interfaces";
-import { getSourceIcon } from "@/components/source";
 import { buildDocumentSummaryDisplay } from "@/components/search/DocumentDisplay";
 import { CustomCheckbox } from "@/components/CustomCheckbox";
 import { updateHiddenStatus } from "../lib";
@@ -17,6 +16,7 @@ import { useFilters } from "@/lib/hooks";
 import { buildFilters } from "@/lib/search/utils";
 import { DocumentUpdatedAtBadge } from "@/components/search/DocumentUpdatedAtBadge";
 import { Connector, DocumentSet } from "@/lib/types";
+import { SourceIcon } from "@/components/SourceIcon";
 
 const DocumentDisplay = ({
   document,
@@ -30,7 +30,7 @@ const DocumentDisplay = ({
   return (
     <div
       key={document.document_id}
-      className="text-sm border-b border-gray-800 mb-3"
+      className="text-sm border-b border-border mb-3"
     >
       <div className="flex relative">
         <a
@@ -42,14 +42,14 @@ const DocumentDisplay = ({
           target="_blank"
           rel="noopener noreferrer"
         >
-          {getSourceIcon(document.source_type, 22)}
+          <SourceIcon sourceType={document.source_type} iconSize={22} />
           <p className="truncate break-all ml-2 my-auto text-base">
             {document.semantic_identifier || document.document_id}
           </p>
         </a>
       </div>
       <div className="flex flex-wrap gap-x-2 mt-1 text-xs">
-        <div className="px-1 py-0.5 bg-gray-700 rounded flex">
+        <div className="px-1 py-0.5 bg-hover rounded flex">
           <p className="mr-1 my-auto">Boost:</p>
           <ScoreSection
             documentId={document.document_id}
@@ -76,11 +76,11 @@ const DocumentDisplay = ({
               });
             }
           }}
-          className="px-1 py-0.5 bg-gray-700 hover:bg-gray-600 rounded flex cursor-pointer select-none"
+          className="px-1 py-0.5 bg-hover hover:bg-hover-light rounded flex cursor-pointer select-none"
         >
           <div className="my-auto">
             {document.hidden ? (
-              <div className="text-red-500">Hidden</div>
+              <div className="text-error">Hidden</div>
             ) : (
               "Visible"
             )}
@@ -95,7 +95,7 @@ const DocumentDisplay = ({
           <DocumentUpdatedAtBadge updatedAt={document.updated_at} />
         </div>
       )}
-      <p className="pl-1 pt-2 pb-3 text-gray-200 break-words">
+      <p className="pl-1 pt-2 pb-3 break-words">
         {buildDocumentSummaryDisplay(document.match_highlights, document.blurb)}
       </p>
     </div>
@@ -111,7 +111,6 @@ export function Explorer({
   connectors: Connector<any>[];
   documentSets: DocumentSet[];
 }) {
-  console.log(connectors);
   const router = useRouter();
   const { popup, setPopup } = usePopup();
 
@@ -160,11 +159,11 @@ export function Explorer({
     <div>
       {popup}
       <div className="justify-center py-2">
-        <div className="flex items-center w-full border-2 border-gray-600 rounded px-4 py-2 focus-within:border-blue-500">
-          <MagnifyingGlass className="text-gray-400" />
+        <div className="flex items-center w-full border-2 border-border rounded-lg px-4 py-2 focus-within:border-accent">
+          <MagnifyingGlass />
           <textarea
             autoFocus
-            className="flex-grow ml-2 h-6 bg-transparent outline-none placeholder-gray-400 overflow-hidden whitespace-normal resize-none"
+            className="flex-grow ml-2 h-6 bg-transparent outline-none placeholder-subtle overflow-hidden whitespace-normal resize-none"
             role="textarea"
             aria-multiline
             placeholder="Find documents based on title / content..."
@@ -181,7 +180,7 @@ export function Explorer({
             suppressContentEditableWarning={true}
           />
         </div>
-        <div className="mt-4">
+        <div className="mt-4 border-b border-border">
           <HorizontalFilters
             {...filterManager}
             availableDocumentSets={documentSets}
@@ -204,7 +203,7 @@ export function Explorer({
         </div>
       )}
       {!query && (
-        <div className="flex text-gray-400 mt-3">
+        <div className="flex text-emphasis mt-3">
           Search for a document above to modify it&apos;s boost or hide it from
           searches.
         </div>

@@ -1,38 +1,17 @@
 import React from "react";
-import { getSourceIcon } from "../../source";
 import { DocumentSet, ValidSources } from "@/lib/types";
-import { Source } from "@/lib/search/interfaces";
+import { SourceMetadata } from "@/lib/search/interfaces";
 import { InfoIcon, defaultTailwindCSS } from "../../icons/icons";
 import { HoverPopup } from "../../HoverPopup";
 import { FiBook, FiBookmark, FiFilter, FiMap, FiX } from "react-icons/fi";
 import { DateRangeSelector } from "../DateRangeSelector";
 import { DateRangePickerValue } from "@tremor/react";
 import { FilterDropdown } from "./FilterDropdown";
-
-const sources: Source[] = [
-  { displayName: "Google Drive", internalName: "google_drive" },
-  { displayName: "Slack", internalName: "slack" },
-  { displayName: "BookStack", internalName: "bookstack" },
-  { displayName: "Confluence", internalName: "confluence" },
-  { displayName: "Jira", internalName: "jira" },
-  { displayName: "Productboard", internalName: "productboard" },
-  { displayName: "Slab", internalName: "slab" },
-  { displayName: "Github PRs", internalName: "github" },
-  { displayName: "Web", internalName: "web" },
-  { displayName: "Guru", internalName: "guru" },
-  { displayName: "Gong", internalName: "gong" },
-  { displayName: "File", internalName: "file" },
-  { displayName: "Notion", internalName: "notion" },
-  { displayName: "Zulip", internalName: "zulip" },
-  { displayName: "Linear", internalName: "linear" },
-  { displayName: "HubSpot", internalName: "hubspot" },
-  { displayName: "Document360", internalName: "document360" },
-  { displayName: "Request Tracker", internalName: "requesttracker" },
-  { displayName: "Google Sites", internalName: "google_sites" },
-];
+import { listSourceMetadata } from "@/lib/sources";
+import { SourceIcon } from "@/components/SourceIcon";
 
 const SectionTitle = ({ children }: { children: string }) => (
-  <div className="font-medium text-sm flex">{children}</div>
+  <div className="font-bold text-xs mt-2 flex">{children}</div>
 );
 
 interface SourceSelectorProps {
@@ -40,8 +19,8 @@ interface SourceSelectorProps {
   setTimeRange: React.Dispatch<
     React.SetStateAction<DateRangePickerValue | null>
   >;
-  selectedSources: Source[];
-  setSelectedSources: React.Dispatch<React.SetStateAction<Source[]>>;
+  selectedSources: SourceMetadata[];
+  setSelectedSources: React.Dispatch<React.SetStateAction<SourceMetadata[]>>;
   selectedDocumentSets: string[];
   setSelectedDocumentSets: React.Dispatch<React.SetStateAction<string[]>>;
   availableDocumentSets: DocumentSet[];
@@ -58,9 +37,11 @@ export function SourceSelector({
   availableDocumentSets,
   existingSources,
 }: SourceSelectorProps) {
-  const handleSelect = (source: Source) => {
-    setSelectedSources((prev: Source[]) => {
-      if (prev.includes(source)) {
+  const handleSelect = (source: SourceMetadata) => {
+    setSelectedSources((prev: SourceMetadata[]) => {
+      if (
+        prev.map((source) => source.internalName).includes(source.internalName)
+      ) {
         return prev.filter((s) => s.internalName !== source.internalName);
       } else {
         return [...prev, source];
@@ -80,9 +61,9 @@ export function SourceSelector({
 
   return (
     <div>
-      <div className="flex mb-2 pb-1 border-b border-gray-800">
+      <div className="flex mb-4 pb-2 border-b border-border text-emphasis">
         <h2 className="font-bold my-auto">Filters</h2>
-        <FiFilter className="my-auto ml-2" size="18" />
+        <FiFilter className="my-auto ml-2" size="16" />
       </div>
 
       <>
@@ -96,22 +77,24 @@ export function SourceSelector({
         <div className="mt-4">
           <SectionTitle>Sources</SectionTitle>
           <div className="px-1">
-            {sources
+            {listSourceMetadata()
               .filter((source) => existingSources.includes(source.internalName))
               .map((source) => (
                 <div
                   key={source.internalName}
                   className={
-                    "flex cursor-pointer w-full items-center text-white " +
-                    "py-1.5 my-1.5 rounded-lg px-2 " +
-                    (selectedSources.includes(source)
-                      ? "bg-gray-700"
-                      : "hover:bg-gray-800")
+                    "flex cursor-pointer w-full items-center " +
+                    "py-1.5 my-1.5 rounded-lg px-2 select-none " +
+                    (selectedSources
+                      .map((source) => source.internalName)
+                      .includes(source.internalName)
+                      ? "bg-hover"
+                      : "hover:bg-hover-light")
                   }
                   onClick={() => handleSelect(source)}
                 >
-                  {getSourceIcon(source.internalName, 16)}
-                  <span className="ml-2 text-sm text-gray-200">
+                  <SourceIcon sourceType={source.internalName} iconSize={16} />
+                  <span className="ml-2 text-sm text-default">
                     {source.displayName}
                   </span>
                 </div>
@@ -131,11 +114,11 @@ export function SourceSelector({
                 <div
                   key={documentSet.name}
                   className={
-                    "flex cursor-pointer w-full items-center text-white " +
+                    "flex cursor-pointer w-full items-center " +
                     "py-1.5 rounded-lg px-2 " +
                     (selectedDocumentSets.includes(documentSet.name)
-                      ? "bg-gray-700"
-                      : "hover:bg-gray-800")
+                      ? "bg-hover"
+                      : "hover:bg-hover-light")
                   }
                   onClick={() => handleDocumentSetSelect(documentSet.name)}
                 >
@@ -147,19 +130,13 @@ export function SourceSelector({
                     }
                     popupContent={
                       <div className="text-sm w-64">
-                        <div className="flex font-medium text-gray-200">
-                          Description
-                        </div>
-                        <div className="mt-1 text-gray-300">
-                          {documentSet.description}
-                        </div>
+                        <div className="flex font-medium">Description</div>
+                        <div className="mt-1">{documentSet.description}</div>
                       </div>
                     }
                     classNameModifications="-ml-2"
                   />
-                  <span className="text-sm text-gray-200">
-                    {documentSet.name}
-                  </span>
+                  <span className="text-sm">{documentSet.name}</span>
                 </div>
               </div>
             ))}
@@ -180,13 +157,13 @@ function SelectedBubble({
   return (
     <div
       className={
-        "flex cursor-pointer items-center text-white border border-gray-800 " +
-        "py-1 my-1.5 rounded-lg px-2 w-fit bg-dark-tremor-background-muted hover:bg-gray-800"
+        "flex cursor-pointer items-center border border-border " +
+        "py-1 my-1.5 rounded-lg px-2 w-fit hover:bg-hover"
       }
       onClick={onClick}
     >
       {children}
-      <FiX className="ml-2 text-gray-400" size={14} />
+      <FiX className="ml-2" size={14} />
     </div>
   );
 }
@@ -201,8 +178,8 @@ export function HorizontalFilters({
   availableDocumentSets,
   existingSources,
 }: SourceSelectorProps) {
-  const handleSourceSelect = (source: Source) => {
-    setSelectedSources((prev: Source[]) => {
+  const handleSourceSelect = (source: SourceMetadata) => {
+    setSelectedSources((prev: SourceMetadata[]) => {
       const prevSourceNames = prev.map((source) => source.internalName);
       if (prevSourceNames.includes(source.internalName)) {
         return prev.filter((s) => s.internalName !== source.internalName);
@@ -222,12 +199,13 @@ export function HorizontalFilters({
     });
   };
 
-  const availableSources = sources.filter((source) =>
+  const allSources = listSourceMetadata();
+  const availableSources = allSources.filter((source) =>
     existingSources.includes(source.internalName)
   );
 
   return (
-    <div className="dark">
+    <div>
       <div className="flex gap-x-3">
         <div className="w-64">
           <DateRangeSelector value={timeRange} onValueChange={setTimeRange} />
@@ -239,11 +217,8 @@ export function HorizontalFilters({
               key: source.displayName,
               display: (
                 <>
-                  {" "}
-                  {getSourceIcon(source.internalName, 16)}
-                  <span className="ml-2 text-sm text-gray-200">
-                    {source.displayName}
-                  </span>
+                  <SourceIcon sourceType={source.internalName} iconSize={16} />
+                  <span className="ml-2 text-sm">{source.displayName}</span>
                 </>
               ),
             };
@@ -251,11 +226,11 @@ export function HorizontalFilters({
           selected={selectedSources.map((source) => source.displayName)}
           handleSelect={(option) =>
             handleSourceSelect(
-              sources.find((source) => source.displayName === option.key)!
+              allSources.find((source) => source.displayName === option.key)!
             )
           }
           icon={
-            <div className="my-auto mr-2 text-gray-500 w-[16px] h-[16px]">
+            <div className="my-auto mr-2 w-[16px] h-[16px]">
               <FiMap size={16} />
             </div>
           }
@@ -268,12 +243,10 @@ export function HorizontalFilters({
               key: documentSet.name,
               display: (
                 <>
-                  <div className="text-gray-500 my-auto">
+                  <div className="my-auto">
                     <FiBookmark />
                   </div>
-                  <span className="ml-2 text-sm text-gray-200">
-                    {documentSet.name}
-                  </span>
+                  <span className="ml-2 text-sm">{documentSet.name}</span>
                 </>
               ),
             };
@@ -281,7 +254,7 @@ export function HorizontalFilters({
           selected={selectedDocumentSets}
           handleSelect={(option) => handleDocumentSetSelect(option.key)}
           icon={
-            <div className="my-auto mr-2 text-gray-500 w-[16px] h-[16px]">
+            <div className="my-auto mr-2 w-[16px] h-[16px]">
               <FiBook size={16} />
             </div>
           }
@@ -289,13 +262,11 @@ export function HorizontalFilters({
         />
       </div>
 
-      <div className="flex border-b border-gray-800 pb-4 mt-2 h-12">
+      <div className="flex pb-4 mt-2 h-12">
         <div className="flex flex-wrap gap-x-2">
           {timeRange && timeRange.selectValue && (
             <SelectedBubble onClick={() => setTimeRange(null)}>
-              <div className="text-sm flex text-gray-400">
-                {timeRange.selectValue}
-              </div>
+              <div className="text-sm flex">{timeRange.selectValue}</div>
             </SelectedBubble>
           )}
           {existingSources.length > 0 &&
@@ -305,10 +276,8 @@ export function HorizontalFilters({
                 onClick={() => handleSourceSelect(source)}
               >
                 <>
-                  {getSourceIcon(source.internalName, 16)}
-                  <span className="ml-2 text-sm text-gray-400">
-                    {source.displayName}
-                  </span>
+                  <SourceIcon sourceType={source.internalName} iconSize={16} />
+                  <span className="ml-2 text-sm">{source.displayName}</span>
                 </>
               </SelectedBubble>
             ))}
@@ -319,12 +288,10 @@ export function HorizontalFilters({
                 onClick={() => handleDocumentSetSelect(documentSetName)}
               >
                 <>
-                  <div className="text-gray-500">
+                  <div>
                     <FiBookmark />
                   </div>
-                  <span className="ml-2 text-sm text-gray-400">
-                    {documentSetName}
-                  </span>
+                  <span className="ml-2 text-sm">{documentSetName}</span>
                 </>
               </SelectedBubble>
             ))}

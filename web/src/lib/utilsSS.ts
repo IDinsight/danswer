@@ -19,6 +19,5 @@ export function fetchSS(url: string, options?: RequestInit) {
         .join("; "),
     },
   };
-
   return fetch(buildUrl(url), init);
 }

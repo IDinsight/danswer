@@ -35,6 +35,7 @@ import {
   FiBookmark,
   FiCpu,
   FiInfo,
+  FiUploadCloud,
 } from "react-icons/fi";
 import { SiBookstack } from "react-icons/si";
 import Image from "next/image";
@@ -56,7 +57,8 @@ interface IconProps {
   className?: string;
 }
 
-export const defaultTailwindCSS = "my-auto flex flex-shrink-0 text-blue-400";
+export const defaultTailwindCSS = "my-auto flex flex-shrink-0 text-default";
+export const defaultTailwindCSSBlue = "my-auto flex flex-shrink-0 text-link";
 
 export const PlugIcon = ({
   size = 16,
@@ -130,14 +132,14 @@ export const XSquareIcon = ({
 
 export const GlobeIcon = ({
   size = 16,
-  className = defaultTailwindCSS,
+  className = defaultTailwindCSSBlue,
 }: IconProps) => {
   return <FiGlobe size={size} className={className} />;
 };
 
 export const FileIcon = ({
   size = 16,
-  className = defaultTailwindCSS,
+  className = defaultTailwindCSSBlue,
 }: IconProps) => {
   return <FiFile size={size} className={className} />;
 };
@@ -287,6 +289,13 @@ export const RobotIcon = ({
   className = defaultTailwindCSS,
 }: IconProps) => {
   return <FaRobot size={size} className={className} />;
+};
+
+export const ConnectorIcon = ({
+  size = 16,
+  className = defaultTailwindCSS,
+}: IconProps) => {
+  return <FiUploadCloud size={size} className={className} />;
 };
 
 //

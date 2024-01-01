@@ -49,7 +49,7 @@ export function IndexAttemptStatus({
     );
   } else if (status === "in_progress") {
     badge = (
-      <Badge size={size} color="fuchsia" icon={FiClock}>
+      <Badge size={size} color="amber" icon={FiClock}>
         In Progress
       </Badge>
     );
@@ -59,16 +59,9 @@ export function IndexAttemptStatus({
         Scheduled
       </Badge>
     );
-  } else {
-    badge = (
-      <Badge size={size} color="yellow" icon={FiClock}>
-        Initializing
-      </Badge>
-    );
   }
 
-  // TODO: remove wrapping `dark` once we have light/dark mode
-  return <div className="dark">{badge}</div>;
+  return <div>{badge}</div>;
 }
 
 export function CCPairStatus({
@@ -110,6 +103,5 @@ export function CCPairStatus({
     );
   }
 
-  // TODO: remove wrapping `dark` once we have light/dark mode
-  return <div className="dark">{badge}</div>;
+  return <div>{badge}</div>;
 }

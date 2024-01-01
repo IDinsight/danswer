@@ -1,20 +1,28 @@
 import { ChangeEvent, FC, useEffect, useRef, useState } from "react";
 import { ChevronDownIcon } from "./icons/icons";
+import { FiCheck, FiChevronDown } from "react-icons/fi";
+import { FaRobot } from "react-icons/fa";
 
-export interface Option {
+export interface Option<T> {
   name: string;
-  value: string;
+  value: T;
   description?: string;
   metadata?: { [key: string]: any };
 }
 
-interface DropdownProps {
-  options: Option[];
+export type StringOrNumberOption = Option<string | number>;
+
+interface DropdownProps<T> {
+  options: Option<T>[];
   selected: string;
-  onSelect: (selected: Option) => void;
+  onSelect: (selected: Option<T> | null) => void;
 }
 
-export const Dropdown = ({ options, selected, onSelect }: DropdownProps) => {
+export const Dropdown = ({
+  options,
+  selected,
+  onSelect,
+}: DropdownProps<string | number>) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -22,7 +30,7 @@ export const Dropdown = ({ options, selected, onSelect }: DropdownProps) => {
     (option) => option.value === selected
   )?.name;
 
-  const handleSelect = (option: Option) => {
+  const handleSelect = (option: StringOrNumberOption) => {
     onSelect(option);
     setIsOpen(false);
   };
@@ -106,15 +114,15 @@ export const Dropdown = ({ options, selected, onSelect }: DropdownProps) => {
   );
 };
 
-const StandardDropdownOption = ({
+function StandardDropdownOption<T>({
   index,
   option,
   handleSelect,
 }: {
   index: number;
-  option: Option;
-  handleSelect: (option: Option) => void;
-}) => {
+  option: Option<T>;
+  handleSelect: (option: Option<T>) => void;
+}) {
   return (
     <button
       onClick={() => handleSelect(option)}
@@ -131,24 +139,22 @@ const StandardDropdownOption = ({
       )}
     </button>
   );
-};
-
-interface MultiSelectDropdownProps {
-  options: Option[];
-  onSelect: (selected: Option) => void;
-  itemComponent?: FC<{ option: Option }>;
 }
 
-export const SearchMultiSelectDropdown: FC<MultiSelectDropdownProps> = ({
+export function SearchMultiSelectDropdown({
   options,
   onSelect,
   itemComponent,
-}) => {
+}: {
+  options: StringOrNumberOption[];
+  onSelect: (selected: StringOrNumberOption) => void;
+  itemComponent?: FC<{ option: StringOrNumberOption }>;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleSelect = (option: Option) => {
+  const handleSelect = (option: StringOrNumberOption) => {
     onSelect(option);
     setIsOpen(false);
     setSearchTerm(""); // Clear search term after selection
@@ -273,7 +279,7 @@ export const SearchMultiSelectDropdown: FC<MultiSelectDropdownProps> = ({
       )}
     </div>
   );
-};
+}
 
 export const CustomDropdown = ({
   children,
@@ -308,7 +314,7 @@ export const CustomDropdown = ({
       {isOpen && (
         <div
           onClick={() => setIsOpen(!isOpen)}
-          className="pt-2 absolute bottom w-full z-30 bg-gray-900"
+          className="pt-2 absolute bottom w-full z-30 box-shadow"
         >
           {dropdown}
         </div>
@@ -316,3 +322,176 @@ export const CustomDropdown = ({
     </div>
   );
 };
+
+export function DefaultDropdownElement({
+  name,
+  icon,
+  description,
+  onSelect,
+  isSelected,
+  includeCheckbox = false,
+}: {
+  name: string;
+  icon?: React.FC<{ size?: number; className?: string }>;
+  description?: string;
+  onSelect?: () => void;
+  isSelected?: boolean;
+  includeCheckbox?: boolean;
+}) {
+  return (
+    <div
+      className={`
+        flex
+        mx-1
+        px-2
+        text-sm 
+        py-1.5 
+        my-1
+        select-none 
+        cursor-pointer 
+        bg-background
+        rounded
+        hover:bg-hover-light
+      `}
+      onClick={onSelect}
+    >
+      <div>
+        <div className="flex">
+          {includeCheckbox && (
+            <input
+              type="checkbox"
+              className="mr-2"
+              checked={isSelected}
+              onChange={() => null}
+            />
+          )}
+          {icon && icon({ size: 16, className: "mr-2 my-auto" })}
+          {name}
+        </div>
+        {description && <div className="text-xs">{description}</div>}
+      </div>
+      {isSelected && (
+        <div className="ml-auto mr-1 my-auto">
+          <FiCheck />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function DefaultDropdown({
+  options,
+  selected,
+  onSelect,
+  includeDefault = false,
+}: {
+  options: StringOrNumberOption[];
+  selected: string | null;
+  onSelect: (value: string | number | null) => void;
+  includeDefault?: boolean;
+}) {
+  const selectedOption = options.find((option) => option.value === selected);
+
+  return (
+    <CustomDropdown
+      dropdown={
+        <div
+          className={`
+            border 
+            border 
+            rounded-lg 
+            flex 
+            flex-col 
+            bg-background
+            max-h-96 
+            overflow-y-auto 
+            overscroll-contain`}
+        >
+          {includeDefault && (
+            <DefaultDropdownElement
+              key={-1}
+              name="Default"
+              onSelect={() => {
+                onSelect(null);
+              }}
+              isSelected={selected === null}
+            />
+          )}
+          {options.map((option, ind) => {
+            const isSelected = option.value === selected;
+            return (
+              <DefaultDropdownElement
+                key={option.value}
+                name={option.name}
+                description={option.description}
+                onSelect={() => onSelect(option.value)}
+                isSelected={isSelected}
+              />
+            );
+          })}
+        </div>
+      }
+    >
+      <div
+        className={`
+            flex 
+            text-sm 
+            bg-background 
+            px-3
+            py-1.5 
+            rounded-lg 
+            border 
+            border-border 
+            cursor-pointer`}
+      >
+        <p className="line-clamp-1">
+          {selectedOption?.name ||
+            (includeDefault ? "Default" : "Select an option...")}
+        </p>
+        <FiChevronDown className="my-auto ml-auto" />
+      </div>
+    </CustomDropdown>
+  );
+}
+
+export function ControlledPopup({
+  children,
+  popupContent,
+  isOpen,
+  setIsOpen,
+}: {
+  children: JSX.Element | string;
+  popupContent: JSX.Element | string;
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
+}) {
+  const filtersRef = useRef<HTMLDivElement>(null);
+  // hides logout popup on any click outside
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      filtersRef.current &&
+      !filtersRef.current.contains(event.target as Node)
+    ) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div ref={filtersRef} className="relative">
+      {children}
+      {isOpen && (
+        <div className="absolute top-0 translate-y-[-105%] bg-background border border-border z-30 rounded text-emphasis">
+          {popupContent}
+        </div>
+      )}
+    </div>
+  );
+}

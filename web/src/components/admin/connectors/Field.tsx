@@ -1,4 +1,4 @@
-import { Button } from "@/components/Button";
+import { Button } from "@tremor/react";
 import {
   ArrayHelpers,
   ErrorMessage,
@@ -9,80 +9,116 @@ import {
 } from "formik";
 import * as Yup from "yup";
 import { FormBodyBuilder } from "./types";
-import { Dropdown, Option } from "@/components/Dropdown";
+import { DefaultDropdown, StringOrNumberOption } from "@/components/Dropdown";
+import { FiPlus, FiX } from "react-icons/fi";
 
-interface TextFormFieldProps {
-  name: string;
-  label: string;
-  subtext?: string;
-  placeholder?: string;
-  type?: string;
-  disabled?: boolean;
-  autoCompleteDisabled?: boolean;
+export function SectionHeader({
+  children,
+}: {
+  children: string | JSX.Element;
+}) {
+  return <div className="mb-4 font-bold text-lg">{children}</div>;
 }
 
-export const TextFormField = ({
+export function Label({ children }: { children: string | JSX.Element }) {
+  return <div className="block font-medium text-base">{children}</div>;
+}
+
+export function SubLabel({ children }: { children: string | JSX.Element }) {
+  return <div className="text-sm text-subtle mb-2">{children}</div>;
+}
+
+export function ManualErrorMessage({ children }: { children: string }) {
+  return <div className="text-error text-sm mt-1">{children}</div>;
+}
+
+export function TextFormField({
   name,
   label,
   subtext,
   placeholder,
+  onChange,
   type = "text",
+  isTextArea = false,
   disabled = false,
-  autoCompleteDisabled = false,
-}: TextFormFieldProps) => {
+  autoCompleteDisabled = true,
+  error,
+}: {
+  name: string;
+  label: string;
+  subtext?: string | JSX.Element;
+  placeholder?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  type?: string;
+  isTextArea?: boolean;
+  disabled?: boolean;
+  autoCompleteDisabled?: boolean;
+  error?: string;
+}) {
   return (
     <div className="mb-4">
-      <label htmlFor={name} className="block font-medium">
-        {label}
-      </label>
-      {subtext && <p className="text-xs mb-1">{subtext}</p>}
+      <Label>{label}</Label>
+      {subtext && <SubLabel>{subtext}</SubLabel>}
       <Field
+        as={isTextArea ? "textarea" : "input"}
         type={type}
         name={name}
         id={name}
         className={
           `
-          border 
-          text-gray-200 
-          border-gray-300 
-          rounded 
-          w-full 
-          py-2 
-          px-3 
-          mt-1
-        ` + (disabled ? " bg-slate-900" : " bg-slate-700")
+        border 
+        border-border 
+        rounded 
+        w-full 
+        py-2 
+        px-3 
+        mt-1
+        ${isTextArea ? " h-28" : ""}
+      ` + (disabled ? " bg-background-strong" : " bg-background-emphasis")
         }
         disabled={disabled}
         placeholder={placeholder}
         autoComplete={autoCompleteDisabled ? "off" : undefined}
+        {...(onChange ? { onChange } : {})}
       />
-      <ErrorMessage
-        name={name}
-        component="div"
-        className="text-red-500 text-sm mt-1"
-      />
+      {error ? (
+        <ManualErrorMessage>{error}</ManualErrorMessage>
+      ) : (
+        <ErrorMessage
+          name={name}
+          component="div"
+          className="text-red-500 text-sm mt-1"
+        />
+      )}
     </div>
   );
-};
+}
 
 interface BooleanFormFieldProps {
   name: string;
   label: string;
   subtext?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const BooleanFormField = ({
   name,
   label,
   subtext,
+  onChange,
 }: BooleanFormFieldProps) => {
   return (
     <div className="mb-4">
       <label className="flex text-sm">
-        <Field name={name} type="checkbox" className="mx-3 px-5" />
+        <Field
+          name={name}
+          type="checkbox"
+          className="mx-3 px-5 w-3.5 h-3.5 my-auto"
+          {...(onChange ? { onChange } : {})}
+        />
         <div>
-          <p className="font-medium">{label}</p>
-          {subtext && <p className="text-xs">{subtext}</p>}
+          <Label>{label}</Label>
+          {subtext && <SubLabel>{subtext}</SubLabel>}
         </div>
       </label>
 
@@ -112,10 +148,8 @@ export function TextArrayField<T extends Yup.AnyObject>({
 }: TextArrayFieldProps<T>) {
   return (
     <div className="mb-4">
-      <label htmlFor={name} className="block font-medium">
-        {label}
-      </label>
-      {subtext && <p className="text-xs">{subtext}</p>}
+      <Label>{label}</Label>
+      {subtext && <SubLabel>{subtext}</SubLabel>}
 
       <FieldArray
         name={name}
@@ -130,31 +164,43 @@ export function TextArrayField<T extends Yup.AnyObject>({
                       type={type}
                       name={`${name}.${index}`}
                       id={name}
-                      className="border bg-slate-700 text-gray-200 border-gray-300 rounded w-full py-2 px-3 mr-2"
+                      className={`
+                      border 
+                      border-border 
+                      bg-background 
+                      rounded 
+                      w-full 
+                      py-2 
+                      px-3 
+                      mr-4
+                      `}
                       // Disable autocomplete since the browser doesn't know how to handle an array of text fields
                       autoComplete="off"
                     />
-                    <Button
-                      type="button"
-                      onClick={() => arrayHelpers.remove(index)}
-                      className="h-8 my-auto"
-                    >
-                      Remove
-                    </Button>
+                    <div className="my-auto">
+                      <FiX
+                        className="my-auto w-10 h-10 cursor-pointer hover:bg-hover rounded p-2"
+                        onClick={() => arrayHelpers.remove(index)}
+                      />
+                    </div>
                   </div>
                   <ErrorMessage
                     name={`${name}.${index}`}
                     component="div"
-                    className="text-red-500 text-sm mt-1"
+                    className="text-error text-sm mt-1"
                   />
                 </div>
               ))}
+
             <Button
-              type="button"
               onClick={() => {
                 arrayHelpers.push("");
               }}
               className="mt-3"
+              color="green"
+              size="xs"
+              type="button"
+              icon={FiPlus}
             >
               Add New
             </Button>
@@ -183,9 +229,10 @@ export function TextArrayFieldBuilder<T extends Yup.AnyObject>(
 
 interface SelectorFormFieldProps {
   name: string;
-  label: string;
-  options: Option[];
+  label?: string;
+  options: StringOrNumberOption[];
   subtext?: string;
+  includeDefault?: boolean;
 }
 
 export function SelectorFormField({
@@ -193,24 +240,24 @@ export function SelectorFormField({
   label,
   options,
   subtext,
+  includeDefault = false,
 }: SelectorFormFieldProps) {
   const [field] = useField<string>(name);
   const { setFieldValue } = useFormikContext();
 
   return (
     <div className="mb-4">
-      <label className="flex mb-2">
-        <div>
-          {label}
-          {subtext && <p className="text-xs">{subtext}</p>}
-        </div>
-      </label>
+      {label && <Label>{label}</Label>}
+      {subtext && <SubLabel>{subtext}</SubLabel>}
 
-      <Dropdown
-        options={options}
-        selected={field.value}
-        onSelect={(selected) => setFieldValue(name, selected.value)}
-      />
+      <div className="mt-2">
+        <DefaultDropdown
+          options={options}
+          selected={field.value}
+          onSelect={(selected) => setFieldValue(name, selected)}
+          includeDefault={includeDefault}
+        />
+      </div>
 
       <ErrorMessage
         name={name}

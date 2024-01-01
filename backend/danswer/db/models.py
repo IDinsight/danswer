@@ -14,8 +14,8 @@ from fastapi_users_db_sqlalchemy.access_token import SQLAlchemyBaseAccessTokenTa
 from sqlalchemy import Boolean
 from sqlalchemy import DateTime
 from sqlalchemy import Enum
+from sqlalchemy import Float
 from sqlalchemy import ForeignKey
-from sqlalchemy import ForeignKeyConstraint
 from sqlalchemy import func
 from sqlalchemy import Index
 from sqlalchemy import Integer
@@ -32,9 +32,9 @@ from danswer.auth.schemas import UserRole
 from danswer.configs.constants import DEFAULT_BOOST
 from danswer.configs.constants import DocumentSource
 from danswer.configs.constants import MessageType
-from danswer.configs.constants import QAFeedbackType
 from danswer.configs.constants import SearchFeedbackType
 from danswer.connectors.models import InputType
+from danswer.search.models import RecencyBiasSetting
 from danswer.search.models import SearchType
 
 
@@ -65,6 +65,11 @@ class Base(DeclarativeBase):
     pass
 
 
+"""
+Auth/Authz (users, permissions, access) Tables
+"""
+
+
 class OAuthAccount(SQLAlchemyBaseOAuthAccountTableUUID, Base):
     # even an almost empty token from keycloak will not fit the default 1024 bytes
     access_token: Mapped[str] = mapped_column(Text, nullable=False)  # type: ignore
@@ -80,12 +85,11 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     credentials: Mapped[List["Credential"]] = relationship(
         "Credential", back_populates="user", lazy="joined"
     )
-    query_events: Mapped[List["QueryEvent"]] = relationship(
-        "QueryEvent", back_populates="user"
-    )
     chat_sessions: Mapped[List["ChatSession"]] = relationship(
         "ChatSession", back_populates="user"
     )
+    prompts: Mapped[List["Prompt"]] = relationship("Prompt", back_populates="user")
+    personas: Mapped[List["Persona"]] = relationship("Persona", back_populates="user")
 
 
 class AccessToken(SQLAlchemyBaseAccessTokenTableUUID, Base):
@@ -93,7 +97,7 @@ class AccessToken(SQLAlchemyBaseAccessTokenTableUUID, Base):
 
 
 """
-Association tables
+Association Tables
 NOTE: must be at the top since they are referenced by other tables
 """
 
@@ -105,6 +109,13 @@ class Persona__DocumentSet(Base):
     document_set_id: Mapped[int] = mapped_column(
         ForeignKey("document_set.id"), primary_key=True
     )
+
+
+class Persona__Prompt(Base):
+    __tablename__ = "persona__prompt"
+
+    persona_id: Mapped[int] = mapped_column(ForeignKey("persona.id"), primary_key=True)
+    prompt_id: Mapped[int] = mapped_column(ForeignKey("prompt.id"), primary_key=True)
 
 
 class DocumentSet__ConnectorCredentialPair(Base):
@@ -131,6 +142,22 @@ class DocumentSet__ConnectorCredentialPair(Base):
     document_set: Mapped["DocumentSet"] = relationship("DocumentSet")
 
 
+class ChatMessage__SearchDoc(Base):
+    __tablename__ = "chat_message__search_doc"
+
+    chat_message_id: Mapped[int] = mapped_column(
+        ForeignKey("chat_message.id"), primary_key=True
+    )
+    search_doc_id: Mapped[int] = mapped_column(
+        ForeignKey("search_doc.id"), primary_key=True
+    )
+
+
+"""
+Documents/Indexing Tables
+"""
+
+
 class ConnectorCredentialPair(Base):
     """Connectors and Credentials can have a many-to-many relationship
     I.e. A Confluence Connector may have multiple admin users who can run it with their own credentials
@@ -146,9 +173,7 @@ class ConnectorCredentialPair(Base):
         unique=True,
         nullable=False,
     )
-    name: Mapped[str] = mapped_column(
-        String, unique=True, nullable=True
-    )  # nullable for backwards compatability
+    name: Mapped[str] = mapped_column(String, nullable=False)
     connector_id: Mapped[int] = mapped_column(
         ForeignKey("connector.id"), primary_key=True
     )
@@ -183,6 +208,44 @@ class ConnectorCredentialPair(Base):
         secondary=DocumentSet__ConnectorCredentialPair.__table__,
         back_populates="connector_credential_pairs",
         overlaps="document_set",
+    )
+
+
+class Document(Base):
+    __tablename__ = "document"
+
+    # this should correspond to the ID of the document
+    # (as is passed around in Danswer)
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    from_ingestion_api: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=True
+    )
+    # 0 for neutral, positive for mostly endorse, negative for mostly reject
+    boost: Mapped[int] = mapped_column(Integer, default=DEFAULT_BOOST)
+    hidden: Mapped[bool] = mapped_column(Boolean, default=False)
+    semantic_id: Mapped[str] = mapped_column(String)
+    # First Section's link
+    link: Mapped[str | None] = mapped_column(String, nullable=True)
+    # The updated time is also used as a measure of the last successful state of the doc
+    # pulled from the source (to help skip reindexing already updated docs in case of
+    # connector retries)
+    doc_updated_at: Mapped[datetime.datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    # The following are not attached to User because the account/email may not be known
+    # within Danswer
+    # Something like the document creator
+    primary_owners: Mapped[list[str] | None] = mapped_column(
+        postgresql.ARRAY(String), nullable=True
+    )
+    # Something like assignee or space owner
+    secondary_owners: Mapped[list[str] | None] = mapped_column(
+        postgresql.ARRAY(String), nullable=True
+    )
+    # TODO if more sensitive data is added here for display, make sure to add user/group permission
+
+    retrieval_feedbacks: Mapped[List["DocumentRetrievalFeedback"]] = relationship(
+        "DocumentRetrievalFeedback", back_populates="document"
     )
 
 
@@ -316,8 +379,7 @@ class IndexAttempt(Base):
 
 
 class DocumentByConnectorCredentialPair(Base):
-    """Represents an indexing of a document by a specific connector / credential
-    pair"""
+    """Represents an indexing of a document by a specific connector / credential pair"""
 
     __tablename__ = "document_by_connector_credential_pair"
 
@@ -338,52 +400,135 @@ class DocumentByConnectorCredentialPair(Base):
     )
 
 
-class QueryEvent(Base):
-    __tablename__ = "query_event"
+"""
+Messages Tables
+"""
+
+
+class SearchDoc(Base):
+    """Different from Document table. This one stores the state of a document from a retrieval.
+    This allows chat sessions to be replayed with the searched docs
+
+    Notably, this does not include the contents of the Document/Chunk, during inference if a stored
+    SearchDoc is selected, an inference must be remade to retrieve the contents
+    """
+
+    __tablename__ = "search_doc"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    # TODO: make this non-nullable after migration to consolidate chat /
-    # QA flows is complete
-    chat_session_id: Mapped[int | None] = mapped_column(
-        ForeignKey("chat_session.id"), nullable=True
+    document_id: Mapped[str] = mapped_column(String)
+    chunk_ind: Mapped[int] = mapped_column(Integer)
+    semantic_id: Mapped[str] = mapped_column(String)
+    link: Mapped[str | None] = mapped_column(String, nullable=True)
+    blurb: Mapped[str] = mapped_column(String)
+    boost: Mapped[int] = mapped_column(Integer)
+    source_type: Mapped[DocumentSource] = mapped_column(Enum(DocumentSource))
+    hidden: Mapped[bool] = mapped_column(Boolean)
+    score: Mapped[float] = mapped_column(Float)
+    match_highlights: Mapped[list[str]] = mapped_column(postgresql.ARRAY(String))
+    # This is for the document, not this row in the table
+    updated_at: Mapped[datetime.datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
     )
-    query: Mapped[str] = mapped_column(Text)
-    # search_flow refers to user selection, None if user used auto
-    selected_search_flow: Mapped[SearchType | None] = mapped_column(
-        Enum(SearchType), nullable=True
-    )
-    llm_answer: Mapped[str | None] = mapped_column(Text, default=None)
-    # Document IDs of the top context documents retrieved for the query (if any)
-    # NOTE: not using a foreign key to enable easy deletion of documents without
-    # needing to adjust `QueryEvent` rows
-    retrieved_document_ids: Mapped[list[str] | None] = mapped_column(
+    primary_owners: Mapped[list[str] | None] = mapped_column(
         postgresql.ARRAY(String), nullable=True
     )
-    feedback: Mapped[QAFeedbackType | None] = mapped_column(
-        Enum(QAFeedbackType), nullable=True
-    )
-    user_id: Mapped[UUID | None] = mapped_column(ForeignKey("user.id"), nullable=True)
-    time_created: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
+    secondary_owners: Mapped[list[str] | None] = mapped_column(
+        postgresql.ARRAY(String), nullable=True
     )
 
-    user: Mapped[User | None] = relationship("User", back_populates="query_events")
-    document_feedbacks: Mapped[List["DocumentRetrievalFeedback"]] = relationship(
-        "DocumentRetrievalFeedback", back_populates="qa_event"
+    chat_messages = relationship(
+        "ChatMessage",
+        secondary="chat_message__search_doc",
+        back_populates="search_docs",
     )
+
+
+class ChatSession(Base):
+    __tablename__ = "chat_session"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[UUID | None] = mapped_column(ForeignKey("user.id"), nullable=True)
+    persona_id: Mapped[int] = mapped_column(ForeignKey("persona.id"))
+    description: Mapped[str] = mapped_column(Text)
+    # One-shot direct answering, currently the two types of chats are not mixed
+    one_shot: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Only ever set to True if system is set to not hard-delete chats
+    deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+    time_updated: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+    time_created: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    user: Mapped[User] = relationship("User", back_populates="chat_sessions")
+    messages: Mapped[List["ChatMessage"]] = relationship(
+        "ChatMessage", back_populates="chat_session", cascade="delete"
+    )
+    persona: Mapped["Persona"] = relationship("Persona")
+
+
+class ChatMessage(Base):
+    """Note, the first message in a chain has no contents, it's a workaround to allow edits
+    on the first message of a session, an empty root node basically
+
+    Since every user message is followed by a LLM response, chat messages generally come in pairs.
+    Keeping them as separate messages however for future Agentification extensions
+    Fields will be largely duplicated in the pair.
+    """
+
+    __tablename__ = "chat_message"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    chat_session_id: Mapped[int] = mapped_column(ForeignKey("chat_session.id"))
+    parent_message: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    latest_child_message: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    message: Mapped[str] = mapped_column(Text)
+    rephrased_query: Mapped[str] = mapped_column(Text, nullable=True)
+    # If None, then there is no answer generation, it's the special case of only
+    # showing the user the retrieved docs
+    prompt_id: Mapped[int | None] = mapped_column(ForeignKey("prompt.id"))
+    # If prompt is None, then token_count is 0 as this message won't be passed into
+    # the LLM's context (not included in the history of messages)
+    token_count: Mapped[int] = mapped_column(Integer)
+    message_type: Mapped[MessageType] = mapped_column(Enum(MessageType))
+    # Maps the citation numbers to a SearchDoc id
+    citations: Mapped[dict[int, int]] = mapped_column(postgresql.JSONB(), nullable=True)
+    # Only applies for LLM
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    time_sent: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    chat_session: Mapped[ChatSession] = relationship("ChatSession")
+    prompt: Mapped[Optional["Prompt"]] = relationship("Prompt")
+    chat_message_feedbacks: Mapped[List["ChatMessageFeedback"]] = relationship(
+        "ChatMessageFeedback", back_populates="chat_message"
+    )
+    document_feedbacks: Mapped[List["DocumentRetrievalFeedback"]] = relationship(
+        "DocumentRetrievalFeedback", back_populates="chat_message"
+    )
+    search_docs = relationship(
+        "SearchDoc",
+        secondary="chat_message__search_doc",
+        back_populates="chat_messages",
+    )
+
+
+"""
+Feedback, Logging, Metrics Tables
+"""
 
 
 class DocumentRetrievalFeedback(Base):
     __tablename__ = "document_retrieval_feedback"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    qa_event_id: Mapped[int] = mapped_column(
-        ForeignKey("query_event.id"),
-    )
-    document_id: Mapped[str] = mapped_column(
-        ForeignKey("document.id"),
-    )
+    chat_message_id: Mapped[int] = mapped_column(ForeignKey("chat_message.id"))
+    document_id: Mapped[str] = mapped_column(ForeignKey("document.id"))
     # How high up this document is in the results, 1 for first
     document_rank: Mapped[int] = mapped_column(Integer)
     clicked: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -391,50 +536,30 @@ class DocumentRetrievalFeedback(Base):
         Enum(SearchFeedbackType), nullable=True
     )
 
-    qa_event: Mapped[QueryEvent] = relationship(
-        "QueryEvent", back_populates="document_feedbacks"
+    chat_message: Mapped[ChatMessage] = relationship(
+        "ChatMessage", back_populates="document_feedbacks"
     )
-    document: Mapped["Document"] = relationship(
+    document: Mapped[Document] = relationship(
         "Document", back_populates="retrieval_feedbacks"
     )
 
 
-class Document(Base):
-    __tablename__ = "document"
+class ChatMessageFeedback(Base):
+    __tablename__ = "chat_feedback"
 
-    # this should correspond to the ID of the document
-    # (as is passed around in Danswer)
-    id: Mapped[str] = mapped_column(String, primary_key=True)
-    from_ingestion_api: Mapped[bool] = mapped_column(
-        Boolean, default=False, nullable=True
-    )
-    # 0 for neutral, positive for mostly endorse, negative for mostly reject
-    boost: Mapped[int] = mapped_column(Integer, default=DEFAULT_BOOST)
-    hidden: Mapped[bool] = mapped_column(Boolean, default=False)
-    semantic_id: Mapped[str] = mapped_column(String)
-    # First Section's link
-    link: Mapped[str | None] = mapped_column(String, nullable=True)
-    # The updated time is also used as a measure of the last successful state of the doc
-    # pulled from the source (to help skip reindexing already updated docs in case of
-    # connector retries)
-    doc_updated_at: Mapped[datetime.datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    # The following are not attached to User because the account/email may not be known
-    # within Danswer
-    # Something like the document creator
-    primary_owners: Mapped[list[str] | None] = mapped_column(
-        postgresql.ARRAY(String), nullable=True
-    )
-    # Something like assignee or space owner
-    secondary_owners: Mapped[list[str] | None] = mapped_column(
-        postgresql.ARRAY(String), nullable=True
-    )
-    # TODO if more sensitive data is added here for display, make sure to add user/group permission
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    chat_message_id: Mapped[int] = mapped_column(ForeignKey("chat_message.id"))
+    is_positive: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    feedback_text: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    retrieval_feedbacks: Mapped[List[DocumentRetrievalFeedback]] = relationship(
-        "DocumentRetrievalFeedback", back_populates="document"
+    chat_message: Mapped[ChatMessage] = relationship(
+        "ChatMessage", back_populates="chat_message_feedbacks"
     )
+
+
+"""
+Structures, Organizational, Configurations Tables
+"""
 
 
 class DocumentSet(Base):
@@ -444,7 +569,7 @@ class DocumentSet(Base):
     name: Mapped[str] = mapped_column(String, unique=True)
     description: Mapped[str] = mapped_column(String)
     user_id: Mapped[UUID | None] = mapped_column(ForeignKey("user.id"), nullable=True)
-    # whether or not changes to the document set have been propogated
+    # Whether changes to the document set have been propagated
     is_up_to_date: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     connector_credential_pairs: Mapped[list[ConnectorCredentialPair]] = relationship(
@@ -460,71 +585,84 @@ class DocumentSet(Base):
     )
 
 
-class ChatSession(Base):
-    __tablename__ = "chat_session"
+class Prompt(Base):
+    __tablename__ = "prompt"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    # If not belong to a user, then it's shared
     user_id: Mapped[UUID | None] = mapped_column(ForeignKey("user.id"), nullable=True)
-    persona_id: Mapped[int | None] = mapped_column(
-        ForeignKey("persona.id"), default=None
-    )
-    description: Mapped[str] = mapped_column(Text)
+    name: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(String)
+    system_prompt: Mapped[str] = mapped_column(Text)
+    task_prompt: Mapped[str] = mapped_column(Text)
+    include_citations: Mapped[bool] = mapped_column(Boolean, default=True)
+    datetime_aware: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Default prompts are configured via backend during deployment
+    # Treated specially (cannot be user edited etc.)
+    default_prompt: Mapped[bool] = mapped_column(Boolean, default=False)
     deleted: Mapped[bool] = mapped_column(Boolean, default=False)
-    # The following texts help build up the model's ability to use the context effectively
-    time_updated: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
-    )
-    time_created: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
 
-    user: Mapped[User] = relationship("User", back_populates="chat_sessions")
-    messages: Mapped[List["ChatMessage"]] = relationship(
-        "ChatMessage", back_populates="chat_session", cascade="delete"
+    user: Mapped[User] = relationship("User", back_populates="prompts")
+    personas: Mapped[list["Persona"]] = relationship(
+        "Persona",
+        secondary=Persona__Prompt.__table__,
+        back_populates="prompts",
     )
-    persona: Mapped[Optional["Persona"]] = relationship("Persona")
-
-
-class ToolInfo(TypedDict):
-    name: str
-    description: str
 
 
 class Persona(Base):
-    # TODO introduce user and group ownership for personas
     __tablename__ = "persona"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    # If not belong to a user, then it's shared
+    user_id: Mapped[UUID | None] = mapped_column(ForeignKey("user.id"), nullable=True)
     name: Mapped[str] = mapped_column(String)
-    description: Mapped[str | None] = mapped_column(String, nullable=True)
-    # Danswer retrieval, treated as a special tool
-    retrieval_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
-    datetime_aware: Mapped[bool] = mapped_column(Boolean, default=True)
-    system_text: Mapped[str | None] = mapped_column(Text, nullable=True)
-    tools: Mapped[list[ToolInfo] | None] = mapped_column(
-        postgresql.JSONB(), nullable=True
+    description: Mapped[str] = mapped_column(String)
+    # Currently stored but unused, all flows use hybrid
+    search_type: Mapped[SearchType] = mapped_column(
+        Enum(SearchType), default=SearchType.HYBRID
     )
-    hint_text: Mapped[str | None] = mapped_column(Text, nullable=True)
-    # number of chunks to use for retrieval. If unspecified, uses the default set
-    # in the env variables
-    num_chunks: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    # if unspecified, then uses the default set in the env variables
-    apply_llm_relevance_filter: Mapped[bool | None] = mapped_column(
-        Boolean, nullable=True
+    # Number of chunks to pass to the LLM for generation.
+    # If unspecified, uses the default DEFAULT_NUM_CHUNKS_FED_TO_CHAT set in the env variable
+    num_chunks: Mapped[float | None] = mapped_column(Float, nullable=True)
+    # Pass every chunk through LLM for evaluation, fairly expensive
+    # Can be turned off globally by admin, in which case, this setting is ignored
+    llm_relevance_filter: Mapped[bool] = mapped_column(Boolean)
+    # Enables using LLM to extract time and source type filters
+    # Can also be admin disabled globally
+    llm_filter_extraction: Mapped[bool] = mapped_column(Boolean)
+    recency_bias: Mapped[RecencyBiasSetting] = mapped_column(Enum(RecencyBiasSetting))
+    # Allows the Persona to specify a different LLM version than is controlled
+    # globablly via env variables. For flexibility, validity is not currently enforced
+    # NOTE: only is applied on the actual response generation - is not used for things like
+    # auto-detected time filters, relevance filters, etc.
+    llm_model_version_override: Mapped[str | None] = mapped_column(
+        String, nullable=True
     )
     # Default personas are configured via backend during deployment
     # Treated specially (cannot be user edited etc.)
     default_persona: Mapped[bool] = mapped_column(Boolean, default=False)
-    # If it's updated and no longer latest (should no longer be shown), it is also considered deleted
+    # controls whether the persona is available to be selected by users
+    is_visible: Mapped[bool] = mapped_column(Boolean, default=True)
+    # controls the ordering of personas in the UI
+    # higher priority personas are displayed first, ties are resolved by the ID,
+    # where lower value IDs (e.g. created earlier) are displayed first
+    display_priority: Mapped[int] = mapped_column(Integer, nullable=True, default=None)
     deleted: Mapped[bool] = mapped_column(Boolean, default=False)
 
+    # These are only defaults, users can select from all if desired
+    prompts: Mapped[list[Prompt]] = relationship(
+        "Prompt",
+        secondary=Persona__Prompt.__table__,
+        back_populates="personas",
+    )
+    # These are only defaults, users can select from all if desired
     document_sets: Mapped[list[DocumentSet]] = relationship(
         "DocumentSet",
         secondary=Persona__DocumentSet.__table__,
         back_populates="personas",
     )
+    user: Mapped[User] = relationship("User", back_populates="personas")
 
     # Default personas loaded via yaml cannot have the same name
     __table_args__ = (
@@ -537,78 +675,13 @@ class Persona(Base):
     )
 
 
-class ChatMessage(Base):
-    __tablename__ = "chat_message"
-
-    chat_session_id: Mapped[int] = mapped_column(
-        ForeignKey("chat_session.id"), primary_key=True
-    )
-    message_number: Mapped[int] = mapped_column(Integer, primary_key=True)
-    edit_number: Mapped[int] = mapped_column(Integer, default=0, primary_key=True)
-    parent_edit_number: Mapped[int | None] = mapped_column(
-        Integer, nullable=True
-    )  # null if first message
-    latest: Mapped[bool] = mapped_column(Boolean, default=True)
-    message: Mapped[str] = mapped_column(Text)
-    token_count: Mapped[int] = mapped_column(Integer)
-    message_type: Mapped[MessageType] = mapped_column(Enum(MessageType))
-    reference_docs: Mapped[dict[str, Any] | None] = mapped_column(
-        postgresql.JSONB(), nullable=True
-    )
-    persona_id: Mapped[int | None] = mapped_column(
-        ForeignKey("persona.id"), nullable=True
-    )
-    time_sent: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
-
-    chat_session: Mapped[ChatSession] = relationship("ChatSession")
-    persona: Mapped[Persona | None] = relationship("Persona")
-
-
-class ChatMessageFeedback(Base):
-    __tablename__ = "chat_feedback"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    chat_message_chat_session_id: Mapped[int] = mapped_column(Integer)
-    chat_message_message_number: Mapped[int] = mapped_column(Integer)
-    chat_message_edit_number: Mapped[int] = mapped_column(Integer)
-    is_positive: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
-    feedback_text: Mapped[str | None] = mapped_column(Text, nullable=True)
-
-    __table_args__ = (
-        ForeignKeyConstraint(
-            [
-                "chat_message_chat_session_id",
-                "chat_message_message_number",
-                "chat_message_edit_number",
-            ],
-            [
-                "chat_message.chat_session_id",
-                "chat_message.message_number",
-                "chat_message.edit_number",
-            ],
-        ),
-    )
-
-    chat_message: Mapped[ChatMessage] = relationship(
-        "ChatMessage",
-        foreign_keys=[
-            chat_message_chat_session_id,
-            chat_message_message_number,
-            chat_message_edit_number,
-        ],
-        backref="feedbacks",
-    )
-
-
 AllowedAnswerFilters = (
     Literal["well_answered_postfilter"] | Literal["questionmark_prefilter"]
 )
 
 
 class ChannelConfig(TypedDict):
-    """NOTE: is a `TypedDict` so it can be used a type hint for a JSONB column
+    """NOTE: is a `TypedDict` so it can be used as a type hint for a JSONB column
     in Postgres"""
 
     channel_names: list[str]

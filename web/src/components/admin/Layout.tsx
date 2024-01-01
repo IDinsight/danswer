@@ -1,44 +1,42 @@
 import { Header } from "@/components/Header";
-import { Sidebar } from "@/components/admin/connectors/Sidebar";
+import { AdminSidebar } from "@/components/admin/connectors/AdminSidebar";
 import {
   NotebookIcon,
-  GithubIcon,
-  GlobeIcon,
-  GoogleDriveIcon,
-  SlackIcon,
   KeyIcon,
-  BookstackIcon,
-  ConfluenceIcon,
-  GuruIcon,
-  FileIcon,
-  JiraIcon,
-  SlabIcon,
-  NotionIcon,
-  ZulipIcon,
-  ProductboardIcon,
-  LinearIcon,
   UsersIcon,
   ThumbsUpIcon,
-  HubSpotIcon,
   BookmarkIcon,
   CPUIcon,
-  Document360Icon,
-  RequestTrackerIcon,
-  GoogleSitesIcon,
-  GongIcon,
   ZoomInIcon,
-  ZendeskIcon,
   RobotIcon,
+  ConnectorIcon,
 } from "@/components/icons/icons";
-import { getAuthDisabledSS, getCurrentUserSS } from "@/lib/userSS";
+import { User } from "@/lib/types";
+import {
+  AuthTypeMetadata,
+  getAuthTypeMetadataSS,
+  getCurrentUserSS,
+} from "@/lib/userSS";
 import { redirect } from "next/navigation";
 
 export async function Layout({ children }: { children: React.ReactNode }) {
-  const [authDisabled, user] = await Promise.all([
-    getAuthDisabledSS(),
-    getCurrentUserSS(),
-  ]);
+  const tasks = [getAuthTypeMetadataSS(), getCurrentUserSS()];
 
+  // catch cases where the backend is completely unreachable here
+  // without try / catch, will just raise an exception and the page
+  // will not render
+  let results: (User | AuthTypeMetadata | null)[] = [null, null];
+  try {
+    results = await Promise.all(tasks);
+  } catch (e) {
+    console.log(`Some fetch failed for the main search page - ${e}`);
+  }
+
+  const authTypeMetadata = results[0] as AuthTypeMetadata | null;
+  const user = results[1] as User | null;
+
+  const authDisabled = authTypeMetadata?.authType === "disabled";
+  const requiresVerification = authTypeMetadata?.requiresVerification;
   if (!authDisabled) {
     if (!user) {
       return redirect("/auth/login");
@@ -46,314 +44,130 @@ export async function Layout({ children }: { children: React.ReactNode }) {
     if (user.role !== "admin") {
       return redirect("/");
     }
+    if (!user.is_verified && requiresVerification) {
+      return redirect("/auth/waiting-on-verification");
+    }
   }
 
   return (
-    <div>
-      <Header user={user} />
-      <div className="bg-gray-900 pt-8 pb-8 flex">
-        <Sidebar
-          title="Connector"
-          collections={[
-            {
-              name: "Indexing",
-              items: [
-                {
-                  name: (
-                    <div className="flex">
-                      <NotebookIcon size={18} />
-                      <div className="ml-1">Status</div>
-                    </div>
-                  ),
-                  link: "/admin/indexing/status",
-                },
-              ],
-            },
-            {
-              name: "Connector Settings",
-              items: [
-                {
-                  name: (
-                    <div className="flex">
-                      <SlackIcon size={16} />
-                      <div className="ml-1">Slack</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/slack",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <GithubIcon size={16} />
-                      <div className="ml-1">Github</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/github",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <GoogleDriveIcon size={16} />
-                      <div className="ml-1">Google Drive</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/google-drive",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <ConfluenceIcon size={16} />
-                      <div className="ml-1">Confluence</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/confluence",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <JiraIcon size={16} />
-                      <div className="ml-1">Jira</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/jira",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <LinearIcon size={16} />
-                      <div className="ml-1">Linear</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/linear",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <ProductboardIcon size={16} />
-                      <div className="ml-1">Productboard</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/productboard",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <SlabIcon size={16} />
-                      <div className="ml-1">Slab</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/slab",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <NotionIcon size={16} />
-                      <div className="ml-1">Notion</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/notion",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <GuruIcon size={16} />
-                      <div className="ml-1">Guru</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/guru",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <BookstackIcon size={16} />
-                      <div className="ml-1">BookStack</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/bookstack",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <ZulipIcon size={16} />
-                      <div className="ml-1">Zulip</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/zulip",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <GongIcon size={16} />
-                      <div className="ml-1">Gong</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/gong",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <GoogleSitesIcon size={16} />
-                      <div className="ml-1">Google Sites</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/google-sites",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <GlobeIcon size={16} />
-                      <div className="ml-1">Web</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/web",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <FileIcon size={16} />
-                      <div className="ml-1">File</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/file",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <HubSpotIcon size={16} />
-                      <div className="ml-1">HubSpot</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/hubspot",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <RequestTrackerIcon size={16} />
-                      <div className="ml-1">Request Tracker</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/requesttracker",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <Document360Icon size={16} />
-                      <div className="ml-1">Document360</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/document360",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <ZendeskIcon size={16} />
-                      <div className="ml-1">Zendesk</div>
-                    </div>
-                  ),
-                  link: "/admin/connectors/zendesk",
-                },
-              ],
-            },
-            {
-              name: "Keys",
-              items: [
-                {
-                  name: (
-                    <div className="flex">
-                      <KeyIcon size={18} />
-                      <div className="ml-1">OpenAI</div>
-                    </div>
-                  ),
-                  link: "/admin/keys/openai",
-                },
-              ],
-            },
-            {
-              name: "User Management",
-              items: [
-                {
-                  name: (
-                    <div className="flex">
-                      <UsersIcon size={18} />
-                      <div className="ml-1">Users</div>
-                    </div>
-                  ),
-                  link: "/admin/users",
-                },
-              ],
-            },
-            {
-              name: "Document Management",
-              items: [
-                {
-                  name: (
-                    <div className="flex">
-                      <BookmarkIcon size={18} />
-                      <div className="ml-1">Document Sets</div>
-                    </div>
-                  ),
-                  link: "/admin/documents/sets",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <ZoomInIcon size={18} />
-                      <div className="ml-1">Explorer</div>
-                    </div>
-                  ),
-                  link: "/admin/documents/explorer",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <ThumbsUpIcon size={18} />
-                      <div className="ml-1">Feedback</div>
-                    </div>
-                  ),
-                  link: "/admin/documents/feedback",
-                },
-              ],
-            },
-            {
-              name: "Custom Assistants",
-              items: [
-                {
-                  name: (
-                    <div className="flex">
-                      <RobotIcon size={18} />
-                      <div className="ml-1">Personas</div>
-                    </div>
-                  ),
-                  link: "/admin/personas",
-                },
-                {
-                  name: (
-                    <div className="flex">
-                      <CPUIcon size={18} />
-                      <div className="ml-1">Slack Bots</div>
-                    </div>
-                  ),
-                  link: "/admin/bot",
-                },
-              ],
-            },
-            {
-              name: "System Information",
-              items: [
-                {
-                  name: (
-                    <div className="flex">
-                      <NotebookIcon size={18} />
-                      <div className="ml-1">Version</div>
-                    </div>
-                  ),
-                  link: "/admin/systeminfo",
-                },
-              ],
-            },
-          ]}
-        />
-        <div className="px-12 min-h-screen bg-gray-900 text-gray-100 w-full">
+    <div className="h-screen overflow-y-hidden">
+      <div className="absolute top-0 z-50 w-full">
+        <Header user={user} />
+      </div>
+      <div className="flex h-full pt-16">
+        <div className="w-80 pt-12 pb-8 h-full border-r border-border">
+          <AdminSidebar
+            collections={[
+              {
+                name: "Connectors",
+                items: [
+                  {
+                    name: (
+                      <div className="flex">
+                        <NotebookIcon size={18} />
+                        <div className="ml-1">Existing Connectors</div>
+                      </div>
+                    ),
+                    link: "/admin/indexing/status",
+                  },
+                  {
+                    name: (
+                      <div className="flex">
+                        <ConnectorIcon size={18} />
+                        <div className="ml-1.5">Add Connector</div>
+                      </div>
+                    ),
+                    link: "/admin/add-connector",
+                  },
+                ],
+              },
+              {
+                name: "Document Management",
+                items: [
+                  {
+                    name: (
+                      <div className="flex">
+                        <BookmarkIcon size={18} />
+                        <div className="ml-1">Document Sets</div>
+                      </div>
+                    ),
+                    link: "/admin/documents/sets",
+                  },
+                  {
+                    name: (
+                      <div className="flex">
+                        <ZoomInIcon size={18} />
+                        <div className="ml-1">Explorer</div>
+                      </div>
+                    ),
+                    link: "/admin/documents/explorer",
+                  },
+                  {
+                    name: (
+                      <div className="flex">
+                        <ThumbsUpIcon size={18} />
+                        <div className="ml-1">Feedback</div>
+                      </div>
+                    ),
+                    link: "/admin/documents/feedback",
+                  },
+                ],
+              },
+              {
+                name: "Custom Assistants",
+                items: [
+                  {
+                    name: (
+                      <div className="flex">
+                        <RobotIcon size={18} />
+                        <div className="ml-1">Personas</div>
+                      </div>
+                    ),
+                    link: "/admin/personas",
+                  },
+                  {
+                    name: (
+                      <div className="flex">
+                        <CPUIcon size={18} />
+                        <div className="ml-1">Slack Bots</div>
+                      </div>
+                    ),
+                    link: "/admin/bot",
+                  },
+                ],
+              },
+              {
+                name: "Keys",
+                items: [
+                  {
+                    name: (
+                      <div className="flex">
+                        <KeyIcon size={18} />
+                        <div className="ml-1">OpenAI</div>
+                      </div>
+                    ),
+                    link: "/admin/keys/openai",
+                  },
+                ],
+              },
+              {
+                name: "User Management",
+                items: [
+                  {
+                    name: (
+                      <div className="flex">
+                        <UsersIcon size={18} />
+                        <div className="ml-1">Users</div>
+                      </div>
+                    ),
+                    link: "/admin/users",
+                  },
+                ],
+              },
+            ]}
+          />
+        </div>
+        <div className="px-12 pt-8 pb-8 h-full overflow-y-auto w-full">
           {children}
         </div>
       </div>

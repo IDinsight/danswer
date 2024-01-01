@@ -1,15 +1,8 @@
 "use client";
 
 import { DocumentSet } from "@/lib/types";
-import { Button, Divider } from "@tremor/react";
-import {
-  ArrayHelpers,
-  ErrorMessage,
-  Field,
-  FieldArray,
-  Form,
-  Formik,
-} from "formik";
+import { Button, Divider, Text } from "@tremor/react";
+import { ArrayHelpers, FieldArray, Form, Formik } from "formik";
 
 import * as Yup from "yup";
 import { buildFinalPrompt, createPersona, updatePersona } from "./lib";
@@ -18,6 +11,11 @@ import { usePopup } from "@/components/admin/connectors/Popup";
 import { Persona } from "./interfaces";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import {
+  BooleanFormField,
+  SelectorFormField,
+  TextFormField,
+} from "@/components/admin/connectors/Field";
 
 function SectionHeader({ children }: { children: string | JSX.Element }) {
   return <div className="mb-4 font-bold text-lg">{children}</div>;
@@ -25,200 +23,163 @@ function SectionHeader({ children }: { children: string | JSX.Element }) {
 
 function Label({ children }: { children: string | JSX.Element }) {
   return (
-    <div className="block font-medium text-base text-gray-200">{children}</div>
+    <div className="block font-medium text-base text-emphasis">{children}</div>
   );
 }
 
 function SubLabel({ children }: { children: string | JSX.Element }) {
-  return <div className="text-sm text-gray-300 mb-2">{children}</div>;
-}
-
-// TODO: make this the default text input across all forms
-function PersonaTextInput({
-  name,
-  label,
-  subtext,
-  placeholder,
-  onChange,
-  type = "text",
-  isTextArea = false,
-  disabled = false,
-  autoCompleteDisabled = true,
-}: {
-  name: string;
-  label: string;
-  subtext?: string | JSX.Element;
-  placeholder?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  type?: string;
-  isTextArea?: boolean;
-  disabled?: boolean;
-  autoCompleteDisabled?: boolean;
-}) {
-  return (
-    <div className="mb-4">
-      <Label>{label}</Label>
-      {subtext && <SubLabel>{subtext}</SubLabel>}
-      <Field
-        as={isTextArea ? "textarea" : "input"}
-        type={type}
-        name={name}
-        id={name}
-        className={
-          `
-        border 
-        text-gray-200 
-        border-gray-600 
-        rounded 
-        w-full 
-        py-2 
-        px-3 
-        mt-1
-        ${isTextArea ? " h-28" : ""}
-      ` + (disabled ? " bg-gray-900" : " bg-gray-800")
-        }
-        disabled={disabled}
-        placeholder={placeholder}
-        autoComplete={autoCompleteDisabled ? "off" : undefined}
-        {...(onChange ? { onChange } : {})}
-      />
-      <ErrorMessage
-        name={name}
-        component="div"
-        className="text-red-500 text-sm mt-1"
-      />
-    </div>
-  );
-}
-
-function PersonaBooleanInput({
-  name,
-  label,
-  subtext,
-}: {
-  name: string;
-  label: string;
-  subtext?: string | JSX.Element;
-}) {
-  return (
-    <div className="mb-4">
-      <Label>{label}</Label>
-      {subtext && <SubLabel>{subtext}</SubLabel>}
-      <Field
-        type="checkbox"
-        name={name}
-        id={name}
-        className={`
-        ml-2
-        border 
-        text-gray-200 
-        border-gray-600 
-        rounded 
-        py-2 
-        px-3 
-        mt-1
-      `}
-      />
-      <ErrorMessage
-        name={name}
-        component="div"
-        className="text-red-500 text-sm mt-1"
-      />
-    </div>
-  );
+  return <div className="text-sm text-subtle mb-2">{children}</div>;
 }
 
 export function PersonaEditor({
   existingPersona,
   documentSets,
+  llmOverrideOptions,
+  defaultLLM,
 }: {
   existingPersona?: Persona | null;
   documentSets: DocumentSet[];
+  llmOverrideOptions: string[];
+  defaultLLM: string;
 }) {
   const router = useRouter();
   const { popup, setPopup } = usePopup();
 
   const [finalPrompt, setFinalPrompt] = useState<string | null>("");
+  const [finalPromptError, setFinalPromptError] = useState<string>("");
 
   const triggerFinalPromptUpdate = async (
     systemPrompt: string,
-    taskPrompt: string
+    taskPrompt: string,
+    retrievalDisabled: boolean
   ) => {
-    const response = await buildFinalPrompt(systemPrompt, taskPrompt);
+    const response = await buildFinalPrompt(
+      systemPrompt,
+      taskPrompt,
+      retrievalDisabled
+    );
     if (response.ok) {
       setFinalPrompt((await response.json()).final_prompt_template);
     }
   };
 
   const isUpdate = existingPersona !== undefined && existingPersona !== null;
+  const existingPrompt = existingPersona?.prompts[0] ?? null;
 
   useEffect(() => {
-    if (isUpdate) {
+    if (isUpdate && existingPrompt) {
       triggerFinalPromptUpdate(
-        existingPersona.system_prompt,
-        existingPersona.task_prompt
+        existingPrompt.system_prompt,
+        existingPrompt.task_prompt,
+        existingPersona.num_chunks === 0
       );
     }
   }, []);
 
   return (
-    <div className="dark">
+    <div>
       {popup}
       <Formik
+        enableReinitialize={true}
         initialValues={{
           name: existingPersona?.name ?? "",
           description: existingPersona?.description ?? "",
-          system_prompt: existingPersona?.system_prompt ?? "",
-          task_prompt: existingPersona?.task_prompt ?? "",
+          system_prompt: existingPrompt?.system_prompt ?? "",
+          task_prompt: existingPrompt?.task_prompt ?? "",
+          disable_retrieval: (existingPersona?.num_chunks ?? 5) === 0,
           document_set_ids:
             existingPersona?.document_sets?.map(
               (documentSet) => documentSet.id
             ) ?? ([] as number[]),
           num_chunks: existingPersona?.num_chunks ?? null,
-          apply_llm_relevance_filter:
-            existingPersona?.apply_llm_relevance_filter ?? false,
+          llm_relevance_filter: existingPersona?.llm_relevance_filter ?? false,
+          llm_model_version_override:
+            existingPersona?.llm_model_version_override ?? null,
         }}
-        validationSchema={Yup.object().shape({
-          name: Yup.string().required("Must give the Persona a name!"),
-          description: Yup.string().required(
-            "Must give the Persona a description!"
-          ),
-          system_prompt: Yup.string().required(
-            "Must give the Persona a system prompt!"
-          ),
-          task_prompt: Yup.string().required(
-            "Must give the Persona a task prompt!"
-          ),
-          document_set_ids: Yup.array().of(Yup.number()),
-          num_chunks: Yup.number().max(20).nullable(),
-          apply_llm_relevance_filter: Yup.boolean().required(),
-        })}
-        onSubmit={async (values, formikHelpers) => {
-          formikHelpers.setSubmitting(true);
+        validationSchema={Yup.object()
+          .shape({
+            name: Yup.string().required("Must give the Persona a name!"),
+            description: Yup.string().required(
+              "Must give the Persona a description!"
+            ),
+            system_prompt: Yup.string(),
+            task_prompt: Yup.string(),
+            disable_retrieval: Yup.boolean().required(),
+            document_set_ids: Yup.array().of(Yup.number()),
+            num_chunks: Yup.number().max(20).nullable(),
+            llm_relevance_filter: Yup.boolean().required(),
+            llm_model_version_override: Yup.string().nullable(),
+          })
+          .test(
+            "system-prompt-or-task-prompt",
+            "Must provide at least one of System Prompt or Task Prompt",
+            (values) => {
+              const systemPromptSpecified = values.system_prompt
+                ? values.system_prompt.length > 0
+                : false;
+              const taskPromptSpecified = values.task_prompt
+                ? values.task_prompt.length > 0
+                : false;
+              if (systemPromptSpecified || taskPromptSpecified) {
+                setFinalPromptError("");
+                return true;
+              } // Return true if at least one field has a value
 
-          let response;
-          if (isUpdate) {
-            response = await updatePersona({
-              id: existingPersona.id,
-              ...values,
-              num_chunks: values.num_chunks || null,
+              setFinalPromptError(
+                "Must provide at least one of System Prompt or Task Prompt"
+              );
+            }
+          )}
+        onSubmit={async (values, formikHelpers) => {
+          if (finalPromptError) {
+            setPopup({
+              type: "error",
+              message: "Cannot submit while there are errors in the form!",
             });
-          } else {
-            response = await createPersona({
-              ...values,
-              num_chunks: values.num_chunks || null,
-            });
-          }
-          if (response.ok) {
-            router.push(`/admin/personas?u=${Date.now()}`);
             return;
           }
 
-          setPopup({
-            type: "error",
-            message: `Failed to create Persona - ${await response.text()}`,
-          });
-          formikHelpers.setSubmitting(false);
+          formikHelpers.setSubmitting(true);
+
+          // if disable_retrieval is set, set num_chunks to 0
+          // to tell the backend to not fetch any documents
+          const numChunks = values.disable_retrieval
+            ? 0
+            : values.num_chunks || 5;
+
+          let promptResponse;
+          let personaResponse;
+          if (isUpdate) {
+            [promptResponse, personaResponse] = await updatePersona({
+              id: existingPersona.id,
+              existingPromptId: existingPrompt?.id,
+              ...values,
+              num_chunks: numChunks,
+            });
+          } else {
+            [promptResponse, personaResponse] = await createPersona({
+              ...values,
+              num_chunks: numChunks,
+            });
+          }
+
+          let error = null;
+          if (!promptResponse.ok) {
+            error = await promptResponse.text();
+          }
+          if (personaResponse && !personaResponse.ok) {
+            error = await personaResponse.text();
+          }
+
+          if (error) {
+            setPopup({
+              type: "error",
+              message: `Failed to create Persona - ${error}`,
+            });
+            formikHelpers.setSubmitting(false);
+          } else {
+            router.push(`/admin/personas?u=${Date.now()}`);
+          }
         }}
       >
         {({ isSubmitting, values, setFieldValue }) => (
@@ -226,14 +187,14 @@ export function PersonaEditor({
             <div className="pb-6">
               <SectionHeader>Who am I?</SectionHeader>
 
-              <PersonaTextInput
+              <TextFormField
                 name="name"
                 label="Name"
                 disabled={isUpdate}
                 subtext="Users will be able to select this Persona based on this name."
               />
 
-              <PersonaTextInput
+              <TextFormField
                 name="description"
                 label="Description"
                 subtext="Provide a short descriptions which gives users a hint as to what they should use this Persona for."
@@ -243,7 +204,7 @@ export function PersonaEditor({
 
               <SectionHeader>Customize my response style</SectionHeader>
 
-              <PersonaTextInput
+              <TextFormField
                 name="system_prompt"
                 label="System Prompt"
                 isTextArea={true}
@@ -252,11 +213,16 @@ export function PersonaEditor({
                 }
                 onChange={(e) => {
                   setFieldValue("system_prompt", e.target.value);
-                  triggerFinalPromptUpdate(e.target.value, values.task_prompt);
+                  triggerFinalPromptUpdate(
+                    e.target.value,
+                    values.task_prompt,
+                    values.disable_retrieval
+                  );
                 }}
+                error={finalPromptError}
               />
 
-              <PersonaTextInput
+              <TextFormField
                 name="task_prompt"
                 label="Task Prompt"
                 isTextArea={true}
@@ -267,7 +233,26 @@ export function PersonaEditor({
                   setFieldValue("task_prompt", e.target.value);
                   triggerFinalPromptUpdate(
                     values.system_prompt,
-                    e.target.value
+                    e.target.value,
+                    values.disable_retrieval
+                  );
+                }}
+                error={finalPromptError}
+              />
+
+              <BooleanFormField
+                name="disable_retrieval"
+                label="Disable Retrieval"
+                subtext={`
+                If set, the Persona will not fetch any context documents to aid in the response. 
+                Instead, it will only use the supplied system and task prompts plus the user 
+                query in order to generate a response`}
+                onChange={(e) => {
+                  setFieldValue("disable_retrieval", e.target.checked);
+                  triggerFinalPromptUpdate(
+                    values.system_prompt,
+                    values.task_prompt,
+                    e.target.checked
                   );
                 }}
               />
@@ -284,112 +269,164 @@ export function PersonaEditor({
 
               <Divider />
 
-              <SectionHeader>What data should I have access to?</SectionHeader>
+              {!values.disable_retrieval && (
+                <>
+                  <SectionHeader>
+                    What data should I have access to?
+                  </SectionHeader>
 
-              <FieldArray
-                name="document_set_ids"
-                render={(arrayHelpers: ArrayHelpers) => (
-                  <div>
-                    <div>
-                      <SubLabel>
-                        <>
-                          Select which{" "}
-                          <Link
-                            href="/admin/documents/sets"
-                            className="text-blue-500"
-                            target="_blank"
-                          >
-                            Document Sets
-                          </Link>{" "}
-                          that this Persona should search through. If none are
-                          specified, the Persona will search through all
-                          available documents in order to try and response to
-                          queries.
-                        </>
-                      </SubLabel>
-                    </div>
-                    <div className="mb-3 mt-2 flex gap-2 flex-wrap text-sm">
-                      {documentSets.map((documentSet) => {
-                        const ind = values.document_set_ids.indexOf(
-                          documentSet.id
-                        );
-                        let isSelected = ind !== -1;
-                        return (
-                          <div
-                            key={documentSet.id}
-                            className={
-                              `
+                  <FieldArray
+                    name="document_set_ids"
+                    render={(arrayHelpers: ArrayHelpers) => (
+                      <div>
+                        <div>
+                          <SubLabel>
+                            <>
+                              Select which{" "}
+                              <Link
+                                href="/admin/documents/sets"
+                                className="text-blue-500"
+                                target="_blank"
+                              >
+                                Document Sets
+                              </Link>{" "}
+                              that this Persona should search through. If none
+                              are specified, the Persona will search through all
+                              available documents in order to try and response
+                              to queries.
+                            </>
+                          </SubLabel>
+                        </div>
+                        <div className="mb-3 mt-2 flex gap-2 flex-wrap text-sm">
+                          {documentSets.map((documentSet) => {
+                            const ind = values.document_set_ids.indexOf(
+                              documentSet.id
+                            );
+                            let isSelected = ind !== -1;
+                            return (
+                              <div
+                                key={documentSet.id}
+                                className={
+                                  `
                               px-3 
                               py-1
                               rounded-lg 
                               border
-                              border-gray-700 
+                              border-border
                               w-fit 
                               flex 
                               cursor-pointer ` +
-                              (isSelected
-                                ? " bg-gray-600"
-                                : " bg-gray-900 hover:bg-gray-700")
-                            }
-                            onClick={() => {
-                              if (isSelected) {
-                                arrayHelpers.remove(ind);
-                              } else {
-                                arrayHelpers.push(documentSet.id);
-                              }
-                            }}
-                          >
-                            <div className="my-auto">{documentSet.name}</div>
-                          </div>
-                        );
+                                  (isSelected
+                                    ? " bg-hover"
+                                    : " bg-background hover:bg-hover-light")
+                                }
+                                onClick={() => {
+                                  if (isSelected) {
+                                    arrayHelpers.remove(ind);
+                                  } else {
+                                    arrayHelpers.push(documentSet.id);
+                                  }
+                                }}
+                              >
+                                <div className="my-auto">
+                                  {documentSet.name}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  />
+
+                  <Divider />
+                </>
+              )}
+
+              {llmOverrideOptions.length > 0 && defaultLLM && (
+                <>
+                  <SectionHeader>[Advanced] Model Selection</SectionHeader>
+
+                  <Text>
+                    Pick which LLM to use for this Persona. If left as Default,
+                    will use <b className="italic">{defaultLLM}</b>.
+                    <br />
+                    <br />
+                    For more information on the different LLMs, checkout the{" "}
+                    <a
+                      href="https://platform.openai.com/docs/models"
+                      target="_blank"
+                      className="text-blue-500"
+                    >
+                      OpenAI docs
+                    </a>
+                    .
+                  </Text>
+
+                  <div className="w-96">
+                    <SelectorFormField
+                      name="llm_model_version_override"
+                      options={llmOverrideOptions.map((llmOption) => {
+                        return {
+                          name: llmOption,
+                          value: llmOption,
+                        };
                       })}
-                    </div>
+                      includeDefault={true}
+                    />
                   </div>
-                )}
-              />
+                </>
+              )}
 
               <Divider />
 
-              <SectionHeader>[Advanced] Retrieval Customization</SectionHeader>
+              {!values.disable_retrieval && (
+                <>
+                  <SectionHeader>
+                    [Advanced] Retrieval Customization
+                  </SectionHeader>
 
-              <PersonaTextInput
-                name="num_chunks"
-                label="Number of Chunks"
-                subtext={
-                  <div>
-                    How many chunks should we feed into the LLM when generating
-                    the final response? Each chunk is ~400 words long. If you
-                    are using gpt-3.5-turbo or other similar models, setting
-                    this to a value greater than 5 will result in errors at
-                    query time due to the model&apos;s input length limit.
-                    <br />
-                    <br />
-                    If unspecified, will use 5 chunks.
-                  </div>
-                }
-                onChange={(e) => {
-                  const value = e.target.value;
-                  // Allow only integer values
-                  if (value === "" || /^[0-9]+$/.test(value)) {
-                    setFieldValue("num_chunks", value);
-                  }
-                }}
-              />
+                  <TextFormField
+                    name="num_chunks"
+                    label="Number of Chunks"
+                    subtext={
+                      <div>
+                        How many chunks should we feed into the LLM when
+                        generating the final response? Each chunk is ~400 words
+                        long. If you are using gpt-3.5-turbo or other similar
+                        models, setting this to a value greater than 5 will
+                        result in errors at query time due to the model&apos;s
+                        input length limit.
+                        <br />
+                        <br />
+                        If unspecified, will use 5 chunks.
+                      </div>
+                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Allow only integer values
+                      if (value === "" || /^[0-9]+$/.test(value)) {
+                        setFieldValue("num_chunks", value);
+                      }
+                    }}
+                  />
 
-              <PersonaBooleanInput
-                name="apply_llm_relevance_filter"
-                label="Apply LLM Relevance Filter"
-                subtext={
-                  "If enabled, the LLM will filter out chunks that are not relevant to the user query."
-                }
-              />
+                  <BooleanFormField
+                    name="llm_relevance_filter"
+                    label="Apply LLM Relevance Filter"
+                    subtext={
+                      "If enabled, the LLM will filter out chunks that are not relevant to the user query."
+                    }
+                  />
 
-              <Divider />
+                  <Divider />
+                </>
+              )}
 
               <div className="flex">
                 <Button
                   className="mx-auto"
-                  variant="secondary"
+                  color="green"
                   size="md"
                   type="submit"
                   disabled={isSubmitting}

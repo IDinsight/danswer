@@ -1,4 +1,3 @@
-import { FaRobot } from "react-icons/fa";
 import { PersonaEditor } from "../PersonaEditor";
 import { fetchSS } from "@/lib/utilsSS";
 import { ErrorCallout } from "@/components/ErrorCallout";
@@ -6,9 +5,15 @@ import { DocumentSet } from "@/lib/types";
 import { RobotIcon } from "@/components/icons/icons";
 import { BackButton } from "@/components/BackButton";
 import { Card } from "@tremor/react";
+import { AdminPageTitle } from "@/components/admin/Title";
 
 export default async function Page() {
-  const documentSetsResponse = await fetchSS("/manage/document-set");
+  const [documentSetsResponse, llmOverridesResponse, defaultLLMResponse] =
+    await Promise.all([
+      fetchSS("/manage/document-set"),
+      fetchSS("/admin/persona/utils/list-available-models"),
+      fetchSS("/admin/persona/utils/default-model"),
+    ]);
 
   if (!documentSetsResponse.ok) {
     return (
@@ -18,19 +23,43 @@ export default async function Page() {
       />
     );
   }
-
   const documentSets = (await documentSetsResponse.json()) as DocumentSet[];
 
+  if (!llmOverridesResponse.ok) {
+    return (
+      <ErrorCallout
+        errorTitle="Something went wrong :("
+        errorMsg={`Failed to fetch LLM override options - ${await documentSetsResponse.text()}`}
+      />
+    );
+  }
+  const llmOverrideOptions = (await llmOverridesResponse.json()) as string[];
+
+  if (!defaultLLMResponse.ok) {
+    return (
+      <ErrorCallout
+        errorTitle="Something went wrong :("
+        errorMsg={`Failed to fetch default LLM - ${await documentSetsResponse.text()}`}
+      />
+    );
+  }
+  const defaultLLM = (await defaultLLMResponse.json()) as string;
+
   return (
-    <div className="dark">
+    <div>
       <BackButton />
-      <div className="border-solid border-gray-600 border-b pb-2 mb-4 flex">
-        <RobotIcon size={32} />
-        <h1 className="text-3xl font-bold pl-2">Create a New Persona</h1>
-      </div>
+
+      <AdminPageTitle
+        title="Create a New Persona"
+        icon={<RobotIcon size={32} />}
+      />
 
       <Card>
-        <PersonaEditor documentSets={documentSets} />
+        <PersonaEditor
+          documentSets={documentSets}
+          llmOverrideOptions={llmOverrideOptions}
+          defaultLLM={defaultLLM}
+        />
       </Card>
     </div>
   );

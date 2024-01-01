@@ -11,8 +11,8 @@ from danswer.configs.constants import DocumentSource
 from danswer.connectors.models import InputType
 from danswer.db.models import Connector
 from danswer.db.models import IndexAttempt
-from danswer.server.models import ConnectorBase
-from danswer.server.models import ObjectCreationIdResponse
+from danswer.server.documents.models import ConnectorBase
+from danswer.server.documents.models import ObjectCreationIdResponse
 from danswer.server.models import StatusResponse
 from danswer.utils.logger import setup_logger
 
@@ -36,8 +36,12 @@ def fetch_connectors(
     return list(results.all())
 
 
-def connector_by_name_exists(connector_name: str, db_session: Session) -> bool:
-    stmt = select(Connector).where(Connector.name == connector_name)
+def connector_by_name_source_exists(
+    connector_name: str, source: DocumentSource, db_session: Session
+) -> bool:
+    stmt = select(Connector).where(
+        Connector.name == connector_name, Connector.source == source
+    )
     result = db_session.execute(stmt)
     connector = result.scalar_one_or_none()
     return connector is not None
@@ -67,7 +71,9 @@ def create_connector(
     connector_data: ConnectorBase,
     db_session: Session,
 ) -> ObjectCreationIdResponse:
-    if connector_by_name_exists(connector_data.name, db_session):
+    if connector_by_name_source_exists(
+        connector_data.name, connector_data.source, db_session
+    ):
         raise ValueError(
             "Connector by this name already exists, duplicate naming not allowed."
         )
@@ -95,8 +101,8 @@ def update_connector(
     if connector is None:
         return None
 
-    if connector_data.name != connector.name and connector_by_name_exists(
-        connector_data.name, db_session
+    if connector_data.name != connector.name and connector_by_name_source_exists(
+        connector_data.name, connector_data.source, db_session
     ):
         raise ValueError(
             "Connector by this name already exists, duplicate naming not allowed."
@@ -220,7 +226,11 @@ def fetch_latest_index_attempts_by_status(
 def fetch_unique_document_sources(db_session: Session) -> list[DocumentSource]:
     distinct_sources = db_session.query(Connector.source).distinct().all()
 
-    sources = [source[0] for source in distinct_sources]
+    sources = [
+        source[0]
+        for source in distinct_sources
+        if source[0] != DocumentSource.INGESTION_API
+    ]
 
     return sources
 

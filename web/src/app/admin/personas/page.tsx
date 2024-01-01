@@ -6,6 +6,7 @@ import { fetchSS } from "@/lib/utilsSS";
 import { ErrorCallout } from "@/components/ErrorCallout";
 import { Persona } from "./interfaces";
 import { RobotIcon } from "@/components/icons/icons";
+import { AdminPageTitle } from "@/components/admin/Title";
 
 export default async function Page() {
   const personaResponse = await fetchSS("/persona");
@@ -22,16 +23,15 @@ export default async function Page() {
   const personas = (await personaResponse.json()) as Persona[];
 
   return (
-    <div>
-      <div className="border-solid border-gray-600 border-b pb-2 mb-4 flex">
-        <RobotIcon size={32} />
-        <h1 className="text-3xl font-bold pl-2">Personas</h1>
-      </div>
+    <div className="mx-auto container">
+      <AdminPageTitle icon={<RobotIcon size={32} />} title="Personas" />
 
-      <div className="text-gray-300 text-sm mb-2">
+      <Text className="mb-2">
         Personas are a way to build custom search/question-answering experiences
         for different use cases.
-        <p className="mt-2">They allow you to customize:</p>
+      </Text>
+      <Text className="mt-2">They allow you to customize:</Text>
+      <div className="text-sm">
         <ul className="list-disc mt-2 ml-4">
           <li>
             The prompt used by your LLM of choice to respond to the user query
@@ -40,13 +40,13 @@ export default async function Page() {
         </ul>
       </div>
 
-      <div className="dark">
+      <div>
         <Divider />
 
         <Title>Create a Persona</Title>
         <Link
           href="/admin/personas/new"
-          className="text-gray-100 flex py-2 px-4 mt-2 border border-gray-800 h-fit cursor-pointer hover:bg-gray-800 text-sm w-36"
+          className="flex py-2 px-4 mt-2 border border-border h-fit cursor-pointer hover:bg-hover text-sm w-36"
         >
           <div className="mx-auto flex">
             <FiPlusSquare className="my-auto mr-2" />

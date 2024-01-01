@@ -13,6 +13,7 @@ from danswer.background.indexing.dask_utils import ResourceLogger
 from danswer.background.indexing.job_client import SimpleJob
 from danswer.background.indexing.job_client import SimpleJobClient
 from danswer.background.indexing.run_indexing import run_indexing_entrypoint
+from danswer.configs.app_configs import CLEANUP_INDEXING_JOBS_TIMEOUT
 from danswer.configs.app_configs import DASK_JOB_CLIENT_ENABLED
 from danswer.configs.app_configs import LOG_LEVEL
 from danswer.configs.app_configs import MODEL_SERVER_HOST
@@ -155,7 +156,8 @@ def create_indexing_jobs(existing_jobs: dict[int, Future | SimpleJob]) -> None:
 
 
 def cleanup_indexing_jobs(
-    existing_jobs: dict[int, Future | SimpleJob]
+    existing_jobs: dict[int, Future | SimpleJob],
+    timeout_hours: int = CLEANUP_INDEXING_JOBS_TIMEOUT,
 ) -> dict[int, Future | SimpleJob]:
     existing_jobs_copy = existing_jobs.copy()
 
@@ -203,13 +205,13 @@ def cleanup_indexing_jobs(
             )
             for index_attempt in in_progress_indexing_attempts:
                 if index_attempt.id in existing_jobs:
-                    # check to see if the job has been updated in last hour, if not
+                    # check to see if the job has been updated in last n hours, if not
                     # assume it to frozen in some bad state and just mark it as failed. Note: this relies
                     # on the fact that the `time_updated` field is constantly updated every
                     # batch of documents indexed
                     current_db_time = get_db_current_time(db_session=db_session)
                     time_since_update = current_db_time - index_attempt.time_updated
-                    if time_since_update.total_seconds() > 60 * 60:
+                    if time_since_update.total_seconds() > 60 * 60 * timeout_hours:
                         existing_jobs[index_attempt.id].cancel()
                         _mark_run_failed(
                             db_session=db_session,
@@ -313,10 +315,14 @@ def update_loop(delay: int = 10, num_workers: int = NUM_INDEXING_WORKERS) -> Non
         start = time.time()
         start_time_utc = datetime.utcfromtimestamp(start).strftime("%Y-%m-%d %H:%M:%S")
         logger.info(f"Running update, current UTC time: {start_time_utc}")
-        logger.debug(
-            "Found existing indexing jobs: "
-            f"{[(attempt_id, job.status) for attempt_id, job in existing_jobs.items()]}"
-        )
+
+        if existing_jobs:
+            # TODO: make this debug level once the "no jobs are being scheduled" issue is resolved
+            logger.info(
+                "Found existing indexing jobs: "
+                f"{[(attempt_id, job.status) for attempt_id, job in existing_jobs.items()]}"
+            )
+
         try:
             existing_jobs = cleanup_indexing_jobs(existing_jobs=existing_jobs)
             create_indexing_jobs(existing_jobs=existing_jobs)
@@ -330,7 +336,7 @@ def update_loop(delay: int = 10, num_workers: int = NUM_INDEXING_WORKERS) -> Non
             time.sleep(sleep_time)
 
 
-if __name__ == "__main__":
+def update__main() -> None:
     # needed for CUDA to work with multiprocessing
     # NOTE: needs to be done on application startup
     # before any other torch code has been run
@@ -342,3 +348,7 @@ if __name__ == "__main__":
         warm_up_models(indexer_only=True, skip_cross_encoders=True)
     logger.info("Starting Indexing Loop")
     update_loop()
+
+
+if __name__ == "__main__":
+    update__main()

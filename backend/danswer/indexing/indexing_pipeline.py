@@ -5,6 +5,10 @@ from typing import Protocol
 from sqlalchemy.orm import Session
 
 from danswer.access.access import get_access_for_documents
+from danswer.configs.constants import DEFAULT_BOOST
+from danswer.connectors.cross_connector_utils.miscellaneous_utils import (
+    get_experts_stores_representations,
+)
 from danswer.connectors.models import Document
 from danswer.connectors.models import IndexAttemptMetadata
 from danswer.db.document import get_documents_by_ids
@@ -23,6 +27,7 @@ from danswer.indexing.models import DocAwareChunk
 from danswer.indexing.models import DocMetadataAwareIndexChunk
 from danswer.search.models import Embedder
 from danswer.utils.logger import setup_logger
+from danswer.utils.timing import log_function_time
 
 logger = setup_logger()
 
@@ -50,8 +55,8 @@ def upsert_documents_in_db(
             document_id=doc.id,
             semantic_identifier=doc.semantic_identifier,
             first_link=first_link,
-            primary_owners=doc.primary_owners,
-            secondary_owners=doc.secondary_owners,
+            primary_owners=get_experts_stores_representations(doc.primary_owners),
+            secondary_owners=get_experts_stores_representations(doc.secondary_owners),
             from_ingestion_api=doc.from_ingestion_api,
         )
         doc_m_batch.append(db_doc_metadata)
@@ -62,7 +67,8 @@ def upsert_documents_in_db(
     )
 
 
-def _indexing_pipeline(
+@log_function_time()
+def index_doc_batch(
     *,
     chunker: Chunker,
     embedder: Embedder,
@@ -83,6 +89,7 @@ def _indexing_pipeline(
             document_ids=document_ids,
             db_session=db_session,
         )
+        id_to_db_doc_map = {doc.id: doc for doc in db_docs}
         id_update_time_map = {
             doc.id: doc.doc_updated_at for doc in db_docs if doc.doc_updated_at
         }
@@ -140,6 +147,11 @@ def _indexing_pipeline(
                 document_sets=set(
                     document_id_to_document_set.get(chunk.source_document.id, [])
                 ),
+                boost=(
+                    id_to_db_doc_map[chunk.source_document.id].boost
+                    if chunk.source_document.id in id_to_db_doc_map
+                    else DEFAULT_BOOST
+                ),
             )
             for chunk in chunks_with_embeddings
         ]
@@ -190,7 +202,7 @@ def build_indexing_pipeline(
     document_index = document_index or get_default_document_index()
 
     return partial(
-        _indexing_pipeline,
+        index_doc_batch,
         chunker=chunker,
         embedder=embedder,
         document_index=document_index,

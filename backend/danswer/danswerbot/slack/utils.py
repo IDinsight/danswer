@@ -13,15 +13,32 @@ from slack_sdk.models.blocks import Block
 from slack_sdk.models.metadata import Metadata
 
 from danswer.configs.constants import ID_SEPARATOR
+from danswer.configs.constants import MessageType
 from danswer.configs.danswerbot_configs import DANSWER_BOT_NUM_RETRIES
 from danswer.connectors.slack.utils import make_slack_api_rate_limited
 from danswer.connectors.slack.utils import SlackTextCleaner
 from danswer.danswerbot.slack.constants import SLACK_CHANNEL_ID
 from danswer.danswerbot.slack.tokens import fetch_tokens
+from danswer.one_shot_answer.models import ThreadMessage
 from danswer.utils.logger import setup_logger
 from danswer.utils.text_processing import replace_whitespaces_w_space
 
 logger = setup_logger()
+
+
+DANSWER_BOT_APP_ID: str | None = None
+
+
+def get_danswer_bot_app_id(web_client: WebClient) -> Any:
+    global DANSWER_BOT_APP_ID
+    if DANSWER_BOT_APP_ID is None:
+        DANSWER_BOT_APP_ID = web_client.auth_test().get("user_id")
+    return DANSWER_BOT_APP_ID
+
+
+def remove_danswer_bot_tag(message_str: str, client: WebClient) -> str:
+    bot_tag_id = get_danswer_bot_app_id(web_client=client)
+    return re.sub(rf"<@{bot_tag_id}>\s", "", message_str)
 
 
 class ChannelIdAdapter(logging.LoggerAdapter):
@@ -95,8 +112,8 @@ def respond_in_thread(
                 raise RuntimeError(f"Failed to post message: {response}")
 
 
-def build_feedback_block_id(
-    query_event_id: int,
+def build_feedback_id(
+    message_id: int,
     document_id: str | None = None,
     document_rank: int | None = None,
 ) -> str:
@@ -108,21 +125,21 @@ def build_feedback_block_id(
             raise ValueError(
                 "Separator pattern should not already exist in document id"
             )
-        block_id = ID_SEPARATOR.join(
-            [str(query_event_id), document_id, str(document_rank)]
+        feedback_id = ID_SEPARATOR.join(
+            [str(message_id), document_id, str(document_rank)]
         )
     else:
-        block_id = str(query_event_id)
+        feedback_id = str(message_id)
 
-    return unique_prefix + ID_SEPARATOR + block_id
+    return unique_prefix + ID_SEPARATOR + feedback_id
 
 
-def decompose_block_id(block_id: str) -> tuple[int, str | None, int | None]:
+def decompose_feedback_id(feedback_id: str) -> tuple[int, str | None, int | None]:
     """Decompose into query_id, document_id, document_rank, see above function"""
     try:
-        components = block_id.split(ID_SEPARATOR)
+        components = feedback_id.split(ID_SEPARATOR)
         if len(components) != 2 and len(components) != 4:
-            raise ValueError("Block ID does not contain right number of elements")
+            raise ValueError("Feedback ID does not contain right number of elements")
 
         if len(components) == 2:
             return int(components[-1]), None, None
@@ -131,7 +148,36 @@ def decompose_block_id(block_id: str) -> tuple[int, str | None, int | None]:
 
     except Exception as e:
         logger.error(e)
-        raise ValueError("Received invalid Feedback Block Identifier")
+        raise ValueError("Received invalid Feedback Identifier")
+
+
+def get_view_values(state_values: dict[str, Any]) -> dict[str, str]:
+    """Extract view values
+
+    Args:
+        state_values (dict): The Slack view-submission values
+
+    Returns:
+        dict: keys/values of the view state content
+    """
+    view_values = {}
+    for _, view_data in state_values.items():
+        for k, v in view_data.items():
+            if (
+                "selected_option" in v
+                and isinstance(v["selected_option"], dict)
+                and "value" in v["selected_option"]
+            ):
+                view_values[k] = v["selected_option"]["value"]
+            elif "selected_options" in v and isinstance(v["selected_options"], list):
+                view_values[k] = [
+                    x["value"] for x in v["selected_options"] if "value" in x
+                ]
+            elif "selected_date" in v:
+                view_values[k] = v["selected_date"]
+            elif "value" in v:
+                view_values[k] = v["value"]
+    return view_values
 
 
 def translate_vespa_highlight_to_slack(match_strs: list[str], used_chars: int) -> str:
@@ -201,3 +247,57 @@ def fetch_userids_from_emails(user_emails: list[str], client: WebClient) -> list
         )
 
     return user_ids
+
+
+def fetch_user_semantic_id_from_id(user_id: str, client: WebClient) -> str | None:
+    response = client.users_info(user=user_id)
+    if not response["ok"]:
+        return None
+
+    user: dict = cast(dict[Any, dict], response.data).get("user", {})
+
+    return (
+        user.get("real_name")
+        or user.get("name")
+        or user.get("profile", {}).get("email")
+    )
+
+
+def read_slack_thread(
+    channel: str, thread: str, client: WebClient
+) -> list[ThreadMessage]:
+    thread_messages: list[ThreadMessage] = []
+    response = client.conversations_replies(channel=channel, ts=thread)
+    replies = cast(dict, response.data).get("messages", [])
+    for reply in replies:
+        if "user" in reply and "bot_id" not in reply:
+            message = remove_danswer_bot_tag(reply["text"], client=client)
+            user_sem_id = fetch_user_semantic_id_from_id(reply["user"], client)
+            message_type = MessageType.USER
+        else:
+            self_app_id = get_danswer_bot_app_id(client)
+
+            # Only include bot messages from Danswer, other bots are not taken in as context
+            if self_app_id != reply.get("user"):
+                continue
+
+            blocks = reply["blocks"]
+            if len(blocks) <= 1:
+                continue
+
+            # The useful block is the second one after the header block that says AI Answer
+            message = reply["blocks"][1]["text"]["text"]
+
+            if message.startswith("_Filters"):
+                if len(blocks) <= 2:
+                    continue
+                message = reply["blocks"][2]["text"]["text"]
+
+            user_sem_id = "Assistant"
+            message_type = MessageType.ASSISTANT
+
+        thread_messages.append(
+            ThreadMessage(message=message, sender=user_sem_id, role=message_type)
+        )
+
+    return thread_messages

@@ -1,6 +1,28 @@
+import codecs
 import json
 import re
+import string
 from urllib.parse import quote
+
+
+ESCAPE_SEQUENCE_RE = re.compile(
+    r"""
+    ( \\U........      # 8-digit hex escapes
+    | \\u....          # 4-digit hex escapes
+    | \\x..            # 2-digit hex escapes
+    | \\[0-7]{1,3}     # Octal escapes
+    | \\N\{[^}]+\}     # Unicode characters by name
+    | \\[\\'"abfnrtv]  # Single-character escapes
+    )""",
+    re.UNICODE | re.VERBOSE,
+)
+
+
+def decode_escapes(s: str) -> str:
+    def decode_match(match: re.Match) -> str:
+        return codecs.decode(match.group(0), "unicode-escape")
+
+    return ESCAPE_SEQUENCE_RE.sub(decode_match, s)
 
 
 def make_url_compatible(s: str) -> str:
@@ -60,3 +82,17 @@ def shared_precompare_cleanup(text: str) -> str:
     text = re.sub(r'\s|\*|\\"|[.,:`"#-]', "", text)
 
     return text
+
+
+def is_valid_email(text: str) -> bool:
+    """Can use a library instead if more detailed checks are needed"""
+    regex = r"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+
+    if re.match(regex, text):
+        return True
+    else:
+        return False
+
+
+def count_punctuation(text: str) -> int:
+    return sum(1 for char in text if char in string.punctuation)

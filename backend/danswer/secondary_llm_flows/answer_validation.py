@@ -1,6 +1,6 @@
 from danswer.llm.factory import get_default_llm
 from danswer.llm.utils import dict_based_prompt_to_langchain_prompt
-from danswer.prompts.secondary_llm_flows import ANSWER_VALIDITY_PROMPT
+from danswer.prompts.answer_validation import ANSWER_VALIDITY_PROMPT
 from danswer.utils.logger import setup_logger
 from danswer.utils.timing import log_function_time
 
@@ -40,6 +40,9 @@ def get_answer_validity(
         if model_output.strip().strip("```").strip().split()[-1].lower() == "invalid":
             return False
         return True  # If something is wrong, let's not toss away the answer
+
+    if not answer:
+        return False
 
     messages = _get_answer_validation_messages(query, answer)
     filled_llm_prompt = dict_based_prompt_to_langchain_prompt(messages)

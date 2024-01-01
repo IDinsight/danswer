@@ -41,11 +41,10 @@ DISABLE_DANSWER_BOT_FILTER_DETECT = (
 )
 # Add a second LLM call post Answer to verify if the Answer is valid
 # Throws out answers that don't directly or fully answer the user query
-# This is the default for all DanswerBot channels unless the bot is configured individually
+# This is the default for all DanswerBot channels unless the channel is configured individually
+# Set/unset by "Hide Non Answers"
 ENABLE_DANSWERBOT_REFLEXION = (
     os.environ.get("ENABLE_DANSWERBOT_REFLEXION", "").lower() == "true"
 )
-# Add the per document feedback blocks that affect the document rankings via boosting
-ENABLE_SLACK_DOC_FEEDBACK = (
-    os.environ.get("ENABLE_SLACK_DOC_FEEDBACK", "").lower() == "true"
-)
+# Currently not support chain of thought, probably will add back later
+DANSWER_BOT_DISABLE_COT = True
