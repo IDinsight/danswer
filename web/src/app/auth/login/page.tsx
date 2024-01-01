@@ -89,7 +89,7 @@ const Page = async ({
             <Card className="mt-4 w-96">
               <div className="flex">
                 <Title className="mb-2 mx-auto font-bold">
-                  Log In to Danswer
+                  Log In to HubGPT
                 </Title>
               </div>
               <EmailPasswordForm />
@@ -105,7 +105,6 @@ const Page = async ({
           )}
         </div>
         <div className="fixed bottom-4 right-4 z-50 text-slate-400 p-2">
-          VERSION w{web_version} b{backend_version}
         </div>
       </div>
     </main>
