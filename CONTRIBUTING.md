@@ -58,9 +58,10 @@ development purposes but also feel free to just use the containers and update wi
 
 
 ### Local Set Up
-It is recommended to use Python versions >= 3.11.
+It is recommended to use Python version 3.11
 
-This guide skips setting up User Authentication for the purpose of simplicity
+If using a lower version, modifications will have to be made to the code.
+If using a higher version, the version of Tensorflow we use may not be available for your platform.
 
 
 #### Installing Requirements
@@ -88,7 +89,12 @@ Once the above is done, navigate to `danswer/web` run:
 npm i
 ```
 
-Install Playwright (required by the Web Connector), with the python venv active, run:
+Install Playwright (required by the Web Connector)
+
+> Note: If you have just done the pip install, open a new terminal and source the python virtual-env again.
+This will update the path to include playwright
+
+Then install Playwright by running:
 ```bash
 playwright install
 ```
