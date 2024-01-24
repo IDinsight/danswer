@@ -81,6 +81,7 @@ SMTP_SERVER = os.environ.get("SMTP_SERVER") or "smtp.gmail.com"
 SMTP_PORT = int(os.environ.get("SMTP_PORT") or "587")
 SMTP_USER = os.environ.get("SMTP_USER", "your-email@gmail.com")
 SMTP_PASS = os.environ.get("SMTP_PASS", "your-gmail-password")
+EMAIL_FROM = os.environ.get("EMAIL_FROM") or SMTP_USER
 
 
 #####
@@ -116,6 +117,8 @@ POSTGRES_DB = os.environ.get("POSTGRES_DB") or "postgres"
 #####
 # Connector Configs
 #####
+POLL_CONNECTOR_OFFSET = 30  # Minutes overlap between poll windows
+
 GOOGLE_DRIVE_INCLUDE_SHARED = False
 GOOGLE_DRIVE_FOLLOW_SHORTCUTS = False
 
@@ -149,6 +152,8 @@ CONFLUENCE_CONNECTOR_LABELS_TO_SKIP = [
 
 GONG_CONNECTOR_START_TIME = os.environ.get("GONG_CONNECTOR_START_TIME")
 
+GITHUB_CONNECTOR_BASE_URL = os.environ.get("GITHUB_CONNECTOR_BASE_URL") or None
+
 DASK_JOB_CLIENT_ENABLED = (
     os.environ.get("DASK_JOB_CLIENT_ENABLED", "").lower() == "true"
 )
@@ -179,7 +184,7 @@ ENABLE_MINI_CHUNK = os.environ.get("ENABLE_MINI_CHUNK", "").lower() == "true"
 # tokens. But we need it to be at least as big as 1/4th chunk size to avoid having a tiny mini-chunk at the end
 MINI_CHUNK_SIZE = 150
 # Timeout to wait for job's last update before killing it, in hours
-CLEANUP_INDEXING_JOBS_TIMEOUT = int(os.environ.get("CLEANUP_INDEXING_JOBS_TIMEOUT", 1))
+CLEANUP_INDEXING_JOBS_TIMEOUT = int(os.environ.get("CLEANUP_INDEXING_JOBS_TIMEOUT", 3))
 
 
 #####

@@ -31,6 +31,7 @@ QA_PROMPT_OVERRIDE = os.environ.get("QA_PROMPT_OVERRIDE") or None
 DOC_TIME_DECAY = float(
     os.environ.get("DOC_TIME_DECAY") or 0.5  # Hits limit at 2 years by default
 )
+BASE_RECENCY_DECAY = 0.5
 FAVOR_RECENT_DECAY_MULTIPLIER = 2.0
 # Currently this next one is not configurable via env
 DISABLE_LLM_QUERY_ANSWERABILITY = QA_PROMPT_OVERRIDE == "weak"
@@ -70,6 +71,9 @@ TITLE_CONTENT_RATIO = max(
 # A list of languages passed to the LLM to rephase the query
 # For example "English,French,Spanish", be sure to use the "," separator
 MULTILINGUAL_QUERY_EXPANSION = os.environ.get("MULTILINGUAL_QUERY_EXPANSION") or None
+
+# Stops streaming answers back to the UI if this pattern is seen:
+STOP_STREAM_PAT = os.environ.get("STOP_STREAM_PAT") or None
 
 # The backend logic for this being True isn't fully supported yet
 HARD_DELETE_CHATS = False
