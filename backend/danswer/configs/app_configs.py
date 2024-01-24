@@ -63,6 +63,13 @@ VALID_EMAIL_DOMAINS = (
     if _VALID_EMAIL_DOMAINS_STR
     else []
 )
+
+# Email whitelist, ie, emails of users who will be allowed to login
+_USER_WHITELIST = os.environ.get("USER_WHITELIST") or None
+USER_WHITELIST = (
+    [domain.strip() for domain in _USER_WHITELIST.split(",")] if _USER_WHITELIST else []
+)
+
 # OAuth Login Flow
 # Used for both Google OAuth2 and OIDC flows
 OAUTH_CLIENT_ID = (

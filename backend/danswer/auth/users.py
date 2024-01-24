@@ -38,6 +38,7 @@ from danswer.configs.app_configs import SMTP_PASS
 from danswer.configs.app_configs import SMTP_PORT
 from danswer.configs.app_configs import SMTP_SERVER
 from danswer.configs.app_configs import SMTP_USER
+from danswer.configs.app_configs import USER_WHITELIST
 from danswer.configs.app_configs import VALID_EMAIL_DOMAINS
 from danswer.configs.app_configs import WEB_DOMAIN
 from danswer.configs.constants import AuthType
@@ -56,7 +57,7 @@ from danswer.utils.variable_functionality import fetch_versioned_implementation
 logger = setup_logger()
 
 USER_WHITELIST_FILE = "/home/danswer_whitelist.txt"
-_user_whitelist: list[str] | None = None
+_user_whitelist: list[str] | None = USER_WHITELIST
 
 
 def verify_auth_setting() -> None:

@@ -125,8 +125,8 @@ export const SlackBotCreationForm = ({
               const errorMsg = responseJson.detail || responseJson.message;
               setPopup({
                 message: isUpdate
-                  ? `Error updating DanswerBot config - ${errorMsg}`
-                  : `Error creating DanswerBot config - ${errorMsg}`,
+                  ? `Error updating UPGovGPT config - ${errorMsg}`
+                  : `Error creating UPGovGPT config - ${errorMsg}`,
                 type: "error",
               });
             }
@@ -148,7 +148,7 @@ export const SlackBotCreationForm = ({
                       &apos;#ask-danswer&apos;.
                       <br />
                       <br />
-                      <i>NOTE</i>: you still need to add DanswerBot to the
+                      <i>NOTE</i>: you still need to add UPGovGPT to the
                       channel(s) in Slack itself. Setting this config will not
                       auto-add the bot to the channel.
                     </div>
@@ -156,7 +156,7 @@ export const SlackBotCreationForm = ({
                 />
                 <Divider />
 
-                <SectionHeader>When should DanswerBot respond?</SectionHeader>
+                <SectionHeader>When should UPGovGPT respond?</SectionHeader>
 
                 <BooleanFormField
                   name="answer_validity_check_enabled"
@@ -170,17 +170,17 @@ export const SlackBotCreationForm = ({
                 />
                 <BooleanFormField
                   name="respond_tag_only"
-                  label="Respond to @DanswerBot Only"
-                  subtext="If set, DanswerBot will only respond when directly tagged"
+                  label="Respond to @UPGovGPT Only"
+                  subtext="If set, UPGovGPT will only respond when directly tagged"
                 />
                 <TextArrayField
                   name="respond_team_member_list"
                   label="Team Members Emails"
-                  subtext={`If specified, DanswerBot responses will only be 
+                  subtext={`If specified, UPGovGPT responses will only be 
                   visible to members in this list. This is
-                  useful if you want DanswerBot to operate in an
+                  useful if you want UPGovGPT to operate in an
                   "assistant" mode, where it helps the team members find
-                  answers, but let's them build on top of DanswerBot's response / throw 
+                  answers, but let's them build on top of UPGovGPT's response / throw 
                   out the occasional incorrect answer.`}
                   values={values}
                 />
@@ -192,7 +192,7 @@ export const SlackBotCreationForm = ({
                   </SectionHeader>
                   <Text>
                     Use either a Persona <b>or</b> Document Sets to control how
-                    DanswerBot answers.
+                    UPGovGPT answers.
                   </Text>
                   <Text>
                     <ul className="list-disc mt-2 ml-4">
@@ -202,7 +202,7 @@ export const SlackBotCreationForm = ({
                       </li>
                       <li>
                         You should use Document Sets if you just want to control
-                        which documents DanswerBot uses as references.
+                        which documents UPGovGPT uses as references.
                       </li>
                     </ul>
                   </Text>
@@ -230,8 +230,8 @@ export const SlackBotCreationForm = ({
                           <div>
                             <div>
                               <SubLabel>
-                                The document sets that DanswerBot should search
-                                through. If left blank, DanswerBot will search
+                                The document sets that UPGovGPT should search
+                                through. If left blank, UPGovGPT will search
                                 through all documents.
                               </SubLabel>
                             </div>

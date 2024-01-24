@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Danswer",
+  title: "UPGovGPT",
   description: "Question answering for your documents",
 };
 
