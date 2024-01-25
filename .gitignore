@@ -6,4 +6,5 @@ secrets.yaml
 *.json
 *.log
 .idea
+deployment/data/nginx/app.conf
 /deployment/data/nginx/app.conf
