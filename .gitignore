@@ -8,3 +8,4 @@ secrets.yaml
 .idea
 deployment/data/nginx/app.conf
 /deployment/data/nginx/app.conf
+.vscode/launch.json

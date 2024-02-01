@@ -1,5 +1,5 @@
-schema danswer_chunk {
-    document danswer_chunk {
+schema DANSWER_CHUNK_NAME {
+    document DANSWER_CHUNK_NAME {
         # Not to be confused with the UUID generated for this chunk which is called documentid by default
         field document_id type string {
             indexing: summary | attribute
@@ -145,7 +145,7 @@ schema danswer_chunk {
         match-features: recency_bias
     }
 
-    rank-profile hybrid_search inherits default, default_rank {
+    rank-profile hybrid_searchVARIABLE_DIM inherits default, default_rank {
         inputs {
             query(query_embedding) tensor<float>(x[VARIABLE_DIM])
         }
@@ -227,7 +227,7 @@ schema danswer_chunk {
         match-features: recency_bias document_boost bm25(content)
     }
 
-    rank-profile semantic_search inherits default, default_rank {
+    rank-profile semantic_searchVARIABLE_DIM inherits default, default_rank {
         inputs {
             query(query_embedding) tensor<float>(x[VARIABLE_DIM])
         }
