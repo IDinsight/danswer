@@ -2,5 +2,10 @@
 .DS_store
 .venv
 .mypy_cache
+secrets.yaml
+*.json
+*.log
 .idea
+deployment/data/nginx/app.conf
 /deployment/data/nginx/app.conf
+.vscode/launch.json
