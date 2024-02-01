@@ -4,7 +4,6 @@ from datetime import datetime
 from typing import Any
 
 from danswer.access.models import DocumentAccess
-from danswer.configs.model_configs import DOC_EMBEDDING_DIM
 from danswer.indexing.models import DocMetadataAwareIndexChunk
 from danswer.indexing.models import InferenceChunk
 from danswer.search.models import IndexFilters
@@ -46,19 +45,31 @@ class UpdateRequest:
 
 class Verifiable(abc.ABC):
     @abc.abstractmethod
-    def __init__(self, index_name: str, *args: Any, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        index_name: str,
+        secondary_index_name: str | None,
+        *args: Any,
+        **kwargs: Any
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.index_name = index_name
+        self.secondary_index_name = secondary_index_name
 
     @abc.abstractmethod
-    def ensure_indices_exist(self, embedding_dim: int = DOC_EMBEDDING_DIM) -> None:
+    def ensure_indices_exist(
+        self,
+        index_embedding_dim: int,
+        secondary_index_embedding_dim: int | None,
+    ) -> None:
         raise NotImplementedError
 
 
 class Indexable(abc.ABC):
     @abc.abstractmethod
     def index(
-        self, chunks: list[DocMetadataAwareIndexChunk]
+        self,
+        chunks: list[DocMetadataAwareIndexChunk],
     ) -> set[DocumentInsertionRecord]:
         """Indexes document chunks into the Document Index and return the IDs of all the documents indexed"""
         raise NotImplementedError
@@ -106,7 +117,8 @@ class VectorCapable(abc.ABC):
     @abc.abstractmethod
     def semantic_retrieval(
         self,
-        query: str,
+        query: str,  # Needed for matching purposes
+        query_embedding: list[float],
         filters: IndexFilters,
         time_decay_multiplier: float,
         num_to_retrieve: int,
@@ -120,6 +132,7 @@ class HybridCapable(abc.ABC):
     def hybrid_retrieval(
         self,
         query: str,
+        query_embedding: list[float],
         filters: IndexFilters,
         time_decay_multiplier: float,
         num_to_retrieve: int,

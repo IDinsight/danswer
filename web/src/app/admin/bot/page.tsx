@@ -2,7 +2,12 @@
 
 import { ThreeDotsLoader } from "@/components/Loading";
 import { PageSelector } from "@/components/PageSelector";
-import { CPUIcon, EditIcon, TrashIcon } from "@/components/icons/icons";
+import {
+  CPUIcon,
+  EditIcon,
+  SlackIcon,
+  TrashIcon,
+} from "@/components/icons/icons";
 import { SlackBotConfig } from "@/lib/types";
 import { useState } from "react";
 import { useSlackBotConfigs, useSlackBotTokens } from "./hooks";
@@ -21,7 +26,12 @@ import {
   Text,
   Title,
 } from "@tremor/react";
-import { FiArrowUpRight, FiChevronDown, FiChevronUp } from "react-icons/fi";
+import {
+  FiArrowUpRight,
+  FiChevronDown,
+  FiChevronUp,
+  FiSlack,
+} from "react-icons/fi";
 import Link from "next/link";
 import { InstantSSRAutoRefresh } from "@/components/SSRAutoRefresh";
 
@@ -177,8 +187,9 @@ const Main = () => {
       {popup}
 
       <Text className="mb-2">
-        Setup a Slack bot that connects to UPGovGPT. Once setup, you will be able
-        to ask questions to UPGovGPT directly from Slack. Additionally, you can:
+        Setup a Slack bot that connects to UPGovGPT. Once setup, you will be
+        able to ask questions to UPGovGPT directly from Slack. Additionally, you
+        can:
       </Text>
 
       <Text className="mb-2">
@@ -188,12 +199,11 @@ const Main = () => {
             channels.
           </li>
           <li>
-            Choose which document sets UPGovGPT should answer from, depending
-            on the channel the question is being asked.
+            Choose which document sets UPGovGPT should answer from, depending on
+            the channel the question is being asked.
           </li>
           <li>
-            Directly message UPGovGPT to search just as you would in the web
-            UI.
+            Directly message UPGovGPT to search just as you would in the web UI.
           </li>
         </ul>
       </Text>
@@ -283,7 +293,7 @@ const Page = () => {
   return (
     <div className="container mx-auto">
       <AdminPageTitle
-        icon={<CPUIcon size={32} />}
+        icon={<FiSlack size={32} />}
         title="Slack Bot Configuration"
       />
       <InstantSSRAutoRefresh />

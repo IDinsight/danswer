@@ -6,12 +6,7 @@ import {
 import { redirect } from "next/navigation";
 import { fetchSS } from "@/lib/utilsSS";
 import { Connector, DocumentSet, Tag, User, ValidSources } from "@/lib/types";
-import {
-  BackendMessage,
-  ChatSession,
-  Message,
-  RetrievalType,
-} from "./interfaces";
+import { ChatSession } from "./interfaces";
 import { unstable_noStore as noStore } from "next/cache";
 import { Persona } from "../admin/personas/interfaces";
 import { InstantSSRAutoRefresh } from "@/components/SSRAutoRefresh";
@@ -21,6 +16,11 @@ import { cookies } from "next/headers";
 import { DOCUMENT_SIDEBAR_WIDTH_COOKIE_NAME } from "@/components/resizable/contants";
 import { personaComparator } from "../admin/personas/lib";
 import { ChatLayout } from "./ChatPage";
+import {
+  FullEmbeddingModelResponse,
+  checkModelNameIsValid,
+} from "../admin/models/embedding/embeddingModels";
+import { SwitchModelModal } from "@/components/SwitchModelModal";
 
 export default async function Page({
   searchParams,
@@ -37,20 +37,19 @@ export default async function Page({
     fetchSS("/persona?include_default=true"),
     fetchSS("/chat/get-user-chat-sessions"),
     fetchSS("/query/valid-tags"),
+    fetchSS("/secondary-index/get-embedding-models"),
   ];
 
   // catch cases where the backend is completely unreachable here
   // without try / catch, will just raise an exception and the page
   // will not render
-  let results: (User | Response | AuthTypeMetadata | null)[] = [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-  ];
+  let results: (
+    | User
+    | Response
+    | AuthTypeMetadata
+    | FullEmbeddingModelResponse
+    | null
+  )[] = [null, null, null, null, null, null, null, null];
   try {
     results = await Promise.all(tasks);
   } catch (e) {
@@ -63,6 +62,7 @@ export default async function Page({
   const personasResponse = results[4] as Response | null;
   const chatSessionsResponse = results[5] as Response | null;
   const tagsResponse = results[6] as Response | null;
+  const embeddingModelResponse = results[7] as Response | null;
 
   const authDisabled = authTypeMetadata?.authType === "disabled";
   if (!authDisabled && !user) {
@@ -124,6 +124,15 @@ export default async function Page({
     console.log(`Failed to fetch tags - ${tagsResponse?.status}`);
   }
 
+  const embeddingModelVersionInfo =
+    embeddingModelResponse && embeddingModelResponse.ok
+      ? ((await embeddingModelResponse.json()) as FullEmbeddingModelResponse)
+      : null;
+  const currentEmbeddingModelName =
+    embeddingModelVersionInfo?.current_model_name;
+  const nextEmbeddingModelName =
+    embeddingModelVersionInfo?.secondary_model_name;
+
   const defaultPersonaIdRaw = searchParams["personaId"];
   const defaultPersonaId = defaultPersonaIdRaw
     ? parseInt(defaultPersonaIdRaw)
@@ -141,7 +150,15 @@ export default async function Page({
       <InstantSSRAutoRefresh />
       <ApiKeyModal />
 
-      {connectors.length === 0 && <WelcomeModal />}
+      {connectors.length === 0 ? (
+        <WelcomeModal embeddingModelName={currentEmbeddingModelName} />
+      ) : (
+        embeddingModelVersionInfo &&
+        !checkModelNameIsValid(currentEmbeddingModelName) &&
+        !nextEmbeddingModelName && (
+          <SwitchModelModal embeddingModelName={currentEmbeddingModelName} />
+        )
+      )}
 
       <ChatLayout
         user={user}

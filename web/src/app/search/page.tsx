@@ -17,6 +17,11 @@ import { WelcomeModal } from "@/components/WelcomeModal";
 import { unstable_noStore as noStore } from "next/cache";
 import { InstantSSRAutoRefresh } from "@/components/SSRAutoRefresh";
 import { personaComparator } from "../admin/personas/lib";
+import {
+  FullEmbeddingModelResponse,
+  checkModelNameIsValid,
+} from "../admin/models/embedding/embeddingModels";
+import { SwitchModelModal } from "@/components/SwitchModelModal";
 
 export default async function Home() {
   // Disable caching so we always get the up to date connector / document set / persona info
@@ -31,19 +36,19 @@ export default async function Home() {
     fetchSS("/manage/document-set"),
     fetchSS("/persona"),
     fetchSS("/query/valid-tags"),
+    fetchSS("/secondary-index/get-embedding-models"),
   ];
 
   // catch cases where the backend is completely unreachable here
   // without try / catch, will just raise an exception and the page
   // will not render
-  let results: (User | Response | AuthTypeMetadata | null)[] = [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-  ];
+  let results: (
+    | User
+    | Response
+    | AuthTypeMetadata
+    | FullEmbeddingModelResponse
+    | null
+  )[] = [null, null, null, null, null, null, null];
   try {
     results = await Promise.all(tasks);
   } catch (e) {
@@ -55,6 +60,7 @@ export default async function Home() {
   const documentSetsResponse = results[3] as Response | null;
   const personaResponse = results[4] as Response | null;
   const tagsResponse = results[5] as Response | null;
+  const embeddingModelResponse = results[6] as Response | null;
 
   const authDisabled = authTypeMetadata?.authType === "disabled";
   if (!authDisabled && !user) {
@@ -99,6 +105,16 @@ export default async function Home() {
     console.log(`Failed to fetch tags - ${tagsResponse?.status}`);
   }
 
+  const embeddingModelVersionInfo =
+    embeddingModelResponse && embeddingModelResponse.ok
+      ? ((await embeddingModelResponse.json()) as FullEmbeddingModelResponse)
+      : null;
+  const currentEmbeddingModelName =
+    embeddingModelVersionInfo?.current_model_name;
+  const nextEmbeddingModelName =
+    embeddingModelVersionInfo?.secondary_model_name;
+  console.log(embeddingModelVersionInfo);
+
   // needs to be done in a non-client side component due to nextjs
   const storedSearchType = cookies().get("searchType")?.value as
     | string
@@ -117,7 +133,17 @@ export default async function Home() {
       </div>
       <ApiKeyModal />
       <InstantSSRAutoRefresh />
-      {connectors.length === 0 && connectorsResponse?.ok && <WelcomeModal />}
+
+      {connectors.length === 0 ? (
+        <WelcomeModal embeddingModelName={currentEmbeddingModelName} />
+      ) : (
+        embeddingModelVersionInfo &&
+        !checkModelNameIsValid(currentEmbeddingModelName) &&
+        !nextEmbeddingModelName && (
+          <SwitchModelModal embeddingModelName={currentEmbeddingModelName} />
+        )
+      )}
+
       <div className="px-24 pt-10 flex flex-col items-center min-h-screen">
         <div className="w-full">
           <SearchSection
