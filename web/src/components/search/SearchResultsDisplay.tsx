@@ -166,8 +166,8 @@ export const SearchResultsDisplay = ({
           <div className="font-bold text-emphasis border-b mb-3 pb-1 border-border text-lg">
             Results
           </div>
-          {removeDuplicateDocs(documents).map((document) => (
-            <div className="w-3/5 mx-auto">
+          <div className="w-3/5 mx-auto">
+            {removeDuplicateDocs(documents).map((document) => (
               <DocumentDisplay
                 key={document.document_id}
                 document={document}
@@ -175,8 +175,8 @@ export const SearchResultsDisplay = ({
                 isSelected={selectedDocumentIds.has(document.document_id)}
                 setPopup={setPopup}
               />
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </>
