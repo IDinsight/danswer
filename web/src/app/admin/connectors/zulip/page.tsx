@@ -93,7 +93,7 @@ const MainSection = () => {
         <>
           <Text className="mb-4">
             To use the Zulip connector, you must first provide content of the
-            zuliprc config file. For more details on setting up the UPGovGPT
+            zuliprc config file. For more details on setting up the ElectionGPT
             Zulip connector, see the{" "}
             <a
               className="text-link"

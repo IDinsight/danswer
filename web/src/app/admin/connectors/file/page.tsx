@@ -52,9 +52,9 @@ const Main = () => {
       {filesAreUploading && <Spinner />}
       <Text className="mb-2">
         Specify files below, click the <b>Upload</b> button, and the contents of
-        these files will be searchable via UPGovGPT! Currently only <i>.txt</i>,{" "}
-        <i>.pdf</i> and <i>.zip</i> files (containing only <i>.txt</i> files)
-        are supported.
+        these files will be searchable via ElectionGPT! Currently only{" "}
+        <i>.txt</i>, <i>.pdf</i> and <i>.zip</i> files (containing only{" "}
+        <i>.txt</i> files) are supported.
       </Text>
       <Text className="mb-3">
         <b>NOTE:</b> if the original document is accessible via a link, you can
@@ -65,8 +65,8 @@ const Main = () => {
           </div>
         </div>{" "}
         where <i>{"<LINK>"}</i> is the link to the file. This will enable
-        UPGovGPT to link users to the original document when they click on the
-        search result. More details on this can be found in the{" "}
+        ElectionGPT to link users to the original document when they click on
+        the search result. More details on this can be found in the{" "}
         <a
           href="https://docs.danswer.dev/connectors/file"
           className="text-link"

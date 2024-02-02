@@ -73,7 +73,7 @@ async function Page({ params }: { params: { id: string } }) {
 
       <Text className="mb-8">
         Edit the existing configuration below! This config will determine how
-        UPGovGPT behaves in the specified channels.
+        ElectionGPT behaves in the specified channels.
       </Text>
 
       <SlackBotCreationForm

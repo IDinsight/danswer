@@ -187,23 +187,24 @@ const Main = () => {
       {popup}
 
       <Text className="mb-2">
-        Setup a Slack bot that connects to UPGovGPT. Once setup, you will be
-        able to ask questions to UPGovGPT directly from Slack. Additionally, you
-        can:
+        Setup a Slack bot that connects to ElectionGPT. Once setup, you will be
+        able to ask questions to ElectionGPT directly from Slack. Additionally,
+        you can:
       </Text>
 
       <Text className="mb-2">
         <ul className="list-disc mt-2 ml-4">
           <li>
-            Setup UPGovGPT to automatically answer questions in certain
+            Setup ElectionGPT to automatically answer questions in certain
             channels.
           </li>
           <li>
-            Choose which document sets UPGovGPT should answer from, depending on
-            the channel the question is being asked.
+            Choose which document sets ElectionGPT should answer from, depending
+            on the channel the question is being asked.
           </li>
           <li>
-            Directly message UPGovGPT to search just as you would in the web UI.
+            Directly message ElectionGPT to search just as you would in the web
+            UI.
           </li>
         </ul>
       </Text>
@@ -259,10 +260,10 @@ const Main = () => {
       )}
       {slackBotTokens && (
         <>
-          <Title className="mb-2 mt-4">Step 2: Setup UPGovGPT</Title>
+          <Title className="mb-2 mt-4">Step 2: Setup ElectionGPT</Title>
           <Text className="mb-3">
-            Configure UPGovGPT to automatically answer questions in Slack
-            channels. By default, UPGovGPT only responds in channels where a
+            Configure ElectionGPT to automatically answer questions in Slack
+            channels. By default, ElectionGPT only responds in channels where a
             configuration is setup unless it is explicitly tagged.
           </Text>
 

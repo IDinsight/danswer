@@ -316,9 +316,9 @@ export const GmailOAuthSection = ({
     return (
       <div>
         <p className="text-sm mb-2">
-          When using a Gmail Service Account, you can either have Danswer act as
-          the service account itself OR you can specify an account for the
-          service account to impersonate.
+          When using a Gmail Service Account, you can either have ElectionGPT
+          act as the service account itself OR you can specify an account for
+          the service account to impersonate.
           <br />
           <br />
           If you want to use the service account itself, leave the{" "}
@@ -371,7 +371,7 @@ export const GmailOAuthSection = ({
                 <TextFormField
                   name="gmail_delegated_user"
                   label="[Optional] User email to impersonate:"
-                  subtext="If left blank, Danswer will use the service account itself."
+                  subtext="If left blank, ElectionGPT will use the service account itself."
                 />
                 <div className="flex">
                   <button

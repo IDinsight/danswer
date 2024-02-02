@@ -63,7 +63,9 @@ export const AIMessage = ({
               </div>
             </div>
 
-            <div className="font-bold text-emphasis ml-2 my-auto">UPGovGPT</div>
+            <div className="font-bold text-emphasis ml-2 my-auto">
+              ElectionGPT
+            </div>
 
             {query === undefined &&
               hasDocs &&

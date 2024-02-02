@@ -77,8 +77,8 @@ const Main = () => {
       <Text>
         This connector allows you to sync all your <i>Features</i>,{" "}
         <i>Components</i>, <i>Products</i>, and <i>Objectives</i> from
-        Productboard into UPGovGPT. At this time, the Productboard APIs does not
-        support pulling in <i>Releases</i> or <i>Notes</i>.
+        Productboard into ElectionGPT. At this time, the Productboard APIs does
+        not support pulling in <i>Releases</i> or <i>Notes</i>.
       </Text>
 
       <Title className="mb-2 mt-6 ml-auto mr-auto">
