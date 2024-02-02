@@ -55,40 +55,36 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
 
   return (
     <header className="border-b border-border bg-background-emphasis">
-      <div className="mx-8 flex h-16">
-        <Link className="py-4" href="/search">
+      <div className="mx-4 flex h-16 items-center justify-between">
+        <Link className="py-2" href="/search">
           <div className="flex">
-            <div className="h-[32px] w-[30px] mr-3">
-              <Image src="/logo.png" alt="Logo" width="1419" height="1520" />
-            </div>
             <h1 className="flex text-2xl text-strong font-bold my-auto">
               ElectionGPT
             </h1>
           </div>
         </Link>
 
-        <Link
-          href="/search"
-          className={"ml-6 h-full flex flex-col hover:bg-hover"}
-        >
-          <div className="w-24 flex my-auto">
-            <div className={"mx-auto flex text-strong px-2"}>
-              <FiSearch className="my-auto mr-1" />
-              <h1 className="flex text-sm font-bold my-auto">Search</h1>
+        <div className="flex space-x-4">
+          <Link href="/search" className="h-full flex flex-col hover:bg-hover">
+            <div className="flex my-auto">
+              <div className="flex text-strong px-1">
+                <FiSearch className="my-auto mr-1" />
+                <h1 className="flex text-sm font-bold my-auto">Search</h1>
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
 
-        <Link href="/chat" className="h-full flex flex-col hover:bg-hover">
-          <div className="w-24 flex my-auto">
-            <div className="mx-auto flex text-strong px-2">
-              <FiMessageSquare className="my-auto mr-1" />
-              <h1 className="flex text-sm font-bold my-auto">Chat</h1>
+          <Link href="/chat" className="h-full flex flex-col hover:bg-hover">
+            <div className="flex my-auto">
+              <div className="flex text-strong px-1">
+                <FiMessageSquare className="my-auto mr-1" />
+                <h1 className="flex text-sm font-bold my-auto">Chat</h1>
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+        </div>
 
-        <div className="ml-auto h-full flex flex-col">
+        <div className="h-full flex flex-col">
           <div className="my-auto">
             <CustomDropdown
               dropdown={

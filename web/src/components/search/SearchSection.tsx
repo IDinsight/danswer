@@ -212,8 +212,8 @@ export const SearchSection = ({
   };
 
   return (
-    <div className="relative max-w-[2000px] xl:max-w-[1430px] mx-auto">
-      <div className="absolute left-0 hidden 2xl:block w-64">
+    <div className="relative w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-[1430px] mx-auto">
+      <div className="absolute left-0 hidden 3xl:block w-64">
         {(connectors.length > 0 || documentSets.length > 0) && (
           <SourceSelector
             {...filterManager}
@@ -222,7 +222,6 @@ export const SearchSection = ({
             availableTags={tags}
           />
         )}
-
         <div className="mt-10 pr-5">
           <SearchHelper
             isFetching={isFetching}
@@ -246,7 +245,7 @@ export const SearchSection = ({
           />
         </div>
       </div>
-      <div className="w-[800px] mx-auto">
+      <div className="w-full sm:w-[600px] md:w-[800px] mx-auto">
         {personas.length > 0 ? (
           <div className="flex mb-2 w-fit">
             <PersonaSelector

@@ -167,13 +167,15 @@ export const SearchResultsDisplay = ({
             Results
           </div>
           {removeDuplicateDocs(documents).map((document) => (
-            <DocumentDisplay
-              key={document.document_id}
-              document={document}
-              queryEventId={queryEventId}
-              isSelected={selectedDocumentIds.has(document.document_id)}
-              setPopup={setPopup}
-            />
+            <div className="w-3/5 mx-auto">
+              <DocumentDisplay
+                key={document.document_id}
+                document={document}
+                queryEventId={queryEventId}
+                isSelected={selectedDocumentIds.has(document.document_id)}
+                setPopup={setPopup}
+              />
+            </div>
           ))}
         </div>
       )}
