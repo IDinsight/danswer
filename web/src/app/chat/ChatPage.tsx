@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { FiMenu } from "react-icons/fi";
 import { useSearchParams } from "next/navigation";
 import { ChatSession } from "./interfaces";
 import { ChatSidebar } from "./sessionSidebar/ChatSidebar";
@@ -33,6 +35,7 @@ export function ChatLayout({
   const searchParams = useSearchParams();
   const chatIdRaw = searchParams.get("chatId");
   const chatId = chatIdRaw ? parseInt(chatIdRaw) : null;
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const selectedChatSession = chatSessions.find(
     (chatSession) => chatSession.id === chatId
@@ -42,17 +45,29 @@ export function ChatLayout({
     <>
       <div className="absolute top-0 z-40 w-full">
         <Header user={user} />
+        <button
+          className="md:hidden p-4"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          <FiMenu />
+        </button>
       </div>
       <HealthCheckBanner />
       <ApiKeyModal />
       <InstantSSRAutoRefresh />
 
       <div className="flex relative bg-background text-default overflow-x-hidden">
-        <ChatSidebar
-          existingChats={chatSessions}
-          currentChatId={chatId}
-          user={user}
-        />
+        <div
+          className={`transform top-0 left-0 w-64 md:w-96 fixed h-full overflow-auto ease-in-out transition-all duration-300 z-30 ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 md:relative md:static`}
+        >
+          <ChatSidebar
+            existingChats={chatSessions}
+            currentChatId={chatId}
+            user={user}
+          />
+        </div>
 
         <Chat
           existingChatSessionId={chatId}

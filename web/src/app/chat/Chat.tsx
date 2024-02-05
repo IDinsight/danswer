@@ -148,10 +148,10 @@ export const Chat = ({
           (persona) => persona.id === existingChatSessionPersonaId
         )
       : defaultSelectedPersonaId !== undefined
-        ? availablePersonas.find(
-            (persona) => persona.id === defaultSelectedPersonaId
-          )
-        : undefined
+      ? availablePersonas.find(
+          (persona) => persona.id === defaultSelectedPersonaId
+        )
+      : undefined
   );
   const livePersona = selectedPersona || availablePersonas[0];
 
@@ -448,23 +448,6 @@ export const Chat = ({
               className={`w-full h-screen ${HEADER_PADDING} flex flex-col overflow-y-auto relative`}
               ref={scrollableDivRef}
             >
-              {livePersona && (
-                <div className="sticky top-0 left-80 z-10 w-full bg-background/90">
-                  <div className="ml-2 p-1 rounded mt-2 w-fit">
-                    <ChatPersonaSelector
-                      personas={availablePersonas}
-                      selectedPersonaId={livePersona.id}
-                      onPersonaChange={(persona) => {
-                        if (persona) {
-                          setSelectedPersona(persona);
-                          router.push(`/chat?personaId=${persona.id}`);
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
-
               {messageHistory.length === 0 &&
                 !isFetchingChatMessages &&
                 !isStreaming && (
