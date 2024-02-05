@@ -91,7 +91,7 @@ export const AIMessage = ({
             {query !== undefined &&
               handleShowRetrieved !== undefined &&
               isCurrentlyShowingRetrieved !== undefined && (
-                <div className="my-1">
+                <div className="my-1 hidden sm:block">
                   <SearchSummary
                     query={query}
                     hasDocs={hasDocs || false}
