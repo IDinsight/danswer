@@ -55,7 +55,7 @@ export const AIMessage = ({
   return (
     <div
       className={
-        "px-0 py-5 sm:py-5 sm:px-5 flex -mr-6 w-full h-screen sm:h-auto justify-center"
+        "px-0 py-5 sm:py-5 sm:px-5 flex -mr-6 w-full h-auto sm:h-auto justify-center"
       }
     >
       <div className="mx-0 sm:mx-auto w-full sm:w-searchbar-xs 2xl:w-searchbar-sm 3xl:w-searchbar relative min-w-0 overflow-wrap break-word">
