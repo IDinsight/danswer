@@ -68,18 +68,18 @@ export const ChatSidebar = ({
   return (
     <div
       className={`
-        w-72
-        2xl:w-80
-        ${HEADER_PADDING}
-        border-r 
-        border-border 
-        flex 
-        flex-col 
-        h-screen
-        transition-transform`}
+      w-full
+      md:w-72
+      2xl:w-80
+      ${HEADER_PADDING}
+      flex 
+      flex-col 
+      h-screen
+      transition-transform
+      items-center sm:items-start`}
       id="chat-sidebar"
     >
-      <Link href="/chat" className="mx-3 mt-5">
+      <Link href="/chat" passHref className="mx-3 mt-5">
         <BasicClickable fullWidth>
           <div className="flex text-sm">
             <FiPlusSquare className="my-auto mr-2" /> New Chat
