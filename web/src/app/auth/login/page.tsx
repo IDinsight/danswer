@@ -69,9 +69,6 @@ const Page = async ({
       </div>
       <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div>
-          <div className="h-16 w-16 mx-auto">
-            <Image src="/logo.png" alt="Logo" width="1419" height="1520" />
-          </div>
           {authUrl && authTypeMetadata && (
             <>
               <h2 className="text-center text-xl text-strong font-bold mt-6">
