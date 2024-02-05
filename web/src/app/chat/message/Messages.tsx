@@ -53,9 +53,13 @@ export const AIMessage = ({
 }) => {
   const [copyClicked, setCopyClicked] = useState(false);
   return (
-    <div className={"py-5 px-5 flex -mr-6 w-full"}>
-      <div className="mx-auto w-searchbar-xs 2xl:w-searchbar-sm 3xl:w-searchbar relative">
-        <div className="ml-8">
+    <div
+      className={
+        "px-0 py-5 sm:py-5 sm:px-5 flex -mr-6 w-full h-screen sm:h-auto justify-center"
+      }
+    >
+      <div className="mx-0 sm:mx-auto w-full sm:w-searchbar-xs 2xl:w-searchbar-sm 3xl:w-searchbar relative min-w-0 overflow-wrap break-word">
+        <div className="ml-0 sm:ml-8">
           <div className="flex">
             <div className="p-1 bg-ai rounded-lg h-fit my-auto">
               <div className="text-inverted">
@@ -72,7 +76,7 @@ export const AIMessage = ({
               handleShowRetrieved !== undefined &&
               isCurrentlyShowingRetrieved !== undefined && (
                 <div className="flex w-message-xs 2xl:w-message-sm 3xl:w-message-default absolute ml-8">
-                  <div className="ml-auto">
+                  <div className="ml-auto hidden sm:block">
                     <ShowHideDocsButton
                       messageId={messageId}
                       isCurrentlyShowingRetrieved={isCurrentlyShowingRetrieved}
@@ -83,7 +87,7 @@ export const AIMessage = ({
               )}
           </div>
 
-          <div className="w-message-xs 2xl:w-message-sm 3xl:w-message-default break-words mt-1 ml-8">
+          <div className="max-w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl break-words mt-1 ml-8">
             {query !== undefined &&
               handleShowRetrieved !== undefined &&
               isCurrentlyShowingRetrieved !== undefined && (
@@ -180,7 +184,7 @@ export const AIMessage = ({
             )}
           </div>
           {handleFeedback && (
-            <div className="flex flex-col md:flex-row gap-x-0.5 ml-8 mt-1">
+            <div className="flex flex-row gap-x-0.5 ml-8 mt-1">
               <Hoverable
                 onClick={() => {
                   navigator.clipboard.writeText(content.toString());
@@ -210,9 +214,9 @@ export const HumanMessage = ({
   content: string | JSX.Element;
 }) => {
   return (
-    <div className="py-5 px-5 flex -mr-6 w-full">
-      <div className="mx-auto w-searchbar-xs 2xl:w-searchbar-sm 3xl:w-searchbar">
-        <div className="ml-8">
+    <div className="p-0 sm:py-5 sm:px-5 flex w-full">
+      <div className="mx-0 sm:mx-auto w-full sm:w-searchbar-xs 2xl:w-searchbar-sm 3xl:w-searchbar">
+        <div className="ml-0 sm:ml-8">
           <div className="flex">
             <div className="p-1 bg-user rounded-lg h-fit">
               <div className="text-inverted">
@@ -222,8 +226,8 @@ export const HumanMessage = ({
 
             <div className="font-bold text-emphasis ml-2 my-auto">You</div>
           </div>
-          <div className="mx-auto mt-1 ml-8 w-searchbar-xs 2xl:w-searchbar-sm 3xl:w-searchbar-default flex flex-wrap">
-            <div className="w-message-xs 2xl:w-message-sm 3xl:w-message-default break-words">
+          <div>
+            <div className="break-words">
               {typeof content === "string" ? (
                 <ReactMarkdown
                   className="prose max-w-full"

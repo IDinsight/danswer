@@ -700,18 +700,20 @@ export const Chat = ({
             </div>
           </div>
 
-          <ResizableSection
-            intialWidth={documentSidebarInitialWidth}
-            minWidth={400}
-            maxWidth={maxDocumentSidebarWidth || undefined}
-          >
-            <DocumentSidebar
-              selectedMessage={aiMessage}
-              selectedDocuments={selectedDocuments}
-              setSelectedDocuments={setSelectedDocuments}
-              isLoading={isFetchingChatMessages}
-            />
-          </ResizableSection>
+          <div className="hidden sm:block">
+            <ResizableSection
+              intialWidth={documentSidebarInitialWidth}
+              minWidth={400}
+              maxWidth={maxDocumentSidebarWidth || undefined}
+            >
+              <DocumentSidebar
+                selectedMessage={aiMessage}
+                selectedDocuments={selectedDocuments}
+                setSelectedDocuments={setSelectedDocuments}
+                isLoading={isFetchingChatMessages}
+              />
+            </ResizableSection>
+          </div>
         </>
       ) : (
         <div className="mx-auto h-full flex flex-col">
