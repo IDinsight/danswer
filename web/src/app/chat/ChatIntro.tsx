@@ -164,7 +164,9 @@ export function ChatIntro({
                         <div className="mr-1 my-auto">
                           {sourceMetadata.icon({})}
                         </div>
-                        {sourceMetadata.displayName}
+                        <div className="my-auto">
+                          {sourceMetadata.displayName}
+                        </div>
                       </span>
                     ))}
                   </div>
