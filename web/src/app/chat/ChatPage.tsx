@@ -66,6 +66,7 @@ export function ChatLayout({
             existingChats={chatSessions}
             currentChatId={chatId}
             user={user}
+            setIsSidebarOpen={setIsSidebarOpen}
           />
         </div>
 

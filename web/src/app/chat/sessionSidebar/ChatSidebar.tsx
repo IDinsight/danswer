@@ -24,12 +24,14 @@ interface ChatSidebarProps {
   existingChats: ChatSession[];
   currentChatId: number | null;
   user: User | null;
+  setIsSidebarOpen: (value: boolean) => void;
 }
 
 export const ChatSidebar = ({
   existingChats,
   currentChatId,
   user,
+  setIsSidebarOpen,
 }: ChatSidebarProps) => {
   const router = useRouter();
 
@@ -80,7 +82,7 @@ export const ChatSidebar = ({
       id="chat-sidebar"
     >
       <Link href="/chat" passHref className="mx-3 mt-5">
-        <BasicClickable fullWidth>
+        <BasicClickable fullWidth onClick={() => setIsSidebarOpen(false)}>
           <div className="flex text-sm">
             <FiPlusSquare className="my-auto mr-2" /> New Chat
           </div>
