@@ -94,23 +94,24 @@ def extract_text_from_pdf(pdf_path, zoom_factor=4):
     return {"text": extracted_text, "title": inferred_name}
 
 
-# Loop through each file in the folder
-for filename in os.listdir(folder_path):
-    if filename.endswith(".pdf"):
-        # Extract text from the PDF
-        extracted = extract_text_from_pdf(
-            os.path.join(folder_path, filename), zoom_factor=4
-        )
-        text = extracted["text"]
-        title = extracted["title"]
+if __name__ == "__main__":
+    # Loop through each file in the folder
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".pdf"):
+            # Extract text from the PDF
+            extracted = extract_text_from_pdf(
+                os.path.join(folder_path, filename), zoom_factor=4
+            )
+            text = extracted["text"]
+            title = extracted["title"].replace("/", " Or ")
 
-        counter = 1
-        output_file_path = os.path.join(output_path, f"{title}.txt")
+            counter = 1
+            output_file_path = os.path.join(output_path, f"{title}.txt")
 
-        # If the file already exists, append a counter to the filename
-        while os.path.exists(output_file_path):
-            output_file_path = os.path.join(output_path, f"{title}_{counter}.txt")
-            counter += 1
+            # If the file already exists, append a counter to the filename
+            while os.path.exists(output_file_path):
+                output_file_path = os.path.join(output_path, f"{title}_{counter}.txt")
+                counter += 1
 
-        with open(output_file_path, "w") as file:
-            file.write(text)
+            with open(output_file_path, "w") as file:
+                file.write(text)
