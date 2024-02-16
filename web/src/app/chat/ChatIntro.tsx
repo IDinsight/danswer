@@ -182,7 +182,13 @@ export function ChatIntro({
               <p className="font-bold text-xl mb-1 mt-4 text-emphasis text-center">
                 Chat with ElectionGPT{" "}
               </p>
-              <p className="text-sm text-center">Ask a question</p>
+              <p className="text-sm text-center">Ask a question.</p>
+              <br />
+              <p className="text-sm text-center text-gray-600 bg-gray-200 p-3 rounded-md">
+                <strong>Disclaimer</strong>: ElectionGPT is a prototype system.
+                Answers may not always be reliable or correct. Consider checking
+                source documents for important queries.
+              </p>
               {availablePersonas.length > MAX_PERSONAS_TO_DISPLAY && (
                 <div className="mt-4 flex">
                   <div
