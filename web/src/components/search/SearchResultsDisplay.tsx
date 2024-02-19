@@ -165,7 +165,7 @@ export const SearchResultsDisplay = ({
           <div className="font-bold text-emphasis border-b mb-3 pb-1 border-border text-lg">
             Results
           </div>
-          <div className="w-3/5 mx-auto">
+          <div className="w-4/5 mx-auto">
             {removeDuplicateDocs(documents).map((document, ind) => (
               <DocumentDisplay
                 key={document.document_id}

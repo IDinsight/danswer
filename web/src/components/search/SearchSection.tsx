@@ -268,7 +268,7 @@ export const SearchSection = ({
           }}
         />
         {!searchResponse && <DisclaimerAndExamples />}
-        <div className="mt-2">
+        <div className="mt-2 mx-5">
           <SearchResultsDisplay
             searchResponse={searchResponse}
             validQuestionResponse={validQuestionResponse}

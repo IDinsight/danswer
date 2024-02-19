@@ -144,7 +144,7 @@ export default async function Home() {
         )
       )}
 
-      <div className="px-2 pt-10 flex flex-col items-center min-h-screen sm:w-4/5 sm:mx-auto">
+      <div className="mt-20 px-2 pt-10 flex flex-col items-center min-h-screen sm:w-4/5 sm:mx-auto">
         <div className="w-full">
           <SearchSection
             connectors={connectors}
