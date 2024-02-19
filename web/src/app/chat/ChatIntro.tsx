@@ -176,12 +176,11 @@ export function ChatIntro({
           <div className="px-12 w-searchbar-xs 2xl:w-searchbar-sm 3xl:w-searchbar">
             <div className="mx-auto"></div>
 
-            <div className="mt-2">
+            <div className="mt-40">
               <p className="font-bold text-xl mb-1 mt-4 text-emphasis text-center">
                 Chat with ElectionGPT{" "}
               </p>
               <p className="text-sm text-center">Ask a question.</p>
-              <br />
               <DisclaimerAndExamples />
               {availablePersonas.length > MAX_PERSONAS_TO_DISPLAY && (
                 <div className="mt-4 flex">
