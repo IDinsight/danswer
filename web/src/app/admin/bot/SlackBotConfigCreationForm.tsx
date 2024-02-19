@@ -193,7 +193,7 @@ export const SlackBotCreationForm = ({
                 <BooleanFormField
                   name="respond_to_bots"
                   label="Responds to Bot messages"
-                  subtext="If not set, DanswerBot will always ignore messages from Bots"
+                  subtext="If not set, ElectionGPT will always ignore messages from Bots"
                 />
                 <TextArrayField
                   name="respond_team_member_list"
