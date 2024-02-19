@@ -3,7 +3,7 @@ import React, { ReactFragment } from "react";
 const DisclaimerAndExamples: React.FC = () => {
   return (
     <>
-      <div className="mt-4">
+      <div className="mt-4 mx-5">
         <div className="font-bold text-emphasis border-b mb-3 pb-1 border-border text-lg">
           Example Queries
         </div>
