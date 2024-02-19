@@ -247,7 +247,7 @@ export const SearchSection = ({
         </div>
       </div>
       <div className="w-full sm:w-[600px] md:w-[800px] mx-auto">
-        {personas.length > 0 ? (
+        {/* {personas.length > 0 ? (
           <div className="flex mb-2 w-fit">
             <PersonaSelector
               personas={personas}
@@ -257,7 +257,7 @@ export const SearchSection = ({
           </div>
         ) : (
           <div className="pt-3" />
-        )}
+        )} */}
 
         <SearchBar
           query={query}
