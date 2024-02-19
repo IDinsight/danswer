@@ -1,28 +1,29 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { SearchBar } from "./SearchBar";
-import { SearchResultsDisplay } from "./SearchResultsDisplay";
-import { SourceSelector } from "./filtering/Filters";
-import { Connector, DocumentSet, Tag } from "@/lib/types";
+import { Persona } from "@/app/admin/personas/interfaces";
+import { computeAvailableFilters } from "@/lib/filters";
+import { useFilters, useObjectState } from "@/lib/hooks";
+import { CancellationToken, cancellable } from "@/lib/search/cancellable";
 import {
   DanswerDocument,
-  Quote,
-  SearchResponse,
   FlowType,
-  SearchType,
+  Quote,
   SearchDefaultOverrides,
   SearchRequestOverrides,
+  SearchResponse,
+  SearchType,
   ValidQuestionResponse,
 } from "@/lib/search/interfaces";
 import { searchRequestStreamed } from "@/lib/search/streamingQa";
-import { SearchHelper } from "./SearchHelper";
-import { CancellationToken, cancellable } from "@/lib/search/cancellable";
-import { useFilters, useObjectState } from "@/lib/hooks";
 import { questionValidationStreamed } from "@/lib/search/streamingQuestionValidation";
-import { Persona } from "@/app/admin/personas/interfaces";
+import { Connector, DocumentSet, Tag } from "@/lib/types";
+import { useRef, useState } from "react";
+import DisclaimerAndExamples from "./DisclaimerAndExamples";
 import { PersonaSelector } from "./PersonaSelector";
-import { computeAvailableFilters } from "@/lib/filters";
+import { SearchBar } from "./SearchBar";
+import { SearchHelper } from "./SearchHelper";
+import { SearchResultsDisplay } from "./SearchResultsDisplay";
+import { SourceSelector } from "./filtering/Filters";
 
 const SEARCH_DEFAULT_OVERRIDES_START: SearchDefaultOverrides = {
   forceDisplayQA: false,
@@ -266,7 +267,7 @@ export const SearchSection = ({
             await onSearch({ offset: 0 });
           }}
         />
-
+        {!searchResponse && <DisclaimerAndExamples />}
         <div className="mt-2">
           <SearchResultsDisplay
             searchResponse={searchResponse}

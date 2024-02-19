@@ -1,14 +1,12 @@
-import { getSourceMetadataForSources, listSourceMetadata } from "@/lib/sources";
-import { ValidSources } from "@/lib/types";
-import Image from "next/image";
-import { Persona } from "../admin/personas/interfaces";
-import { Divider } from "@tremor/react";
-import { FiBookmark, FiCpu, FiInfo, FiX, FiZoomIn } from "react-icons/fi";
 import { HoverPopup } from "@/components/HoverPopup";
 import { Modal } from "@/components/Modal";
+import DisclaimerAndExamples from "@/components/search/DisclaimerAndExamples";
+import { getSourceMetadataForSources } from "@/lib/sources";
+import { ValidSources } from "@/lib/types";
+import { Divider } from "@tremor/react";
 import { useState } from "react";
-import { FaRobot } from "react-icons/fa";
-import { SourceMetadata } from "@/lib/search/interfaces";
+import { FiBookmark, FiCpu, FiInfo, FiX, FiZoomIn } from "react-icons/fi";
+import { Persona } from "../admin/personas/interfaces";
 
 const MAX_PERSONAS_TO_DISPLAY = 4;
 
@@ -184,11 +182,7 @@ export function ChatIntro({
               </p>
               <p className="text-sm text-center">Ask a question.</p>
               <br />
-              <p className="text-sm text-center text-gray-600 bg-gray-200 p-3 rounded-md">
-                <strong>Disclaimer</strong>: ElectionGPT is a prototype system.
-                Answers may not always be reliable or correct. Consider checking
-                source documents for important queries.
-              </p>
+              <DisclaimerAndExamples />
               {availablePersonas.length > MAX_PERSONAS_TO_DISPLAY && (
                 <div className="mt-4 flex">
                   <div
