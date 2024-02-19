@@ -17,7 +17,7 @@ const DisclaimerAndExamples: React.FC = () => {
         ].map((query, index) => (
           <div
             key={index}
-            className="p-2 mt-2 sm:mt-6 border border-gray-500 rounded text-gray-600 shadow text-center text-xs sm:text-sm"
+            className="p-2 mt-2 sm:mt-6 border border-gray-500 rounded text-gray-600 shadow text-center text-bold text-xs sm:text-xs"
           >
             {query}
           </div>
