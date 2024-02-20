@@ -12,26 +12,29 @@ export function DownloadFile({ disabled }: { disabled?: boolean }) {
       if (!response.ok) throw new Error("Network response was not ok.");
       const data = await response.json();
 
-      // Convert data to CSV format
       const csvContent = data.reduce((csv: string, item: any) => {
-        console.log(item);
-        // Check if file_locations exists before calling map
+        // Check if file_locations exist before calling map
         const fileLocations =
-          item.connector &&
-          item.connector.connector_specific_config &&
-          item.connector.connector_specific_config.file_locations;
+          item.connector?.connector_specific_config?.file_locations;
         if (!fileLocations) {
           return csv; // Skip this item or handle it as needed
         }
-        // Explicitly specify the type of 'item'
-        const fileNames = fileLocations.map((location: string) =>
-          location.split("/").pop()
-        );
-        return csv + fileNames.join(",") + "\n";
-      }, "File Names\n");
+
+        // Map through file locations and extract filenames, each on a new line
+        const fileNames = fileLocations
+          .map((location: string) => `"${location.split("/").pop()}"`)
+          .join("\n");
+        return `${csv}${fileNames}\n`;
+      }, "");
+
+      // Add the header
+      const header = "File Names\n";
+      const finalCsvContent = header + csvContent.trim(); // Trim to remove the last newline character
 
       // Create a blob with CSV data
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const blob = new Blob([finalCsvContent], {
+        type: "text/csv;charset=utf-8;",
+      });
       const url = URL.createObjectURL(blob);
 
       // Create a temporary link to trigger the download
