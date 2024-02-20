@@ -18,7 +18,7 @@ import { searchRequestStreamed } from "@/lib/search/streamingQa";
 import { questionValidationStreamed } from "@/lib/search/streamingQuestionValidation";
 import { Connector, DocumentSet, Tag } from "@/lib/types";
 import { useRef, useState } from "react";
-import DisclaimerAndExamples from "./DisclaimerAndExamples";
+import DisclaimerAndExamples from "./DownloadFileAndDisclaimer";
 import { PersonaSelector } from "./PersonaSelector";
 import { SearchBar } from "./SearchBar";
 import { SearchHelper } from "./SearchHelper";

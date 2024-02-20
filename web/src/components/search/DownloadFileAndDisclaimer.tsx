@@ -1,4 +1,4 @@
-import React, { ReactFragment } from "react";
+import { DownloadFile } from "../DownloadFileButton";
 
 const DisclaimerAndExamples: React.FC = () => {
   return (
@@ -29,6 +29,9 @@ const DisclaimerAndExamples: React.FC = () => {
           Answers may not always be reliable or correct. Consider checking
           source documents for important queries.
         </p>
+      </div>
+      <div className="flex justify-center items-center">
+        <DownloadFile />
       </div>
     </>
   );

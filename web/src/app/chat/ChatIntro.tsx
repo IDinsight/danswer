@@ -1,6 +1,6 @@
 import { HoverPopup } from "@/components/HoverPopup";
 import { Modal } from "@/components/Modal";
-import DisclaimerAndExamples from "@/components/search/DisclaimerAndExamples";
+import DisclaimerAndExamples from "@/components/search/DownloadFileAndDisclaimer";
 import { getSourceMetadataForSources } from "@/lib/sources";
 import { ValidSources } from "@/lib/types";
 import { Divider } from "@tremor/react";

@@ -406,14 +406,16 @@ def get_connector_indexing_status(
                 docs_indexed=cc_pair_to_document_cnt.get(
                     (connector.id, credential.id), 0
                 ),
-                error_msg=latest_index_attempt.error_msg
-                if latest_index_attempt
-                else None,
-                latest_index_attempt=IndexAttemptSnapshot.from_index_attempt_db_model(
-                    latest_index_attempt
-                )
-                if latest_index_attempt
-                else None,
+                error_msg=(
+                    latest_index_attempt.error_msg if latest_index_attempt else None
+                ),
+                latest_index_attempt=(
+                    IndexAttemptSnapshot.from_index_attempt_db_model(
+                        latest_index_attempt
+                    )
+                    if latest_index_attempt
+                    else None
+                ),
                 deletion_attempt=get_deletion_status(
                     connector_id=connector.id,
                     credential_id=credential.id,
@@ -431,7 +433,7 @@ def get_connector_indexing_status(
 @router.post("/admin/connector")
 def create_connector_from_model(
     connector_info: ConnectorBase,
-    _: User = Depends(current_admin_user),
+    _: User = Depends(current_user),
     db_session: Session = Depends(get_session),
 ) -> ObjectCreationIdResponse:
     try:
