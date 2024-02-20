@@ -350,7 +350,7 @@ def upload_files(
 @router.get("/admin/connector/indexing-status")
 def get_connector_indexing_status(
     secondary_index: bool = False,
-    _: User = Depends(current_admin_user),
+    _: User = Depends(current_user),
     db_session: Session = Depends(get_session),
 ) -> list[ConnectorIndexingStatus]:
     indexing_statuses: list[ConnectorIndexingStatus] = []
