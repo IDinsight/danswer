@@ -21,7 +21,9 @@ prompts:
       
       I have not read or seen any of the documents and do not want to read them.
       
-      If there are no relevant documents, refer to the chat history and existing knowledge.
+      If there are no relevant documents, refer to the chat history.
+
+      IMPORTANT: NEVER USE YOUR OWN KNOWLEDGE.
     # Inject a statement at the end of system prompt to inform the LLM of the current date/time
     # Format looks like: "October 16, 2023 14:30"
     datetime_aware: true
