@@ -267,7 +267,9 @@ export const SearchSection = ({
             await onSearch({ offset: 0 });
           }}
         />
-        {!searchResponse && <DisclaimerAndExamples />}
+        {!searchResponse && (
+          <DisclaimerAndExamples onExampleClick={(query) => setQuery(query)} />
+        )}
         <div className="mt-2 mx-5">
           <SearchResultsDisplay
             searchResponse={searchResponse}

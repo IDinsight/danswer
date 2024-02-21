@@ -1,26 +1,29 @@
 import { DownloadFile } from "../DownloadFileButton";
 
-const DisclaimerAndExamples: React.FC = () => {
+const DisclaimerAndExamples: React.FC<{
+  onExampleClick: (query: string) => void;
+}> = ({ onExampleClick }) => {
   return (
     <>
       <div className="mt-10 mx-7">
         <div className="font-bold text-emphasis mb-3 pb-1 text-lg">
           Example Queries:
         </div>
-      </div>
-      <div className="mx-4 sm:mx-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mb-2">
-        {[
-          "Tell me a legal provision that can be invoked against a BLO not doing her duty.",
-          "What is the role of sector magistrates and sector police officers during elections?",
-          "What to do if an EVM stops working at a booth on election day?",
-        ].map((query, index) => (
-          <div
-            key={index}
-            className="p-2 mt-2 sm:mt-6 border border-gray-500 rounded text-gray-600 shadow text-center text-bold text-xs mx-2"
-          >
-            {query}
-          </div>
-        ))}
+        <div className="mx-4 sm:mx-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mb-2">
+          {[
+            "Tell me a legal provision that can be invoked against a BLO not doing her duty.",
+            "What is the role of sector magistrates and sector police officers during elections?",
+            "What to do if an EVM stops working at a booth on election day?",
+          ].map((query, index) => (
+            <div
+              key={index}
+              className="p-2 mt-2 sm:mt-6 border border-gray-500 rounded text-gray-600 shadow text-center text-bold text-xs mx-2 cursor-pointer hover:bg-gray-200"
+              onClick={() => onExampleClick(query)}
+            >
+              {query}
+            </div>
+          ))}
+        </div>
       </div>
       <div className="text-xs sm:text-sm text-center text-gray-600 bg-gray-200 p-2 sm:p-3 rounded-md mx-7 mt-10 sm:mt-20 m-2 sm:m-3">
         <p>
