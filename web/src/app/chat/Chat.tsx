@@ -164,10 +164,10 @@ export const Chat = ({
           (persona) => persona.id === existingChatSessionPersonaId
         )
       : defaultSelectedPersonaId !== undefined
-      ? availablePersonas.find(
-          (persona) => persona.id === defaultSelectedPersonaId
-        )
-      : undefined
+        ? availablePersonas.find(
+            (persona) => persona.id === defaultSelectedPersonaId
+          )
+        : undefined
   );
   const livePersona = selectedPersona || availablePersonas[0];
 
@@ -508,6 +508,7 @@ export const Chat = ({
                     availableSources={finalAvailableSources}
                     availablePersonas={availablePersonas}
                     selectedPersona={selectedPersona}
+                    onExampleClick={(query) => setMessage(query)}
                     handlePersonaSelect={(persona) => {
                       setSelectedPersona(persona);
                       router.push(`/chat?personaId=${persona.id}`);

@@ -80,11 +80,13 @@ export function ChatIntro({
   availablePersonas,
   selectedPersona,
   handlePersonaSelect,
+  onExampleClick,
 }: {
   availableSources: ValidSources[];
   availablePersonas: Persona[];
   selectedPersona?: Persona;
   handlePersonaSelect: (persona: Persona) => void;
+  onExampleClick: (query: string) => void;
 }) {
   const [isAllPersonaOptionVisible, setIsAllPersonaOptionVisible] =
     useState(false);
@@ -181,7 +183,7 @@ export function ChatIntro({
                 Chat with ElectionGPT{" "}
               </p>
               <p className="text-sm text-center">Ask a question.</p>
-              <DisclaimerAndExamples />
+              <DisclaimerAndExamples onExampleClick={onExampleClick} />
               {availablePersonas.length > MAX_PERSONAS_TO_DISPLAY && (
                 <div className="mt-4 flex">
                   <div
