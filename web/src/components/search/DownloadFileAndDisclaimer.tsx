@@ -13,7 +13,6 @@ const DisclaimerAndExamples: React.FC = () => {
           "Tell me a legal provision that can be invoked against a BLO not doing her duty.",
           "What is the role of sector magistrates and sector police officers during elections?",
           "What to do if an EVM stops working at a booth on election day?",
-          "Top things that an Observer should check on the first day of their visit to a constituency.",
         ].map((query, index) => (
           <div
             key={index}

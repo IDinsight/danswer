@@ -67,7 +67,7 @@ export function DownloadFile({ disabled }: { disabled?: boolean }) {
       onClick={downloadFile}
     >
       <FiDownload className="mr-1 my-auto" />
-      Download list of indexed filenames
+      Download list of mapped documents
     </div>
   );
 }
