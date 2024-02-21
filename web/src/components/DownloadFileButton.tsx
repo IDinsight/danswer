@@ -57,11 +57,11 @@ export function DownloadFile({ disabled }: { disabled?: boolean }) {
       const doc = new jsPDF();
 
       // Adding a title for the table (optional)
-      doc.text("List of File Names", 14, 15);
+      // doc.text("Mapped Files", 14, 15);
 
       doc.autoTable({
         startY: 20, // Adjust this value as needed for positioning after the title or other content
-        head: [["File Name"]], // Column header
+        head: [["Mapped Filenames"]], // Column header
         body: tableData, // Data for the table
       });
 
