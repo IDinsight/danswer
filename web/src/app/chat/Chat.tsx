@@ -1,9 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { FiRefreshCcw, FiSend, FiStopCircle } from "react-icons/fi";
-import { AIMessage, HumanMessage } from "./message/Messages";
+import { DanswerInitializingLoader } from "@/components/DanswerInitializingLoader";
+import { usePopup } from "@/components/admin/connectors/Popup";
+import { ResizableSection } from "@/components/resizable/ResizableSection";
+import { HEADER_PADDING } from "@/lib/constants";
+import { computeAvailableFilters } from "@/lib/filters";
+import { useFilters } from "@/lib/hooks";
 import { AnswerPiecePacket, DanswerDocument } from "@/lib/search/interfaces";
+import { buildFilters } from "@/lib/search/utils";
+import { DocumentSet, Tag, ValidSources } from "@/lib/types";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { FiSend, FiStopCircle } from "react-icons/fi";
+import { ThreeDots } from "react-loader-spinner";
+import { Persona } from "../admin/personas/interfaces";
+import { ChatIntro } from "./ChatIntro";
+import { DocumentSidebar } from "./documentSidebar/DocumentSidebar";
 import {
   BackendChatSession,
   BackendMessage,
@@ -12,8 +24,6 @@ import {
   RetrievalType,
   StreamingError,
 } from "./interfaces";
-import { useRouter } from "next/navigation";
-import { FeedbackType } from "./types";
 import {
   createChatSession,
   getCitedDocumentsFromMessage,
@@ -25,22 +35,11 @@ import {
   processRawChatHistory,
   sendMessage,
 } from "./lib";
-import { ThreeDots } from "react-loader-spinner";
+import { AIMessage, HumanMessage } from "./message/Messages";
 import { FeedbackModal } from "./modal/FeedbackModal";
-import { DocumentSidebar } from "./documentSidebar/DocumentSidebar";
-import { Persona } from "../admin/personas/interfaces";
-import { ChatPersonaSelector } from "./ChatPersonaSelector";
-import { useFilters } from "@/lib/hooks";
-import { DocumentSet, Tag, ValidSources } from "@/lib/types";
 import { ChatFilters } from "./modifiers/ChatFilters";
-import { buildFilters } from "@/lib/search/utils";
 import { SelectedDocuments } from "./modifiers/SelectedDocuments";
-import { usePopup } from "@/components/admin/connectors/Popup";
-import { ResizableSection } from "@/components/resizable/ResizableSection";
-import { DanswerInitializingLoader } from "@/components/DanswerInitializingLoader";
-import { ChatIntro } from "./ChatIntro";
-import { HEADER_PADDING } from "@/lib/constants";
-import { computeAvailableFilters } from "@/lib/filters";
+import { FeedbackType } from "./types";
 import { useDocumentSelection } from "./useDocumentSelection";
 
 const MAX_INPUT_HEIGHT = 200;
@@ -140,6 +139,8 @@ export const Chat = ({
     initialSessionFetch();
   }, [existingChatSessionId]);
 
+  const [isPending, startTransition] = useTransition();
+  const [isExampleClicked, setIsExampleClicked] = useState(false);
   const [chatSessionId, setChatSessionId] = useState<number | null>(
     existingChatSessionId
   );
@@ -147,6 +148,12 @@ export const Chat = ({
   const [messageHistory, setMessageHistory] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
 
+  useEffect(() => {
+    if (message && isExampleClicked) {
+      onSubmit();
+      setIsExampleClicked(false);
+    }
+  }, [message, isExampleClicked]);
   // for document display
   // NOTE: -1 is a special designation that means the latest AI message
   const [selectedMessageForDocDisplay, setSelectedMessageForDocDisplay] =
@@ -296,6 +303,14 @@ export const Chat = ({
     queryOverride?: string;
     forceSearch?: boolean;
   } = {}) => {
+    if (!message.trim()) {
+      setPopup({
+        message: "Please enter a message before sending.",
+        type: "error",
+      });
+      return;
+    }
+
     let currChatSessionId: number;
     let isNewSession = chatSessionId === null;
     if (isNewSession) {
@@ -508,7 +523,12 @@ export const Chat = ({
                     availableSources={finalAvailableSources}
                     availablePersonas={availablePersonas}
                     selectedPersona={selectedPersona}
-                    onExampleClick={(query) => setMessage(query)}
+                    onExampleClick={(query) => {
+                      startTransition(() => {
+                        setMessage(query);
+                        setIsExampleClicked(true);
+                      });
+                    }}
                     handlePersonaSelect={(persona) => {
                       setSelectedPersona(persona);
                       router.push(`/chat?personaId=${persona.id}`);

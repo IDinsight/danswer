@@ -268,7 +268,13 @@ export const SearchSection = ({
           }}
         />
         {!searchResponse && (
-          <DisclaimerAndExamples onExampleClick={(query) => setQuery(query)} />
+          <DisclaimerAndExamples
+            onExampleClick={async (query) => {
+              setQuery(query);
+              setDefaultOverrides(SEARCH_DEFAULT_OVERRIDES_START);
+              await onSearch({ offset: 0 });
+            }}
+          />
         )}
         <div className="mt-2 mx-5">
           <SearchResultsDisplay
