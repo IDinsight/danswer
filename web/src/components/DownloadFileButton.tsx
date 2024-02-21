@@ -40,7 +40,14 @@ export function DownloadFile({ disabled }: { disabled?: boolean }) {
       });
 
       // Sorting logic
-      const keywords = ["Representation", "Rules", "Handbook", "Manual", "Act"];
+      const keywords = [
+        "Representation",
+        "Rules",
+        "Handbook",
+        "Hand Book",
+        "Manual",
+        "Act",
+      ];
       const sortedFileNames = titleFileNames.sort((a: string, b: string) => {
         const aIndex = keywords.findIndex((keyword) => a.includes(keyword));
         const bIndex = keywords.findIndex((keyword) => b.includes(keyword));
