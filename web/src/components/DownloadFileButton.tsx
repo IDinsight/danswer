@@ -58,7 +58,14 @@ export function DownloadFile({ disabled }: { disabled?: boolean }) {
       });
 
       // Prepare data for the table
-      const tableData = sortedFileNames.map((fileName: string) => [fileName]);
+      const tableData: Array<Array<string>> = sortedFileNames.map(
+        (fileName: string) => [fileName]
+      );
+
+      // Add serial numbers to the table
+      tableData.forEach((item: Array<string>, index: number) => {
+        item.unshift((index + 1).toString());
+      });
 
       // Generate PDF with a table
       const doc = new jsPDF();
@@ -68,7 +75,7 @@ export function DownloadFile({ disabled }: { disabled?: boolean }) {
 
       doc.autoTable({
         startY: 20, // Adjust this value as needed for positioning after the title or other content
-        head: [["Mapped Filenames"]], // Column header
+        head: [["Serial No.", "Mapped Filenames"]], // Column header
         body: tableData, // Data for the table
       });
 
