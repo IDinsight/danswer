@@ -17,7 +17,7 @@ import {
 import { searchRequestStreamed } from "@/lib/search/streamingQa";
 import { questionValidationStreamed } from "@/lib/search/streamingQuestionValidation";
 import { Connector, DocumentSet, Tag } from "@/lib/types";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DisclaimerAndExamples from "./DownloadFileAndDisclaimer";
 import { PersonaSelector } from "./PersonaSelector";
 import { SearchBar } from "./SearchBar";
@@ -138,6 +138,15 @@ export const SearchSection = ({
       ...(prevState || initialSearchResponse),
       messageId,
     }));
+
+  const [isExampleClicked, setIsExampleClicked] = useState(false);
+  useEffect(() => {
+    if (query && isExampleClicked) {
+      setQuery(query);
+      onSearch({ offset: 0 });
+      setIsExampleClicked(false);
+    }
+  }, [query, isExampleClicked]);
 
   let lastSearchCancellationToken = useRef<CancellationToken | null>(null);
   const onSearch = async ({
@@ -271,8 +280,7 @@ export const SearchSection = ({
           <DisclaimerAndExamples
             onExampleClick={async (query) => {
               setQuery(query);
-              setDefaultOverrides(SEARCH_DEFAULT_OVERRIDES_START);
-              await onSearch({ offset: 0 });
+              setIsExampleClicked(true);
             }}
           />
         )}
