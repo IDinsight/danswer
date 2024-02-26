@@ -303,14 +303,6 @@ export const Chat = ({
     queryOverride?: string;
     forceSearch?: boolean;
   } = {}) => {
-    if (!message.trim()) {
-      setPopup({
-        message: "Please enter a message before sending.",
-        type: "error",
-      });
-      return;
-    }
-
     let currChatSessionId: number;
     let isNewSession = chatSessionId === null;
     if (isNewSession) {
