@@ -29,7 +29,8 @@ const DisclaimerAndExamples: React.FC<{
         <p>
           <strong>Disclaimer</strong>: ElectionGPT is a prototype system.
           Answers may not always be reliable or correct. Consider checking
-          source documents for important queries.
+          source documents for important queries. Email us at
+          "dsem@idinsight.org"
         </p>
       </div>
       <div className="flex justify-center items-center">
