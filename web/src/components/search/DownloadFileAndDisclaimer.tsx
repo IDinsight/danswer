@@ -30,7 +30,7 @@ const DisclaimerAndExamples: React.FC<{
           <strong>Disclaimer</strong>: ElectionGPT is a prototype system.
           Answers may not always be reliable or correct. Consider checking
           source documents for important queries. Email us at
-          "dsem@idinsight.org"
+          &quot;dsem@idinsight.org&quot;
         </p>
       </div>
       <div className="flex justify-center items-center">
