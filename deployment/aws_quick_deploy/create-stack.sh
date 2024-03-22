@@ -1,0 +1,1 @@
+aws cloudformation create-stack --stack-name $STACK --template-body file://ec2-stack.yaml --region us-east-1
