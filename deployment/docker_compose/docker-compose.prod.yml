@@ -78,6 +78,8 @@ services:
     image: postgres:15.2-alpine
     restart: always
     # POSTGRES_USER and POSTGRES_PASSWORD should be set in .env file
+    ports:
+      - "5432:5432"
     env_file:
       - .env
     volumes:
