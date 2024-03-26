@@ -2,6 +2,7 @@ from collections.abc import AsyncGenerator
 from collections.abc import Generator
 from datetime import datetime
 
+from ddtrace import tracer
 from sqlalchemy import text
 from sqlalchemy.engine import create_engine
 from sqlalchemy.engine import Engine
@@ -56,7 +57,7 @@ def get_sqlalchemy_engine() -> Engine:
     global _SYNC_ENGINE
     if _SYNC_ENGINE is None:
         connection_string = build_connection_string(db_api=SYNC_DB_API)
-        _SYNC_ENGINE = create_engine(connection_string)
+        _SYNC_ENGINE = create_engine(connection_string, pool_size=50, max_overflow=25)
     return _SYNC_ENGINE
 
 
@@ -69,8 +70,9 @@ def get_sqlalchemy_async_engine() -> AsyncEngine:
 
 
 def get_session() -> Generator[Session, None, None]:
-    with Session(get_sqlalchemy_engine(), expire_on_commit=False) as session:
-        yield session
+    with tracer.trace("db.get_session"):
+        with Session(get_sqlalchemy_engine(), expire_on_commit=False) as session:
+            yield session
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
