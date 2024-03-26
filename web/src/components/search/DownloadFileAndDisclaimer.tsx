@@ -11,9 +11,9 @@ const DisclaimerAndExamples: React.FC<{
         </div>
         <div className="mx-4 sm:mx-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mb-2">
           {[
-            "Tell me a legal provision that can be invoked against a BLO not doing her duty.",
-            "What is the role of sector magistrates and sector police officers during elections?",
-            "What to do if an EVM stops working at a booth on election day?",
+            "How many flags are allowed per vehicle while MCC is in force?",
+            "Which legal provisions empower the DEO to requisition private vehicles during elections?",
+            "When do SSTs and FSTs start functioning and what are their key responsibilities?",
           ].map((query, index) => (
             <div
               key={index}
