@@ -31,13 +31,14 @@ const DisclaimerAndExamples: React.FC<{
           Answers may not always be reliable or correct. Consider checking
           source documents for important queries.
         </p>
+        <br />
         <p>
           Please use this{" "}
           <a
             href="https://forms.gle/qe9di633K3P7yijo7"
-            style={{ color: "blue", fontWeight: "bold" }}
+            style={{ textDecoration: "underline", fontWeight: "bold" }}
           >
-            Form
+            form
           </a>{" "}
           to give us detailed feedback.
         </p>
