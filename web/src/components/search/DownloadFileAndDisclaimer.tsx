@@ -29,9 +29,17 @@ const DisclaimerAndExamples: React.FC<{
         <p>
           <strong>Disclaimer</strong>: ElectionGPT is a prototype system.
           Answers may not always be reliable or correct. Consider checking
-          source documents for important queries. Use this{" "}
-          <a href="https://forms.gle/qe9di633K3P7yijo7">link</a> to give us
-          detailed feedback.
+          source documents for important queries.
+        </p>
+        <p>
+          Please use this{" "}
+          <a
+            href="https://forms.gle/qe9di633K3P7yijo7"
+            style={{ color: "blue", fontWeight: "bold" }}
+          >
+            Form
+          </a>{" "}
+          to give us detailed feedback.
         </p>
       </div>
       <div className="flex justify-center items-center">
