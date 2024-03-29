@@ -16,10 +16,9 @@ import {
 } from "@/lib/search/interfaces";
 import { searchRequestStreamed } from "@/lib/search/streamingQa";
 import { questionValidationStreamed } from "@/lib/search/streamingQuestionValidation";
-import { Connector, DocumentSet, Tag } from "@/lib/types";
+import { CCPairBasicInfo, DocumentSet, Tag } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
 import DisclaimerAndExamples from "./DownloadFileAndDisclaimer";
-import { PersonaSelector } from "./PersonaSelector";
 import { SearchBar } from "./SearchBar";
 import { SearchHelper } from "./SearchHelper";
 import { SearchResultsDisplay } from "./SearchResultsDisplay";
@@ -37,7 +36,7 @@ const VALID_QUESTION_RESPONSE_DEFAULT: ValidQuestionResponse = {
 };
 
 interface SearchSectionProps {
-  connectors: Connector<any>[];
+  ccPairs: CCPairBasicInfo[];
   documentSets: DocumentSet[];
   personas: Persona[];
   tags: Tag[];
@@ -45,7 +44,7 @@ interface SearchSectionProps {
 }
 
 export const SearchSection = ({
-  connectors,
+  ccPairs,
   documentSets,
   personas,
   tags,
@@ -73,7 +72,7 @@ export const SearchSection = ({
 
   // Filters
   const filterManager = useFilters();
-  const availableSources = connectors.map((connector) => connector.source);
+  const availableSources = ccPairs.map((ccPair) => ccPair.source);
   const [finalAvailableSources, finalAvailableDocumentSets] =
     computeAvailableFilters({
       selectedPersona: personas.find(
@@ -224,7 +223,7 @@ export const SearchSection = ({
   return (
     <div className="relative w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-[1430px] mx-auto">
       <div className="absolute left-0 hidden 3xl:block w-64">
-        {(connectors.length > 0 || documentSets.length > 0) && (
+        {(ccPairs.length > 0 || documentSets.length > 0) && (
           <SourceSelector
             {...filterManager}
             availableDocumentSets={finalAvailableDocumentSets}

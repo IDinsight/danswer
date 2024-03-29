@@ -1,7 +1,6 @@
 "use client";
 
 import { Header } from "@/components/Header";
-import { InstantSSRAutoRefresh } from "@/components/SSRAutoRefresh";
 import { HealthCheckBanner } from "@/components/health/healthcheck";
 import { ApiKeyModal } from "@/components/openai/ApiKeyModal";
 import { DocumentSet, Tag, User, ValidSources } from "@/lib/types";
@@ -12,6 +11,7 @@ import { Persona } from "../admin/personas/interfaces";
 import { Chat } from "./Chat";
 import { ChatSession } from "./interfaces";
 import { ChatSidebar } from "./sessionSidebar/ChatSidebar";
+import { InstantSSRAutoRefresh } from "@/components/SSRAutoRefresh";
 
 export function ChatLayout({
   user,
@@ -53,7 +53,6 @@ export function ChatLayout({
         </button>
       </div>
       <HealthCheckBanner />
-      <ApiKeyModal />
       <InstantSSRAutoRefresh />
 
       <div className="flex relative bg-background text-default overflow-x-hidden">
@@ -64,9 +63,8 @@ export function ChatLayout({
         >
           <ChatSidebar
             existingChats={chatSessions}
-            currentChatId={chatId}
+            currentChatSession={selectedChatSession}
             user={user}
-            setIsSidebarOpen={setIsSidebarOpen}
           />
         </div>
 

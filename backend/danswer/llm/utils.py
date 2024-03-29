@@ -1,9 +1,11 @@
 from collections.abc import Callable
 from collections.abc import Iterator
 from copy import copy
+from functools import lru_cache
 from typing import Any
 from typing import cast
 
+import litellm  # type: ignore
 import tiktoken
 from langchain.prompts.base import StringPromptValue
 from langchain.prompts.chat import ChatPromptValue
@@ -14,22 +16,24 @@ from langchain.schema.messages import BaseMessage
 from langchain.schema.messages import BaseMessageChunk
 from langchain.schema.messages import HumanMessage
 from langchain.schema.messages import SystemMessage
-from litellm import get_max_tokens  # type: ignore
 from tiktoken.core import Encoding
 
 from danswer.configs.app_configs import LOG_LEVEL
 from danswer.configs.constants import GEN_AI_API_KEY_STORAGE_KEY
+from danswer.configs.constants import GEN_AI_DETECTED_MODEL
 from danswer.configs.constants import MessageType
 from danswer.configs.model_configs import DOC_EMBEDDING_CONTEXT_SIZE
+from danswer.configs.model_configs import FAST_GEN_AI_MODEL_VERSION
 from danswer.configs.model_configs import GEN_AI_API_KEY
 from danswer.configs.model_configs import GEN_AI_MAX_OUTPUT_TOKENS
 from danswer.configs.model_configs import GEN_AI_MAX_TOKENS
 from danswer.configs.model_configs import GEN_AI_MODEL_PROVIDER
 from danswer.configs.model_configs import GEN_AI_MODEL_VERSION
 from danswer.db.models import ChatMessage
-from danswer.dynamic_configs import get_dynamic_config_store
+from danswer.dynamic_configs.factory import get_dynamic_config_store
 from danswer.dynamic_configs.interface import ConfigNotFoundError
 from danswer.indexing.models import InferenceChunk
+from danswer.llm.answering.models import PreviousMessage
 from danswer.llm.interfaces import LLM
 from danswer.utils.logger import setup_logger
 
@@ -37,6 +41,34 @@ logger = setup_logger()
 
 _LLM_TOKENIZER: Any = None
 _LLM_TOKENIZER_ENCODE: Callable[[str], Any] | None = None
+
+
+@lru_cache()
+def get_default_llm_version() -> tuple[str, str]:
+    default_openai_model = "gpt-3.5-turbo-16k-0613"
+    if GEN_AI_MODEL_VERSION:
+        llm_version = GEN_AI_MODEL_VERSION
+    else:
+        if GEN_AI_MODEL_PROVIDER != "openai":
+            logger.warning("No LLM Model Version set")
+            # Either this value is unused or it will throw an error
+            llm_version = default_openai_model
+        else:
+            kv_store = get_dynamic_config_store()
+            try:
+                llm_version = cast(str, kv_store.load(GEN_AI_DETECTED_MODEL))
+            except ConfigNotFoundError:
+                llm_version = default_openai_model
+
+    if FAST_GEN_AI_MODEL_VERSION:
+        fast_llm_version = FAST_GEN_AI_MODEL_VERSION
+    else:
+        if GEN_AI_MODEL_PROVIDER == "openai":
+            fast_llm_version = default_openai_model
+        else:
+            fast_llm_version = llm_version
+
+    return llm_version, fast_llm_version
 
 
 def get_default_llm_tokenizer() -> Encoding:
@@ -83,7 +115,9 @@ def tokenizer_trim_chunks(
     return new_chunks
 
 
-def translate_danswer_msg_to_langchain(msg: ChatMessage) -> BaseMessage:
+def translate_danswer_msg_to_langchain(
+    msg: ChatMessage | PreviousMessage,
+) -> BaseMessage:
     if msg.message_type == MessageType.SYSTEM:
         raise ValueError("System messages are not currently part of history")
     if msg.message_type == MessageType.ASSISTANT:
@@ -95,7 +129,7 @@ def translate_danswer_msg_to_langchain(msg: ChatMessage) -> BaseMessage:
 
 
 def translate_history_to_basemessages(
-    history: list[ChatMessage],
+    history: list[ChatMessage] | list[PreviousMessage],
 ) -> tuple[list[BaseMessage], list[int]]:
     history_basemessages = [
         translate_danswer_msg_to_langchain(msg)
@@ -192,19 +226,22 @@ def get_gen_ai_api_key() -> str | None:
     return GEN_AI_API_KEY
 
 
-def test_llm(llm: LLM) -> bool:
+def test_llm(llm: LLM) -> str | None:
     # try for up to 2 timeouts (e.g. 10 seconds in total)
+    error_msg = None
     for _ in range(2):
         try:
             llm.invoke("Do not respond")
-            return True
+            return None
         except Exception as e:
-            logger.warning(f"GenAI API key failed for the following reason: {e}")
+            error_msg = str(e)
+            logger.warning(f"Failed to call LLM with the following error: {error_msg}")
 
-    return False
+    return error_msg
 
 
 def get_llm_max_tokens(
+    model_map: dict,
     model_name: str | None = GEN_AI_MODEL_VERSION,
     model_provider: str = GEN_AI_MODEL_PROVIDER,
 ) -> int:
@@ -213,14 +250,25 @@ def get_llm_max_tokens(
         # This is an override, so always return this
         return GEN_AI_MAX_TOKENS
 
-    if not model_name:
-        return 4096
+    model_name = model_name or get_default_llm_version()[0]
 
     try:
         if model_provider == "openai":
-            return get_max_tokens(model_name)
-        return get_max_tokens("/".join([model_provider, model_name]))
+            model_obj = model_map[model_name]
+        else:
+            model_obj = model_map[f"{model_provider}/{model_name}"]
+
+        if "max_input_tokens" in model_obj:
+            return model_obj["max_input_tokens"]
+
+        if "max_tokens" in model_obj:
+            return model_obj["max_tokens"]
+
+        raise RuntimeError("No max tokens found for LLM")
     except Exception:
+        logger.exception(
+            f"Failed to get max tokens for LLM with name {model_name}. Defaulting to 4096."
+        )
         return 4096
 
 
@@ -229,8 +277,22 @@ def get_max_input_tokens(
     model_provider: str = GEN_AI_MODEL_PROVIDER,
     output_tokens: int = GEN_AI_MAX_OUTPUT_TOKENS,
 ) -> int:
+    # NOTE: we previously used `litellm.get_max_tokens()`, but despite the name, this actually
+    # returns the max OUTPUT tokens. Under the hood, this uses the `litellm.model_cost` dict,
+    # and there is no other interface to get what we want. This should be okay though, since the
+    # `model_cost` dict is a named public interface:
+    # https://litellm.vercel.app/docs/completion/token_usage#7-model_cost
+    # model_map is  litellm.model_cost
+    litellm_model_map = litellm.model_cost
+
+    model_name = model_name or get_default_llm_version()[0]
+
     input_toks = (
-        get_llm_max_tokens(model_name=model_name, model_provider=model_provider)
+        get_llm_max_tokens(
+            model_name=model_name,
+            model_provider=model_provider,
+            model_map=litellm_model_map,
+        )
         - output_tokens
     )
 

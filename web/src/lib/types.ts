@@ -33,7 +33,8 @@ export type ValidSources =
   | "google_sites"
   | "loopio"
   | "sharepoint"
-  | "zendesk";
+  | "zendesk"
+  | "axero";
 
 export type ValidInputTypes = "load_state" | "poll" | "event";
 export type ValidStatuses =
@@ -42,6 +43,7 @@ export type ValidStatuses =
   | "in_progress"
   | "not_started";
 export type TaskStatus = "PENDING" | "STARTED" | "SUCCESS" | "FAILURE";
+export type Feedback = "like" | "dislike";
 
 export interface DocumentBoostStatus {
   document_id: string;
@@ -104,6 +106,7 @@ export interface ConfluenceConfig {
 
 export interface JiraConfig {
   jira_project_url: string;
+  comment_email_blacklist?: string[];
 }
 
 export interface SharepointConfig {
@@ -165,6 +168,7 @@ export interface IndexAttemptSnapshot {
   id: number;
   status: ValidStatuses | null;
   new_docs_indexed: number;
+  docs_removed_from_index: number;
   total_docs_indexed: number;
   error_msg: string | null;
   full_exception_trace: string | null;
@@ -189,6 +193,12 @@ export interface ConnectorIndexingStatus<
   latest_index_attempt: IndexAttemptSnapshot | null;
   deletion_attempt: DeletionAttemptSnapshot | null;
   is_deletable: boolean;
+}
+
+export interface CCPairBasicInfo {
+  docs_indexed: number;
+  has_successful_run: boolean;
+  source: ValidSources;
 }
 
 // CREDENTIALS
@@ -226,6 +236,10 @@ export interface ConfluenceCredentialJson {
 
 export interface JiraCredentialJson {
   jira_user_email: string;
+  jira_api_token: string;
+}
+
+export interface JiraServerCredentialJson {
   jira_api_token: string;
 }
 
@@ -314,6 +328,10 @@ export interface SharepointCredentialJson {
   aad_directory_id: string;
 }
 
+export interface AxeroCredentialJson {
+  axero_api_token: string;
+}
+
 // DELETION
 
 export interface DeletionAttemptSnapshot {
@@ -336,6 +354,9 @@ export interface DocumentSet {
   description: string;
   cc_pair_descriptors: CCPairDescriptor<any, any>[];
   is_up_to_date: boolean;
+  is_public: boolean;
+  users: string[];
+  groups: number[];
 }
 
 export interface Tag {
@@ -359,13 +380,28 @@ export interface ChannelConfig {
   follow_up_tags?: string[];
 }
 
+export type SlackBotResponseType = "quotes" | "citations";
+
 export interface SlackBotConfig {
   id: number;
   persona: Persona | null;
   channel_config: ChannelConfig;
+  response_type: SlackBotResponseType;
 }
 
 export interface SlackBotTokens {
   bot_token: string;
   app_token: string;
+}
+
+/* EE Only Types */
+export interface UserGroup {
+  id: number;
+  name: string;
+  users: User[];
+  cc_pairs: CCPairDescriptor<any, any>[];
+  document_sets: DocumentSet[];
+  personas: Persona[];
+  is_up_to_date: boolean;
+  is_up_for_deletion: boolean;
 }

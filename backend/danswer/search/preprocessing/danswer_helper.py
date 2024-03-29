@@ -1,17 +1,20 @@
-from transformers import AutoTokenizer  # type:ignore
+from typing import TYPE_CHECKING
 
-from danswer.search.models import QueryFlow
+from danswer.search.enums import QueryFlow
 from danswer.search.models import SearchType
+from danswer.search.retrieval.search_runner import remove_stop_words_and_punctuation
 from danswer.search.search_nlp_models import get_default_tokenizer
 from danswer.search.search_nlp_models import IntentModel
-from danswer.search.search_runner import remove_stop_words_and_punctuation
 from danswer.server.query_and_chat.models import HelperResponse
 from danswer.utils.logger import setup_logger
 
 logger = setup_logger()
 
+if TYPE_CHECKING:
+    from transformers import AutoTokenizer  # type:ignore
 
-def count_unk_tokens(text: str, tokenizer: AutoTokenizer) -> int:
+
+def count_unk_tokens(text: str, tokenizer: "AutoTokenizer") -> int:
     """Unclear if the wordpiece tokenizer used is actually tokenizing anything as the [UNK] token
     It splits up even foreign characters and unicode emojis without using UNK"""
     tokenized_text = tokenizer.tokenize(text)

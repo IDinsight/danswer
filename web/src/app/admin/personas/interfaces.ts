@@ -1,5 +1,11 @@
 import { DocumentSet } from "@/lib/types";
 
+export interface StarterMessage {
+  name: string;
+  description: string | null;
+  message: string;
+}
+
 export interface Prompt {
   id: number;
   name: string;
@@ -17,6 +23,7 @@ export interface Persona {
   name: string;
   shared: boolean;
   is_visible: boolean;
+  is_public: boolean;
   display_priority: number | null;
   description: string;
   document_sets: DocumentSet[];
@@ -25,5 +32,7 @@ export interface Persona {
   llm_relevance_filter?: boolean;
   llm_filter_extraction?: boolean;
   llm_model_version_override?: string;
+  starter_messages: StarterMessage[] | null;
   default_persona: boolean;
+  groups: number[];
 }

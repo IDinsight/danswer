@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -61,6 +62,34 @@ class BasicExpertInfo(BaseModel):
 
         return "Unknown"
 
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, BasicExpertInfo):
+            return False
+        return (
+            self.display_name,
+            self.first_name,
+            self.middle_initial,
+            self.last_name,
+            self.email,
+        ) == (
+            other.display_name,
+            other.first_name,
+            other.middle_initial,
+            other.last_name,
+            other.email,
+        )
+
+    def __hash__(self) -> int:
+        return hash(
+            (
+                self.display_name,
+                self.first_name,
+                self.middle_initial,
+                self.last_name,
+                self.email,
+            )
+        )
+
 
 class DocumentBase(BaseModel):
     """Used for Danswer ingestion api, the ID is inferred before use if not provided"""
@@ -113,9 +142,11 @@ class Document(DocumentBase):
     @classmethod
     def from_base(cls, base: DocumentBase) -> "Document":
         return cls(
-            id=make_url_compatible(base.id)
-            if base.id
-            else "ingestion_api_" + make_url_compatible(base.semantic_identifier),
+            id=(
+                make_url_compatible(base.id)
+                if base.id
+                else "ingestion_api_" + make_url_compatible(base.semantic_identifier)
+            ),
             sections=base.sections,
             source=base.source or DocumentSource.INGESTION_API,
             semantic_identifier=base.semantic_identifier,

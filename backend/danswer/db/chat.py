@@ -1,25 +1,33 @@
 from collections.abc import Sequence
+from functools import lru_cache
 from uuid import UUID
 
 from sqlalchemy import delete
+from sqlalchemy import func
 from sqlalchemy import not_
 from sqlalchemy import nullsfirst
 from sqlalchemy import or_
 from sqlalchemy import select
+from sqlalchemy import update
 from sqlalchemy.exc import MultipleResultsFound
 from sqlalchemy.orm import Session
 
 from danswer.configs.chat_configs import HARD_DELETE_CHATS
 from danswer.configs.constants import MessageType
 from danswer.db.constants import SLACK_BOT_PERSONA_PREFIX
+from danswer.db.engine import get_sqlalchemy_engine
 from danswer.db.models import ChatMessage
 from danswer.db.models import ChatSession
 from danswer.db.models import DocumentSet as DBDocumentSet
 from danswer.db.models import Persona
+from danswer.db.models import Persona__User
+from danswer.db.models import Persona__UserGroup
 from danswer.db.models import Prompt
 from danswer.db.models import SearchDoc
 from danswer.db.models import SearchDoc as DBSearchDoc
-from danswer.search.models import RecencyBiasSetting
+from danswer.db.models import StarterMessage
+from danswer.db.models import User__UserGroup
+from danswer.search.enums import RecencyBiasSetting
 from danswer.search.models import RetrievalDocs
 from danswer.search.models import SavedSearchDoc
 from danswer.search.models import SearchDoc as ServerSearchDoc
@@ -30,11 +38,17 @@ logger = setup_logger()
 
 
 def get_chat_session_by_id(
-    chat_session_id: int, user_id: UUID | None, db_session: Session
+    chat_session_id: int,
+    user_id: UUID | None,
+    db_session: Session,
+    include_deleted: bool = False,
 ) -> ChatSession:
-    stmt = select(ChatSession).where(
-        ChatSession.id == chat_session_id, ChatSession.user_id == user_id
-    )
+    stmt = select(ChatSession).where(ChatSession.id == chat_session_id)
+
+    # if user_id is None, assume this is an admin who should be able
+    # to view all chat sessions
+    if user_id is not None:
+        stmt = stmt.where(ChatSession.user_id == user_id)
 
     result = db_session.execute(stmt)
     chat_session = result.scalar_one_or_none()
@@ -42,7 +56,7 @@ def get_chat_session_by_id(
     if not chat_session:
         raise ValueError("Invalid Chat Session ID provided")
 
-    if chat_session.deleted:
+    if not include_deleted and chat_session.deleted:
         raise ValueError("Chat session has been deleted")
 
     return chat_session
@@ -301,6 +315,20 @@ def get_prompt_by_id(
     return prompt
 
 
+@lru_cache()
+def get_default_prompt() -> Prompt:
+    with Session(get_sqlalchemy_engine()) as db_session:
+        stmt = select(Prompt).where(Prompt.id == 0)
+
+        result = db_session.execute(stmt)
+        prompt = result.scalar_one_or_none()
+
+        if prompt is None:
+            raise RuntimeError("Default Prompt not found")
+
+        return prompt
+
+
 def get_persona_by_id(
     persona_id: int,
     # if user_id is `None` assume the user is an admin or auth is disabled
@@ -447,7 +475,9 @@ def upsert_persona(
     prompts: list[Prompt] | None,
     document_sets: list[DBDocumentSet] | None,
     llm_model_version_override: str | None,
+    starter_messages: list[StarterMessage] | None,
     shared: bool,
+    is_public: bool,
     db_session: Session,
     persona_id: int | None = None,
     default_persona: bool = False,
@@ -472,7 +502,9 @@ def upsert_persona(
         persona.recency_bias = recency_bias
         persona.default_persona = default_persona
         persona.llm_model_version_override = llm_model_version_override
+        persona.starter_messages = starter_messages
         persona.deleted = False  # Un-delete if previously deleted
+        persona.is_public = is_public
 
         # Do not delete any associations manually added unless
         # a new updated list is provided
@@ -488,6 +520,7 @@ def upsert_persona(
         persona = Persona(
             id=persona_id,
             user_id=None if shared else user_id,
+            is_public=is_public,
             name=name,
             description=description,
             num_chunks=num_chunks,
@@ -498,6 +531,7 @@ def upsert_persona(
             prompts=prompts or [],
             document_sets=document_sets or [],
             llm_model_version_override=llm_model_version_override,
+            starter_messages=starter_messages,
         )
         db_session.add(persona)
 
@@ -531,6 +565,34 @@ def mark_persona_as_deleted(
         persona_id=persona_id, user_id=user_id, db_session=db_session
     )
     persona.deleted = True
+    db_session.commit()
+
+
+def mark_delete_persona_by_name(
+    persona_name: str, db_session: Session, is_default: bool = True
+) -> None:
+    stmt = (
+        update(Persona)
+        .where(Persona.name == persona_name, Persona.default_persona == is_default)
+        .values(deleted=True)
+    )
+
+    db_session.execute(stmt)
+    db_session.commit()
+
+
+def delete_old_default_personas(
+    db_session: Session,
+) -> None:
+    """Note, this locks out the Summarize and Paraphrase personas for now
+    Need a more graceful fix later or those need to never have IDs"""
+    stmt = (
+        update(Persona)
+        .where(Persona.default_persona, Persona.id > 0)
+        .values(deleted=True, name=func.concat(Persona.name, "_old"))
+    )
+
+    db_session.execute(stmt)
     db_session.commit()
 
 
@@ -588,9 +650,28 @@ def get_personas(
     include_slack_bot_personas: bool = False,
     include_deleted: bool = False,
 ) -> Sequence[Persona]:
-    stmt = select(Persona)
+    stmt = select(Persona).distinct()
     if user_id is not None:
-        stmt = stmt.where(or_(Persona.user_id == user_id, Persona.user_id.is_(None)))
+        # Subquery to find all groups the user belongs to
+        user_groups_subquery = (
+            select(User__UserGroup.user_group_id)
+            .where(User__UserGroup.user_id == user_id)
+            .subquery()
+        )
+
+        # Include personas where the user is directly related or part of a user group that has access
+        access_conditions = or_(
+            Persona.is_public == True,  # noqa: E712
+            Persona.id.in_(  # User has access through list of users with access
+                select(Persona__User.persona_id).where(Persona__User.user_id == user_id)
+            ),
+            Persona.id.in_(  # User is part of a group that has access
+                select(Persona__UserGroup.persona_id).where(
+                    Persona__UserGroup.user_group_id.in_(user_groups_subquery)  # type: ignore
+                )
+            ),
+        )
+        stmt = stmt.where(access_conditions)
 
     if not include_default:
         stmt = stmt.where(Persona.default_persona.is_(False))
@@ -709,3 +790,15 @@ def translate_db_message_to_chat_message_detail(
     )
 
     return chat_msg_detail
+
+
+def delete_persona_by_name(
+    persona_name: str, db_session: Session, is_default: bool = True
+) -> None:
+    stmt = delete(Persona).where(
+        Persona.name == persona_name, Persona.default_persona == is_default
+    )
+
+    db_session.execute(stmt)
+
+    db_session.commit()

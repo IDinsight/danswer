@@ -13,7 +13,7 @@ from danswer.db.document_set import get_or_create_document_set_by_name
 from danswer.db.engine import get_sqlalchemy_engine
 from danswer.db.models import DocumentSet as DocumentSetDBModel
 from danswer.db.models import Prompt as PromptDBModel
-from danswer.search.models import RecencyBiasSetting
+from danswer.search.enums import RecencyBiasSetting
 
 
 def load_prompts_from_yaml(prompts_yaml: str = PROMPTS_YAML) -> None:
@@ -78,15 +78,18 @@ def load_personas_from_yaml(
                 if not prompts:
                     prompts = None
 
+            p_id = persona.get("id")
             upsert_persona(
                 user_id=None,
-                persona_id=persona.get("id"),
+                # Negative to not conflict with existing personas
+                persona_id=(-1 * p_id) if p_id is not None else None,
                 name=persona["name"],
                 description=persona["description"],
                 num_chunks=persona.get("num_chunks")
                 if persona.get("num_chunks") is not None
                 else default_chunks,
                 llm_relevance_filter=persona.get("llm_relevance_filter"),
+                starter_messages=persona.get("starter_messages"),
                 llm_filter_extraction=persona.get("llm_filter_extraction"),
                 llm_model_version_override=None,
                 recency_bias=RecencyBiasSetting(persona["recency_bias"]),
@@ -94,6 +97,7 @@ def load_personas_from_yaml(
                 document_sets=doc_sets,
                 default_persona=True,
                 shared=True,
+                is_public=True,
                 db_session=db_session,
             )
 

@@ -14,22 +14,24 @@ import { useRouter } from "next/navigation";
 import { User } from "@/lib/types";
 import { logout } from "@/lib/user";
 import { BasicClickable, BasicSelectable } from "@/components/BasicClickable";
-import Image from "next/image";
 import { ChatSessionDisplay } from "./SessionDisplay";
 import { ChatSession } from "../interfaces";
 import { groupSessionsByDateRange } from "../lib";
-import { HEADER_PADDING } from "@/lib/constants";
+import {
+  HEADER_PADDING,
+  NEXT_PUBLIC_NEW_CHAT_DIRECTS_TO_SAME_PERSONA,
+} from "@/lib/constants";
 
 interface ChatSidebarProps {
   existingChats: ChatSession[];
-  currentChatId: number | null;
+  currentChatSession: ChatSession | null | undefined;
   user: User | null;
   setIsSidebarOpen: (value: boolean) => void;
 }
 
 export const ChatSidebar = ({
   existingChats,
-  currentChatId,
+  currentChatSession,
   user,
   setIsSidebarOpen,
 }: ChatSidebarProps) => {
@@ -67,6 +69,14 @@ export const ChatSidebar = ({
     };
   }, []);
 
+  const currentChatId = currentChatSession?.id;
+
+  // prevent the NextJS Router cache from causing the chat sidebar to not
+  // update / show an outdated list of chats
+  useEffect(() => {
+    router.refresh();
+  }, [currentChatId]);
+
   return (
     <div
       className={`
@@ -81,7 +91,15 @@ export const ChatSidebar = ({
       items-center sm:items-start`}
       id="chat-sidebar"
     >
-      <Link href="/chat" passHref className="mx-3 mt-5">
+      <Link
+        href={
+          "/chat" +
+          (NEXT_PUBLIC_NEW_CHAT_DIRECTS_TO_SAME_PERSONA && currentChatSession
+            ? `?personaId=${currentChatSession.persona_id}`
+            : "")
+        }
+        className="mx-3 mt-5"
+      >
         <BasicClickable fullWidth onClick={() => setIsSidebarOpen(false)}>
           <div className="flex text-sm">
             <FiPlusSquare className="my-auto mr-2" /> New Chat

@@ -14,7 +14,7 @@ import { SearchSummary, ShowHideDocsButton } from "./SearchSummary";
 import { SourceIcon } from "@/components/SourceIcon";
 import { ThreeDots } from "react-loader-spinner";
 import { SkippedSearch } from "./SkippedSearch";
-import { SelectedDocuments } from "../modifiers/SelectedDocuments";
+import remarkGfm from "remark-gfm";
 
 export const Hoverable: React.FC<{
   children: JSX.Element;
@@ -34,6 +34,7 @@ export const AIMessage = ({
   messageId,
   content,
   query,
+  personaName,
   citedDocuments,
   isComplete,
   hasDocs,
@@ -42,10 +43,12 @@ export const AIMessage = ({
   handleShowRetrieved,
   handleSearchQueryEdit,
   handleForceSearch,
+  retrievalDisabled,
 }: {
   messageId: number | null;
   content: string | JSX.Element;
   query?: string;
+  personaName?: string;
   citedDocuments?: [string, DanswerDocument][] | null;
   isComplete?: boolean;
   hasDocs?: boolean;
@@ -54,6 +57,7 @@ export const AIMessage = ({
   handleShowRetrieved?: (messageNumber: number | null) => void;
   handleSearchQueryEdit?: (query: string) => void;
   handleForceSearch?: () => void;
+  retrievalDisabled?: boolean;
 }) => {
   const [copyClicked, setCopyClicked] = useState(false);
   return (
@@ -72,13 +76,14 @@ export const AIMessage = ({
             </div>
 
             <div className="font-bold text-emphasis ml-2 my-auto">
-              ElectionGPT
+              {personaName || "ElectionGPT"}
             </div>
 
             {query === undefined &&
               hasDocs &&
               handleShowRetrieved !== undefined &&
-              isCurrentlyShowingRetrieved !== undefined && (
+              isCurrentlyShowingRetrieved !== undefined &&
+              !retrievalDisabled && (
                 <div className="flex w-message-xs 2xl:w-message-sm 3xl:w-message-default absolute ml-8">
                   <div className="ml-auto hidden sm:block">
                     <ShowHideDocsButton
@@ -94,7 +99,8 @@ export const AIMessage = ({
           <div className="max-w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl break-words mt-1 ml-8">
             {query !== undefined &&
               handleShowRetrieved !== undefined &&
-              isCurrentlyShowingRetrieved !== undefined && (
+              isCurrentlyShowingRetrieved !== undefined &&
+              !retrievalDisabled && (
                 <div className="my-1 hidden sm:block">
                   <SearchSummary
                     query={query}
@@ -109,7 +115,8 @@ export const AIMessage = ({
             {handleForceSearch &&
               content &&
               query === undefined &&
-              !hasDocs && (
+              !hasDocs &&
+              !retrievalDisabled && (
                 <div className="my-1">
                   <SkippedSearch handleForceSearch={handleForceSearch} />
                 </div>
@@ -130,6 +137,7 @@ export const AIMessage = ({
                         />
                       ),
                     }}
+                    remarkPlugins={[remarkGfm]}
                   >
                     {content}
                   </ReactMarkdown>
@@ -253,6 +261,7 @@ export const HumanMessage = ({
                       />
                     ),
                   }}
+                  remarkPlugins={[remarkGfm]}
                 >
                   {content}
                 </ReactMarkdown>
