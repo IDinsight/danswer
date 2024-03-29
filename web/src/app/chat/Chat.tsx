@@ -522,7 +522,7 @@ export const Chat = ({
               className={`w-full h-full ${HEADER_PADDING} flex flex-col overflow-y-auto overflow-x-hidden relative`}
               ref={scrollableDivRef}
             >
-              {livePersona && (
+              {/* {livePersona && (
                 <div className="sticky top-0 left-80 z-10 w-full bg-background/90">
                   <div className="ml-2 p-1 rounded mt-2 w-fit">
                     <ChatPersonaSelector
@@ -538,7 +538,7 @@ export const Chat = ({
                     />
                   </div>
                 </div>
-              )}
+              )} */}
 
               {messageHistory.length === 0 &&
                 !isFetchingChatMessages &&
