@@ -218,7 +218,7 @@ const Main = () => {
         >
           guide{" "}
         </a>
-        found in the Danswer documentation to get started!
+        found in the ElectionGPT documentation to get started!
       </Text>
 
       <Title>Step 1: Configure Slack Tokens</Title>

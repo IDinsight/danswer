@@ -171,11 +171,13 @@ class CompareAnalysis:
                     changes.append(
                         {
                             "previous_rank": pos,
-                            "new_rank": pos
-                            if content_key == "score"
-                            else {
-                                "x": k for k, v in new_content.items() if v == data
-                            }.get("x", "not_ranked"),
+                            "new_rank": (
+                                pos
+                                if content_key == "score"
+                                else {
+                                    "x": k for k, v in new_content.items() if v == data
+                                }.get("x", "not_ranked")
+                            ),
                             "document_id": self._previous_content[pos]["document_id"],
                             "previous_score": self._previous_content[pos]["score"],
                             "new_score": self._new_content[pos]["score"],
@@ -685,8 +687,8 @@ if __name__ == "__main__":
         type=int,
         default=3000,
         help=(
-            "The Danswer Web (not the API) port. We use the UI to forward the requests to the API. "
-            "It should be '3000' for local dev and '80' if Danswer runs using docker compose."
+            "The ElectionGPT Web (not the API) port. We use the UI to forward the requests to the API. "
+            "It should be '3000' for local dev and '80' if ElectionGPT runs using docker compose."
         ),
     )
     parser.add_argument(

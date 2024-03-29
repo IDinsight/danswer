@@ -181,15 +181,15 @@ export const SlackBotCreationForm = ({
                   label="Response Format"
                   subtext={
                     <>
-                      If set to Citations, DanswerBot will respond with a direct
-                      answer with inline citations. It will also provide links
-                      to these cited documents below the answer. When in doubt,
-                      choose this option.
+                      If set to Citations, ElectionGPT will respond with a
+                      direct answer with inline citations. It will also provide
+                      links to these cited documents below the answer. When in
+                      doubt, choose this option.
                       <br />
                       <br />
-                      If set to Quotes, DanswerBot will respond with a direct
+                      If set to Quotes, ElectionGPT will respond with a direct
                       answer as well as with quotes pulled from the context
-                      documents to support that answer. DanswerBot will also
+                      documents to support that answer. ElectionGPT will also
                       give a list of relevant documents. Choose this option if
                       you want a very detailed response AND/OR a list of
                       relevant documents would be useful just in case the LLM
@@ -229,7 +229,7 @@ export const SlackBotCreationForm = ({
                 <BooleanFormField
                   name="respond_to_bots"
                   label="Responds to Bot messages"
-                  subtext="If not set, DanswerBot will always ignore messages from Bots"
+                  subtext="If not set, ElectionGPT will always ignore messages from Bots"
                 />
                 <TextArrayField
                   name="respond_team_member_list"

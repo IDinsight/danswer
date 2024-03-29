@@ -15,6 +15,7 @@ import { FiSend, FiStopCircle } from "react-icons/fi";
 import { ThreeDots } from "react-loader-spinner";
 import { Persona } from "../admin/personas/interfaces";
 import { ChatIntro } from "./ChatIntro";
+import { ChatPersonaSelector } from "./ChatPersonaSelector";
 import { StarterMessage } from "./StarterMessage";
 import { DocumentSidebar } from "./documentSidebar/DocumentSidebar";
 import {
@@ -41,6 +42,7 @@ import { AIMessage, HumanMessage } from "./message/Messages";
 import { FeedbackModal } from "./modal/FeedbackModal";
 import { ChatFilters } from "./modifiers/ChatFilters";
 import { SelectedDocuments } from "./modifiers/SelectedDocuments";
+import { FeedbackType } from "./types";
 import { useDocumentSelection } from "./useDocumentSelection";
 
 const MAX_INPUT_HEIGHT = 200;

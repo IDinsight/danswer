@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 logger = setup_logger()
 
-WARM_UP_STRING = "Danswer is amazing"
+WARM_UP_STRING = "ElectionGPT is amazing"
 
 router = APIRouter(prefix="/encoder")
 
