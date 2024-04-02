@@ -25,7 +25,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@3.108.64.73 << 'EOF'
           docker kill $(docker ps -q)
-          docker system prune -af
           cd /home/ec2-user/danswer
           git fetch origin staging
           git reset --hard FETCH_HEAD
