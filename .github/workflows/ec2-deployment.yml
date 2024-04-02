@@ -19,6 +19,7 @@ jobs:
           ssh-private-key: ${{ secrets.STAGING_EC2_SSH_PRIVATE_KEY }}
 
       - name: SSH and Deploy to EC2
+
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@3.108.64.73 << 'EOF'
           docker kill $(docker ps -q)
