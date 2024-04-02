@@ -27,5 +27,5 @@ jobs:
           cd /home/ec2-user/danswer
           git fetch origin staging
           git reset --hard FETCH_HEAD
-          docker-compose /home/ec2-user/danswer/deployment/docker_compose/docker-compose.prod.yml -d --force-recreate
+          docker-compose -p danswer-stack -f /home/ec2-user/danswer/deployment/docker_compose/docker-compose.prod.yml -d --force-recreate
           EOF
