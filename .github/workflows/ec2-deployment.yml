@@ -30,5 +30,6 @@ jobs:
           git reset --hard FETCH_HEAD
           cd /home/ec2-user/danswer/deployment/docker_compose
           source .env
+          echo "Running Docker compose"
           docker compose -p danswer-stack -f docker-compose.prod.yml up -d --pull always --force-recreate
           EOF
