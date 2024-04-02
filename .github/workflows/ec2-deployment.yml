@@ -23,7 +23,7 @@ jobs:
       - name: SSH and Deploy to EC2
 
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@3.108.64.73 << 'EOF'
+          ssh -o StrictHostKeyChecking=no ec2-user@13.200.246.39 << 'EOF'
           docker kill $(docker ps -q)
           cd /home/ec2-user/danswer
           git fetch origin staging
