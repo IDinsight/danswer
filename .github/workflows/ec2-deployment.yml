@@ -19,11 +19,13 @@ jobs:
           ssh-private-key: ${{ secrets.STAGING_EC2_SSH_PRIVATE_KEY }}
 
       - name: SSH and Deploy to EC2
-        run: ssh -o StrictHostKeyChecking=no ec2-user@3.108.64.73 << 'EOF'
-              docker ps -q | xargs -r docker kill        
-              docker system prune -af
-              cd /home/ec2-user/danswer
-              git fetch origin staging
-              git reset --hard FETCH_HEAD
-              docker-compose -f /home/ec2-user/danswer/deployment/docker_compose/docker-compose.prod.yml up -d --force-recreate
-              EOF
+
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@3.108.64.73 << 'EOF'
+          docker kill $(docker ps -q)
+          docker system prune -af
+          cd /home/ec2-user/danswer
+          git fetch origin staging
+          git reset --hard FETCH_HEAD
+          docker-compose /home/ec2-user/danswer/deployment/docker_compose/docker-compose.prod.yml -d --force-recreate
+          EOF
