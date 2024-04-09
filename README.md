@@ -5,7 +5,7 @@
 </h2>
 
 <p align="center">
-<p align="center">Open Enterprise Question-Answering</p>
+<p align="center">Open SOURCE Enterprise Question-Answering</p>
 
 <p align="center">
 <a href="https://docs.danswer.dev/" target="_blank">
