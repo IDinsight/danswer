@@ -45,9 +45,9 @@ jobs:
       - name: Ping the website
         run: |
           response=$(curl -o /dev/null -s -w "%{http_code}\n" https://hubgpt-prod.idinsight.io)
-          if [ "$response" -eq 200 ]; then
-            echo "Site is up and returned HTTP status 200"
+          if [ "$response" -eq 307 ]; then
+            echo "Site is up and returned HTTP status 307"
           else
-            echo "Site might be down or is not returning HTTP status 200, returned HTTP status $response"
+            echo "Site might be down or is not returning expected codes. Code returned: $response"
             exit 1
           fi
