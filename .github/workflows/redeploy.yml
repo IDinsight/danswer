@@ -14,10 +14,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$PROD_SSH_KEY" > ~/.ssh/hubgpt_prod.key
+          chmod 600 ~/.ssh/hubgpt_prod.key
+          cat >>~/.ssh/config <<END
+          Host prod
+            HostName $PROD_EC2_HOST_IP
+            User $PROD_EC2_USER
+            IdentityFile ~/.ssh/hubgpt_prod.key
+            StrictHostKeyChecking no
+          END
 
       - name: Deploy to Production
         run: |
