@@ -37,6 +37,8 @@ jobs:
           cd danswer
           make re-deploy
           echo "Deployment complete"
+          echo "Last commit merged in:"
+          git --no-pager log -1
           EOF
 
       - name: Wait before pinging
