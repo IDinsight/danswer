@@ -290,7 +290,7 @@ services:
         max-size: "50m"
         max-file: "6"
     env_file:
-      - path: .env
+      - .env
     command: caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
 
   model_server:
