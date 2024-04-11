@@ -1,5 +1,5 @@
  # Insert website URL here, for example:
- https://hubgpt-staging.idinsight.io {
+{$DOMAIN:localhost} {
     # Handle /api requests
     handle_path /api/* {
         reverse_proxy api_server:8080 {
