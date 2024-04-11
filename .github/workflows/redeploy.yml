@@ -25,7 +25,6 @@ jobs:
           make re-deploy
           echo "Deployment complete"
           EOF
-      - name: Test site live
 
       - name: Wait before pinging
         run: sleep 60
