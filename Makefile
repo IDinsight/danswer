@@ -24,3 +24,10 @@ run-background-dev:
 
 run-dev: run-dep-containers
 	${MAKE} -j3 run-web-dev run-backend-dev run-background-dev
+
+re-deploy:
+	cd /home/ec2-user/danswer/deployment/docker_compose && \
+	echo "Current directory is: $$(pwd)" && \
+	docker compose -p danswer-stack down && \
+	git pull origin prod && \
+	docker compose -p danswer-stack -f docker-compose.prod.yml up -d --build
