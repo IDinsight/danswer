@@ -5,7 +5,7 @@
 </h2>
 
 <p align="center">
-<p align="center">Open Source Gen-AI Chat + Unified Search</p>
+<p align="center">Open Source Gen-AI Chat + Unified Search.</p>
 
 <p align="center">
 <a href="https://docs.danswer.dev/" target="_blank">
