@@ -75,7 +75,7 @@ def send_usage_report_to_slack(user_id):
     return None
 
 
-# if __name__ == "__main__":
-# USER_ID = "C05K8F6RXU3"
-# print("Starting...")
-# send_usage_report_to_slack(USER_ID)
+if __name__ == "__main__":
+    USER_ID = "C05K8F6RXU3"
+    print("Starting...")
+    send_usage_report_to_slack(USER_ID)
