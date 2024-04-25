@@ -452,7 +452,11 @@ class GoogleDriveConnector(LoadConnector, PollConnector):
 
         service = discovery.build("drive", "v3", credentials=self.creds)
         folder_ids: Sequence[str | None] = self._process_folder_paths(
-            service, self.folder_paths, self.include_shared, self.follow_shortcuts
+            service,
+            self.folder_paths,
+            self.include_shared,
+            self.follow_shortcuts,
+            self.ignore_archived,
         )
         if not folder_ids:
             folder_ids = [None]
