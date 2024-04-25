@@ -1,4 +1,5 @@
 import io
+import re
 import tempfile
 from collections.abc import Iterator
 from collections.abc import Sequence
@@ -16,6 +17,7 @@ from googleapiclient.errors import HttpError  # type: ignore
 
 from danswer.configs.app_configs import CONTINUE_ON_CONNECTOR_FAILURE
 from danswer.configs.app_configs import GOOGLE_DRIVE_FOLLOW_SHORTCUTS
+from danswer.configs.app_configs import GOOGLE_DRIVE_IGNORE_ARCHIVED
 from danswer.configs.app_configs import GOOGLE_DRIVE_INCLUDE_SHARED
 from danswer.configs.app_configs import GOOGLE_DRIVE_ONLY_ORG_PUBLIC
 from danswer.configs.app_configs import INDEX_BATCH_SIZE
@@ -344,6 +346,7 @@ class GoogleDriveConnector(LoadConnector, PollConnector):
         include_shared: bool = GOOGLE_DRIVE_INCLUDE_SHARED,
         follow_shortcuts: bool = GOOGLE_DRIVE_FOLLOW_SHORTCUTS,
         only_org_public: bool = GOOGLE_DRIVE_ONLY_ORG_PUBLIC,
+        ignore_archived: bool = GOOGLE_DRIVE_IGNORE_ARCHIVED,
         continue_on_failure: bool = CONTINUE_ON_CONNECTOR_FAILURE,
     ) -> None:
         self.folder_paths = folder_paths or []
@@ -351,6 +354,7 @@ class GoogleDriveConnector(LoadConnector, PollConnector):
         self.include_shared = include_shared
         self.follow_shortcuts = follow_shortcuts
         self.only_org_public = only_org_public
+        self.ignore_archived = ignore_archived
         self.continue_on_failure = continue_on_failure
         self.creds: Credentials | None = None
 
@@ -360,6 +364,7 @@ class GoogleDriveConnector(LoadConnector, PollConnector):
         folder_paths: list[str],
         include_shared: bool,
         follow_shortcuts: bool,
+        ignore_archived: bool,
     ) -> list[str]:
         """['Folder/Sub Folder'] -> ['<FOLDER_ID>']"""
         folder_ids: list[str] = []
@@ -367,21 +372,26 @@ class GoogleDriveConnector(LoadConnector, PollConnector):
             folder_names = path.split("/")
             parent_id = "root"
             for folder_name in folder_names:
-                found_parent_id = _get_folder_id(
-                    service=service,
-                    parent_id=parent_id,
-                    folder_name=folder_name,
-                    include_shared=include_shared,
-                    follow_shortcuts=follow_shortcuts,
-                )
-                if found_parent_id is None:
-                    raise ValueError(
-                        (
-                            f"Folder '{folder_name}' in path '{path}' "
-                            "not found in Google Drive"
-                        )
+                pattern = r"archive\w*"
+                contains_archive = bool(re.search(pattern, folder_name, re.IGNORECASE))
+                if ignore_archived and contains_archive:
+                    continue
+                else:  # if not ignore_archived or not contains_archive
+                    found_parent_id = _get_folder_id(
+                        service=service,
+                        parent_id=parent_id,
+                        folder_name=folder_name,
+                        include_shared=include_shared,
+                        follow_shortcuts=follow_shortcuts,
                     )
-                parent_id = found_parent_id
+                    if found_parent_id is None:
+                        raise ValueError(
+                            (
+                                f"Folder '{folder_name}' in path '{path}' "
+                                "not found in Google Drive"
+                            )
+                        )
+                    parent_id = found_parent_id
             folder_ids.append(parent_id)
 
         return folder_ids

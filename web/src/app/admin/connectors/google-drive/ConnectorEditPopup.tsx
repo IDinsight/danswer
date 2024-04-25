@@ -60,6 +60,10 @@ export const ConnectorEditPopup = ({ existingConnector, onSubmit }: Props) => {
                 name="only_org_public"
                 label="Only Include Org Public Files"
               />
+              <BooleanFormField
+                name="ignore_archived"
+                label="Ignore folders including 'archived' in their name"
+              />
             </div>
           )}
           validationSchema={Yup.object().shape({
@@ -73,6 +77,7 @@ export const ConnectorEditPopup = ({ existingConnector, onSubmit }: Props) => {
             include_shared: Yup.boolean().required(),
             follow_shortcuts: Yup.boolean().required(),
             only_org_public: Yup.boolean().required(),
+            ignore_archived: Yup.boolean().required(),
           })}
           onSubmit={onSubmit}
         />

@@ -156,6 +156,16 @@ export const GoogleDriveConnectorsTable = ({
                     </div>
                   </TableCell>
                   <TableCell>
+                    <div>
+                      {connectorIndexingStatus.connector
+                        .connector_specific_config.ignore_archived ? (
+                        <i>Yes</i>
+                      ) : (
+                        <i>No</i>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
                     <StatusRow
                       connectorIndexingStatus={connectorIndexingStatus}
                       hasCredentialsIssue={
@@ -209,6 +219,10 @@ export const GoogleDriveConnectorsTable = ({
         {
           header: "Only Org Public",
           key: "only_org_public",
+        },
+        {
+          header: "Ignore Archived",
+          key: "ignore_archived",
         },
         {
           header: "Status",
@@ -266,6 +280,16 @@ export const GoogleDriveConnectorsTable = ({
             <div>
               {connectorIndexingStatus.connector.connector_specific_config
                 .only_org_public ? (
+                <i>Yes</i>
+              ) : (
+                <i>No</i>
+              )}
+            </div>
+          ),
+          ignore_archived: (
+            <div>
+              {connectorIndexingStatus.connector.connector_specific_config
+                .ignore_archived ? (
                 <i>Yes</i>
               ) : (
                 <i>No</i>

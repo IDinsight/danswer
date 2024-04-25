@@ -5,6 +5,8 @@ export const googleDriveConnectorNameBuilder = (values: GoogleDriveConfig) =>
     values.folder_paths && values.folder_paths.join("_")
   }-${values.include_shared ? "shared" : "not-shared"}-${
     values.only_org_public ? "org-public" : "all"
+  }-${values.include_shared ? "shared" : "not-shared"}-${
+    values.ignore_archived ? "ignore_archived" : "keep_archived"
   }-${
     values.follow_shortcuts ? "follow-shortcuts" : "do-not-follow-shortcuts"
   }`;

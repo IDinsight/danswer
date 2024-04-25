@@ -230,6 +230,14 @@ const GoogleDriveConnectorManagement = ({
                   "shared with any of the orgs."
                 }
               />
+              <BooleanFormField
+                name="ignore_archived"
+                label="Ignore Archived Folders"
+                subtext={
+                  "If checked, connector will ignore any folders including 'archive' in the name. This" +
+                  "is case insensitive and also works on variants like 'archived' etc."
+                }
+              />
             </>
           )}
           validationSchema={Yup.object().shape({
@@ -243,12 +251,14 @@ const GoogleDriveConnectorManagement = ({
             include_shared: Yup.boolean().required(),
             follow_shortcuts: Yup.boolean().required(),
             only_org_public: Yup.boolean().required(),
+            ignore_archived: Yup.boolean().required(),
           })}
           initialValues={{
             folder_paths: [],
             include_shared: false,
             follow_shortcuts: false,
             only_org_public: false,
+            ignore_archived: false,
           }}
           refreshFreq={10 * 60} // 10 minutes
           credentialId={liveCredential.id}
