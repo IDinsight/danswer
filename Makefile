@@ -24,3 +24,6 @@ run-background-dev:
 
 run-dev: run-dep-containers
 	${MAKE} -j3 run-web-dev run-backend-dev run-background-dev
+
+send-slack-metrics:
+	docker exec danswer-stack-background-1 /usr/local/bin/python /app/scripts/send_slack_report/send_slack_report.py

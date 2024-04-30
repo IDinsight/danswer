@@ -40,6 +40,7 @@ RUN apt-get remove -y --allow-remove-essential perl-base xserver-common xvfb cma
 # Set up application files
 WORKDIR /app
 COPY ./danswer /app/danswer
+COPY ./scripts /app/scripts
 COPY ./shared_configs /app/shared_configs
 COPY ./alembic /app/alembic
 COPY ./alembic.ini /app/alembic.ini
