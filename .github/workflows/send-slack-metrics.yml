@@ -34,7 +34,10 @@ jobs:
         run: |
           ssh prod << 'EOF'
           cd danswer
-          METRICS_CHANNEL_ID=$METRICS_CHANNEL_ID SLACK_BOT_TOKEN=$SLACK_BOT_TOKEN make send-slack-metrics
+          docker exec danswer-stack-background-1 sh -c\
+           'export METRICS_CHANNEL_ID=$METRICS_CHANNEL_ID; \
+           export SLACK_BOT_TOKEN=$SLACK_BOT_TOKEN; python\
+            /app/scripts/send_slack_report/send_slack_report.py'
           EOF
 
         env:
