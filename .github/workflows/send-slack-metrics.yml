@@ -34,9 +34,7 @@ jobs:
         run: |
           ssh prod << 'EOF'
           cd danswer
-          export METRICS_CHANNEL_ID=$METRICS_CHANNEL_ID
-          export SLACK_BOT_TOKEN=$SLACK_BOT_TOKEN
-          make send-slack-metrics
+          METRICS_CHANNEL_ID=$METRICS_CHANNEL_ID SLACK_BOT_TOKEN=$SLACK_BOT_TOKEN make send-slack-metrics
           EOF
 
         env:
