@@ -31,3 +31,6 @@ re-deploy:
 	docker compose -p danswer-stack down && \
 	git pull origin prod && \
 	docker compose -p danswer-stack -f docker-compose.prod.yml up -d --build
+
+send-slack-metrics:
+	docker exec danswer-stack-background-1 python /app/scripts/send_slack_report/send_slack_report.py
