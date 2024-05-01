@@ -33,6 +33,7 @@ jobs:
       - name: Trigger metric dispatch
         run: |
           ssh prod << 'EOF'
+          set -e
           cd danswer
           docker exec danswer-stack-background-1 sh -c\
            'export METRICS_CHANNEL_ID=$METRICS_CHANNEL_ID; \
