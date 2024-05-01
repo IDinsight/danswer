@@ -2,8 +2,8 @@ name: Send Slack Metrics
 
 on:
   schedule:
-    - cron: "5 * * * *" 
- branches:
+    - cron: '5 * * * *'
+  branches:
     - prod  
 
 jobs:
