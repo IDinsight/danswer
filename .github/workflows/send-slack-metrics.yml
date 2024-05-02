@@ -1,11 +1,9 @@
 name: Send Slack Metrics
-
+# NB This only works on the default (prod) branch 
 on:
   schedule:
-    - cron: "*/5 * * * *" 
- branches:
-    - prod  
-
+    - cron: '0 12 * * *'
+  
 jobs:
   deploy:
     runs-on: ubuntu-latest
