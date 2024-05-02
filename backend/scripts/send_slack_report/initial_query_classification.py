@@ -125,4 +125,4 @@ def label_question(user_question, client):
     )
     output = chat_completion.choices[0].message.content
     label = re.findall(r"<Response>\s*([\s\S]*?)\s*</Response>", output)[0]
-    return label
+    return label.upper()
