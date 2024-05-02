@@ -64,7 +64,7 @@ def classify_initial_queries():
         for k, v in tally_json.items():
             percentage = v / total_initial_queries * 100
             classifications += f"There were {v} queries (representing {percentage:.1f}% of\
-all initial queries) about {k}\n"
+ all initial queries) about {k}\n"
         return classifications
 
 
@@ -85,7 +85,7 @@ def send_message(user_id, message):
     SLACK_TOKEN = os.environ["SLACK_BOT_TOKEN"]
     if not SLACK_TOKEN:
         logger.debug(
-            "Slack OAuth token not provided. Check env prod template for guindace"
+            "Slack OAuth token not provided. Check env prod template for guidance"
         )
         return None
     logger.info("Initializing Slack client")
