@@ -108,12 +108,13 @@ def send_usage_report_to_slack(user_id):
 
 
 if __name__ == "__main__":
-    USER_ID = os.environ["METRICS_CHANNEL_ID"]
-    if not USER_ID:
-        logger.debug(
-            "Slack Metrics Channel ID token not provided. \
-Check env prod template for guidance"
-        )
-    else:
-        logger.info("Starting Slack usage report")
-        send_usage_report_to_slack(USER_ID)
+    try:
+        USER_ID = os.environ.get("METRICS_CHANNEL_ID")
+        if USER_ID:
+            logger.info("Starting Slack usage report")
+            send_usage_report_to_slack(USER_ID)
+        else:
+            logger.warning("Slack Metrics Channel ID token not provided.")
+            logger.warning("Check env prod template for guidance.")
+    except Exception as e:
+        logger.exception("An error occurred while sending usage report to Slack: %s", e)
