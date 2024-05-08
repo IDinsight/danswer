@@ -97,8 +97,7 @@ def classify_initial_queries():
         total_initial_queries = sum(tally_json.values())
         for k, v in tally_json.items():
             percentage = v / total_initial_queries * 100
-            classifications += f"There were {v} queries (representing {percentage:.1f}% of\
- all initial queries) about {k}\n"
+            classifications += f"{k}: {v} queries ({percentage:.1f}%\n"
         return classifications
 
 
