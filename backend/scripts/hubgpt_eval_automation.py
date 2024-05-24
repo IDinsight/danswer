@@ -83,11 +83,9 @@ if __name__ == "__main__":
     
     for num, query in enumerate(queries_list):
         print(f"Query {num+1}/{len(queries_list)}: {query}")
-        # response = process_question(danswer_url="https:/CSV_PATHdinsight.io", 
-                        #  question=query, 
-                        #  api_key=None)
-        response = 1
-        print(response)
+        response = process_question(
+            danswer_url=os.getenv("WEB_DOMAIN"), question=query, api_key=None
+        )
         responses.append(response)
         print("\n ------------------- \n")
         
