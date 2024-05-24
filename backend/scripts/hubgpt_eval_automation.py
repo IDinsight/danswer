@@ -8,7 +8,7 @@ import pandas as pd
 import requests
 from slack_sdk import WebClient
 
-CSV_PATH = "/app/scripts/hubgpt_eval.csv"
+CSV_PATH = "hubgpt_eval.csv"
 
 def create_new_chat_session(danswer_url: str, api_key: str | None) -> int:
     headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
@@ -84,9 +84,10 @@ if __name__ == "__main__":
     for num, query in enumerate(queries_list):
         print(f"Query {num+1}/{len(queries_list)}: {query}")
         response = process_question(
-            danswer_url=os.getenv("WEB_DOMAIN"), question=query, api_key=None
+            danswer_url="https://hubgpt.idinsight.io", question=query, api_key=None
         )
         responses.append(response)
+        print(response)
         print("\n ------------------- \n")
         
     today_str = str(datetime.date.today())
