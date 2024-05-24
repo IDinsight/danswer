@@ -34,3 +34,6 @@ re-deploy:
 
 send-slack-metrics:
 	docker exec danswer-stack-background-1 python /app/scripts/send_slack_report/send_slack_report.py
+
+send-hubgpt-eval:
+	docker exec danswer-stack-background-1 python /app/scripts/send_slack_report/hubgpt_eval_automation.py
