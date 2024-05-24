@@ -3,9 +3,15 @@
 import datetime
 import json
 import os
+<<<<<<< Updated upstream
 
 import pandas as pd
 import requests
+=======
+import pandas as pd
+import requests
+
+>>>>>>> Stashed changes
 from slack_sdk import WebClient
 
 
@@ -13,7 +19,15 @@ def create_new_chat_session(danswer_url: str, api_key: str | None) -> int:
     headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
     session_endpoint = danswer_url + "/api/chat/create-chat-session"
 
+<<<<<<< Updated upstream
     response = requests.post(session_endpoint, headers=headers, json={"persona_id": 0})
+=======
+    response = requests.post(
+        session_endpoint,
+        headers=headers,
+        json={"persona_id": 0}
+        )
+>>>>>>> Stashed changes
     response.raise_for_status()
 
     new_session_id = response.json()["chat_session_id"]
@@ -57,8 +71,12 @@ def process_question(danswer_url: str, question: str, api_key: str | None) -> No
             if new_token:
                 response_str += new_token
         return response_str
+<<<<<<< Updated upstream
 
 
+=======
+    
+>>>>>>> Stashed changes
 def upload_to_slack(filename, channel_id):
     slack_client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
     size = os.stat(filename).st_size
@@ -68,6 +86,7 @@ def upload_to_slack(filename, channel_id):
     post_response = requests.post(url=upload_url, data=open(filename, "rb"))
     if post_response.status_code == 200:
         upload_response = slack_client.files_completeUploadExternal(
+<<<<<<< Updated upstream
             files=[{"id": file_id, "title": "Monthly Performance Evaluation"}],
             channel_id=channel_id,
         )
@@ -94,6 +113,35 @@ if __name__ == "__main__":
 
     # Record + send info
     data.to_csv("hubgpt_eval_automated.csv", index=False)
+=======
+            files=[{"id": file_id, "title": "Monthly Performance Evaluation"}], channel_id=channel_id
+        )
+    return upload_response.status_code
+
+if __name__ == "__main__":
+    
+    data = pd.read_csv("hubgpt_eval_automated.csv")
+    
+    queries_list = data.Query.tolist()
+    
+    responses = []
+    
+    for num, query in enumerate(queries_list):
+        print(f"Query {num+1}/{len(queries_list)}: {query}")
+        # response = process_question(danswer_url="https://hubgpt-staging.idinsight.io", 
+                        #  question=query, 
+                        #  api_key=None)
+        response = 1
+        print(response)
+        responses.append(response)
+        print("\n ------------------- \n")
+        
+    today_str = str(datetime.date.today())
+    data[today_str] = responses
+    
+    # Record + send info
+    data.to_csv("hubgpt_eval_automated.csv", index = False)
+>>>>>>> Stashed changes
     print("Complete")
     CHANNEL_ID = os.environ.get("METRICS_CHANNEL_ID")
     upload_to_slack("hubgpt_eval_automated.csv", CHANNEL_ID)
