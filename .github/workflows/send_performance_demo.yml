@@ -31,9 +31,9 @@ jobs:
           PROD_SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
           PROD_EC2_HOST_IP: ${{ secrets.PROD_EC2_HOST_IP }}
 
-      - name: Trigger metric dispatch
+      - name: Trigger sample query run
         run: |
           ssh prod << 'EOF'
           cd danswer
-          make send-slack-metrics
+          make send-hubgpt-eval
           EOF
