@@ -74,7 +74,7 @@ def upload_to_slack(filename, channel_id):
 
 if __name__ == "__main__":
     
-    data = pd.read_csv("hubgpt_eval_automated.csv")
+    data = pd.read_csv("hubgpt_eval.csv")
     
     queries_list = data.Query.tolist()
     
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     data[today_str] = responses
     
     # Record + send info
-    data.to_csv("hubgpt_eval_automated.csv", index = False)
+    data.to_csv("hubgpt_eval.csv", index = False)
     print("Complete")
     CHANNEL_ID = os.environ.get("METRICS_CHANNEL_ID")
-    upload_to_slack("hubgpt_eval_automated.csv", CHANNEL_ID)
+    upload_to_slack("hubgpt_eval.csv", CHANNEL_ID)
