@@ -8,6 +8,7 @@ import pandas as pd
 import requests
 from slack_sdk import WebClient
 
+CSV_PATH = "/app/scripts/hubgpt_eval.csv"
 
 def create_new_chat_session(danswer_url: str, api_key: str | None) -> int:
     headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
@@ -74,7 +75,7 @@ def upload_to_slack(filename, channel_id):
 
 if __name__ == "__main__":
     
-    data = pd.read_csv("hubgpt_eval.csv")
+    data = pd.read_csv(CSV_PATH)
     
     queries_list = data.Query.tolist()
     
@@ -82,7 +83,7 @@ if __name__ == "__main__":
     
     for num, query in enumerate(queries_list):
         print(f"Query {num+1}/{len(queries_list)}: {query}")
-        # response = process_question(danswer_url="https://hubgpt-staging.idinsight.io", 
+        # response = process_question(danswer_url="https:/CSV_PATHdinsight.io", 
                         #  question=query, 
                         #  api_key=None)
         response = 1
@@ -94,7 +95,7 @@ if __name__ == "__main__":
     data[today_str] = responses
     
     # Record + send info
-    data.to_csv("hubgpt_eval.csv", index = False)
+    data.to_csv(CSV_PATH, index = False)
     print("Complete")
     CHANNEL_ID = os.environ.get("METRICS_CHANNEL_ID")
-    upload_to_slack("hubgpt_eval.csv", CHANNEL_ID)
+    upload_to_slack(CSV_PATH, CHANNEL_ID)
