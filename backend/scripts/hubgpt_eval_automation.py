@@ -8,7 +8,7 @@ import pandas as pd
 import requests
 from slack_sdk import WebClient
 
-CSV_PATH = "/app/scipts/hubgpt_eval.csv"
+CSV_PATH = "/app/scripts/hubgpt_eval.csv"
 
 def create_new_chat_session(danswer_url: str, api_key: str | None) -> int:
     headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
