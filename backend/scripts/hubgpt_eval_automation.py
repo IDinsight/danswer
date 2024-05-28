@@ -74,7 +74,7 @@ def upload_to_slack(filename, channel_id):
     return upload_response.status_code
 
 if __name__ == "__main__":
-    
+    print("Starting query run")
     data = pd.read_csv(CSV_PATH)
     
     queries_list = data.Query.tolist()
@@ -97,5 +97,4 @@ if __name__ == "__main__":
     data.to_csv(CSV_PATH, index = False)
     print("Complete")
     CHANNEL_ID = os.environ.get("METRICS_CHANNEL_ID")
-    # upload_to_slack(CSV_PATH, CHANNEL_ID)
-    print("Bing bong")
+    upload_to_slack(CSV_PATH, CHANNEL_ID)

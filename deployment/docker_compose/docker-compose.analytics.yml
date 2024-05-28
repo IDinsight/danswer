@@ -12,9 +12,9 @@ services:
       - index
     restart: always
     env_file:
-      - .env.analytics
+      - .env_analytics
     environment:
-      - AUTH_TYPE=${AUTH_TYPE:-google_oauth}
+      - AUTH_TYPE=disabled
       - POSTGRES_HOST=relational_db
       - VESPA_HOST=index
       - MODEL_SERVER_HOST=${MODEL_SERVER_HOST:-inference_model_server}
@@ -43,9 +43,9 @@ services:
       - index
     restart: always
     env_file:
-      - .env.analytics
+      - .env_analytics
     environment:
-      - AUTH_TYPE=${AUTH_TYPE:-google_oauth}
+      - AUTH_TYPE=disabled
       - POSTGRES_HOST=relational_db
       - VESPA_HOST=index
       - MODEL_SERVER_HOST=${MODEL_SERVER_HOST:-inference_model_server}
@@ -75,7 +75,7 @@ services:
       - api_server
     restart: always
     env_file:
-      - .env.analytics
+      - .env_analytics
     environment:
       - INTERNAL_URL=http://api_server:8080
     logging:
@@ -90,7 +90,7 @@ services:
     restart: always
     # POSTGRES_USER and POSTGRES_PASSWORD should be set in .env file
     env_file:
-      - .env.analytics
+      - .env_analytics
     volumes:
       - db_volume:/var/lib/postgresql/data
     logging:
@@ -181,7 +181,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     env_file:
-      - .env.analytics
+      - .env_analytics
     depends_on:
       - api_server
       - web_server
