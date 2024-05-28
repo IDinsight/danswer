@@ -84,6 +84,7 @@ if __name__ == "__main__":
     for num, query in enumerate(queries_list):
         print(f"Query {num+1}/{len(queries_list)}: {query}")
         response = process_question(
+            # Change to staging for staging testing
             danswer_url="https://hubgpt.idinsight.io", question=query, api_key=None
         )
         responses.append(response)
