@@ -37,8 +37,11 @@ send-slack-metrics:
 
 send-hubgpt-eval:
 	cd /home/ec2-user/danswer/deployment/docker_compose && \
+	docker compose -p danswer-stack down && \
 	docker compose -p danswer-stack -f docker-compose.analytics.yml up -d --build 
 	sleep 150
 	docker exec danswer-stack-background-1 python /app/scripts/hubgpt_eval_automation.py
+	cd /home/ec2-user/danswer/deployment/docker_compose && \
+	docker compose -p danswer-stack down && \
 	docker compose -p danswer-stack -f docker-compose.prod.yml up -d --build 
 
