@@ -73,12 +73,17 @@ USAGE_QUERIES = {
     },
 }
 INITIAL_MESSAGES_QUERY = """
-    SELECT message as initial_query FROM (
-        SELECT *,
-            ROW_NUMBER() OVER (PARTITION BY chat_session_id ORDER BY time_sent ASC) as rn
-        FROM chat_message
-        WHERE (time_sent >= (NOW() AT TIME ZONE 'UTC') - INTERVAL '7 days')
-        AND (message_type = 'USER')
-    ) sub
-    WHERE sub.rn = 1
-    ORDER BY sub.time_sent ASC;"""
+WITH subquery AS (
+    SELECT cm.time_sent, cs.user_id, cm.message, cm.id, cf.is_positive, cf.feedback_text,
+           ROW_NUMBER() OVER (PARTITION BY cm.chat_session_id ORDER BY cm.time_sent ASC) AS rn
+    FROM chat_message cm
+    LEFT JOIN chat_session cs ON cs.id = cm.chat_session_id
+    LEFT JOIN chat_feedback cf ON cf.chat_message_id = cm.id
+    WHERE cm.time_sent >= (NOW() AT TIME ZONE 'UTC') - INTERVAL '7 days'
+      AND cm.message_type = 'USER'
+)
+SELECT time_sent, user_id, message, id, is_positive, feedback_text
+FROM subquery
+WHERE rn = 1
+ORDER BY time_sent ASC;
+"""
