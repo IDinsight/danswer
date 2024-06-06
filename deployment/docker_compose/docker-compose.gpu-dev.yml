@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     command: >
       /bin/sh -c "alembic upgrade head &&
-      echo \"Starting Danswer Api Server\" &&
+      echo \"Starting HubGPT Api Server\" &&
       uvicorn danswer.main:app --host 0.0.0.0 --port 8080"
     depends_on:
       - relational_db
@@ -104,7 +104,7 @@ services:
     restart: always
     environment:
       - ENCRYPTION_KEY_SECRET=${ENCRYPTION_KEY_SECRET:-}
-      # Gen AI Settings (Needed by DanswerBot)
+      # Gen AI Settings (Needed by HubGPTBot)
       - GEN_AI_MODEL_PROVIDER=${GEN_AI_MODEL_PROVIDER:-}
       - GEN_AI_MODEL_VERSION=${GEN_AI_MODEL_VERSION:-}
       - FAST_GEN_AI_MODEL_VERSION=${FAST_GEN_AI_MODEL_VERSION:-}
@@ -140,7 +140,7 @@ services:
       - DOCUMENT_ENCODER_MODEL=${DOCUMENT_ENCODER_MODEL:-}
       - DOC_EMBEDDING_DIM=${DOC_EMBEDDING_DIM:-}
       - NORMALIZE_EMBEDDINGS=${NORMALIZE_EMBEDDINGS:-}
-      - ASYM_QUERY_PREFIX=${ASYM_QUERY_PREFIX:-}  # Needed by DanswerBot
+      - ASYM_QUERY_PREFIX=${ASYM_QUERY_PREFIX:-}  # Needed by HubGPTBot
       - ASYM_PASSAGE_PREFIX=${ASYM_PASSAGE_PREFIX:-}
       - MODEL_SERVER_HOST=${MODEL_SERVER_HOST:-inference_model_server}
       - MODEL_SERVER_PORT=${MODEL_SERVER_PORT:-}
@@ -160,7 +160,7 @@ services:
       - NOTION_CONNECTOR_ENABLE_RECURSIVE_PAGE_LOOKUP=${NOTION_CONNECTOR_ENABLE_RECURSIVE_PAGE_LOOKUP:-}
       - GITHUB_CONNECTOR_BASE_URL=${GITHUB_CONNECTOR_BASE_URL:-}
       - DISABLE_DOCUMENT_CLEANUP=${DISABLE_DOCUMENT_CLEANUP:-}
-      # Danswer SlackBot Configs
+      # HubGPT SlackBot Configs
       - DANSWER_BOT_SLACK_APP_TOKEN=${DANSWER_BOT_SLACK_APP_TOKEN:-}
       - DANSWER_BOT_SLACK_BOT_TOKEN=${DANSWER_BOT_SLACK_BOT_TOKEN:-}
       - DANSWER_BOT_DISABLE_DOCS_ONLY_ANSWER=${DANSWER_BOT_DISABLE_DOCS_ONLY_ANSWER:-}

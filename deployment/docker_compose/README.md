@@ -1,6 +1,6 @@
 <!-- DANSWER_METADATA={"link": "https://github.com/danswer-ai/danswer/blob/main/deployment/docker_compose/README.md"} -->
 
-# Deploying Danswer using Docker Compose
+# Deploying HubGPT using Docker Compose
 
 For general information, please read the instructions in this [README](https://github.com/danswer-ai/danswer/blob/main/deployment/docker_compose/README.md).
 
@@ -8,7 +8,7 @@ For general information, please read the instructions in this [README](https://g
 This part is elaborated precisely in  in this [README](https://github.com/danswer-ai/danswer/blob/main/deployment/docker_compose/README.md) in section *Docker Compose*. If you have any questions, please feel free to open an issue or get in touch in slack for support.
 
 ## Deploy in a system with GPU support
-Running Model servers with GPU support while indexing and querying can result in significant improvements in performance. This is highly recommended if you have access to resources. Currently, Danswer offloads embedding model and tokenizers to the GPU VRAM and the size needed depends on chosen embedding model. Default embedding models `intfloat/e5-base-v2` takes up about 1GB of VRAM and since we need this for inference and embedding pipeline, you would need roughly 2GB of VRAM.
+Running Model servers with GPU support while indexing and querying can result in significant improvements in performance. This is highly recommended if you have access to resources. Currently, HubGPT offloads embedding model and tokenizers to the GPU VRAM and the size needed depends on chosen embedding model. Default embedding models `intfloat/e5-base-v2` takes up about 1GB of VRAM and since we need this for inference and embedding pipeline, you would need roughly 2GB of VRAM.
 
 ### Setup
 To be able to use NVIDIA runtime, following is mandatory:
@@ -28,7 +28,7 @@ For GPUs to be accessible to containers, you will need the container toolkit. Pl
 
 ### Launching with GPU
 
-1. To run Danswer with GPU, navigate to `docker_compose` directory and run the following:
+1. To run HubGPT with GPU, navigate to `docker_compose` directory and run the following:
    - `docker compose -f docker-compose.gpu-dev.yml -p danswer-stack up -d --pull always --force-recreate`
       - or run: `docker compose -f docker-compose.gpu-dev.yml -p danswer-stack up -d --build --force-recreate`
 to build from source
