@@ -23,25 +23,25 @@
 </p>
 
 <strong>[Danswer](https://www.danswer.ai/)</strong> is the AI Assistant connected to your company's docs, apps, and people. 
-Danswer provides a Chat interface and plugs into any LLM of your choice. Danswer can be deployed anywhere and for any 
+HubGPTprovides a Chat interface and plugs into any LLM of your choice. HubGPTcan be deployed anywhere and for any 
 scale - on a laptop, on-premise, or to cloud. Since you own the deployment, your user data and chats are fully in your 
-own control. Danswer is MIT licensed and designed to be modular and easily extensible. The system also comes fully ready 
+own control. HubGPTis MIT licensed and designed to be modular and easily extensible. The system also comes fully ready 
 for production usage with user authentication, role management (admin/basic users), chat persistence, and a UI for 
 configuring Personas (AI Assistants) and their Prompts.
 
-Danswer also serves as a Unified Search across all common workplace tools such as Slack, Google Drive, Confluence, etc.
-By combining LLMs and team specific knowledge, Danswer becomes a subject matter expert for the team. Imagine ChatGPT if
+HubGPTalso serves as a Unified Search across all common workplace tools such as Slack, Google Drive, Confluence, etc.
+By combining LLMs and team specific knowledge, HubGPTbecomes a subject matter expert for the team. Imagine ChatGPT if
 it had access to your team's unique knowledge! It enables questions such as "A customer wants feature X, is this already
 supported?" or "Where's the pull request for feature Y?"
 
 <h3>Usage</h3>
 
-Danswer Web App:
+HubGPTWeb App:
 
 https://github.com/danswer-ai/danswer/assets/32520769/563be14c-9304-47b5-bf0a-9049c2b6f410
 
 
-Or, plug Danswer into your existing Slack workflows (more integrations to come 😁):
+Or, plug HubGPTinto your existing Slack workflows (more integrations to come 😁):
 
 https://github.com/danswer-ai/danswer/assets/25087905/3e19739b-d178-4371-9a38-011430bdec1b
 
@@ -51,7 +51,7 @@ For more details on the Admin UI to manage connectors and users, check out our
 
 ## Deployment
 
-Danswer can easily be run locally (even on a laptop) or deployed on a virtual machine with a single
+HubGPTcan easily be run locally (even on a laptop) or deployed on a virtual machine with a single
 `docker compose` command. Checkout our [docs](https://docs.danswer.dev/quickstart) to learn more.
 
 We also have built-in support for deployment on Kubernetes. Files for that can be found [here](https://github.com/danswer-ai/danswer/tree/main/deployment/kubernetes).
@@ -60,7 +60,7 @@ We also have built-in support for deployment on Kubernetes. Files for that can b
 ## 💃 Main Features 
 * Chat UI with the ability to select documents to chat with.
 * Create custom AI Assistants with different prompts and backing knowledge sets.
-* Connect Danswer with LLM of your choice (self-host for a fully airgapped solution).
+* Connect HubGPTwith LLM of your choice (self-host for a fully airgapped solution).
 * Document Search + AI Answers for natural language queries.
 * Connectors to all common workplace tools like Google Drive, Confluence, Slack, etc.
 * Slack integration to get answers and search results directly in Slack.
@@ -79,7 +79,7 @@ We also have built-in support for deployment on Kubernetes. Files for that can b
 * Best in class Hybrid Search across all sources (BM-25 + prefix aware embedding models).
 * Admin Dashboard to configure connectors, document-sets, access, etc.
 * Custom deep learning models + learn from user feedback.
-* Easy deployment and ability to host Danswer anywhere of your choosing.
+* Easy deployment and ability to host HubGPTanywhere of your choosing.
 
 
 ## 🔌 Connectors

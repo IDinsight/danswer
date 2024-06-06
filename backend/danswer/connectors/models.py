@@ -92,7 +92,7 @@ class BasicExpertInfo(BaseModel):
 
 
 class DocumentBase(BaseModel):
-    """Used for Danswer ingestion api, the ID is inferred before use if not provided"""
+    """Used for HubGPT ingestion api, the ID is inferred before use if not provided"""
 
     id: str | None = None
     sections: list[Section]

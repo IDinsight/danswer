@@ -1,7 +1,7 @@
 <!-- DANSWER_METADATA={"link": "https://github.com/danswer-ai/danswer/blob/main/deployment/README.md"} -->
 
 # Deploying Danswer
-The two options provided here are the easiest ways to get Danswer up and running.
+The two options provided here are the easiest ways to get HubGPT up and running.
 
 - Docker Compose is simpler and default values are already preset to run right out of the box with a single command.
 As everything is running on a single machine, this may not be as scalable depending on your hardware, traffic and needs.
@@ -15,13 +15,13 @@ production deployment but there are a few caveats.
   deployments or services according to your setup. This may require existing Kubernetes knowledge or additional
   setup time.
 
-All the features of Danswer are fully available regardless of the deployment option.
+All the features of HubGPT are fully available regardless of the deployment option.
 
 For information on setting up connectors, check out https://docs.danswer.dev/connectors/overview
 
 
 ## Docker Compose:
-Docker Compose provides the easiest way to get Danswer up and running.
+Docker Compose provides the easiest way to get HubGPT up and running.
 
 Requirements: Docker and docker compose
 
@@ -39,7 +39,7 @@ to build from source
    - To delete the containers: `docker compose -f docker-compose.dev.yml -p danswer-stack down`
 
 
-3. To completely remove Danswer run:
+3. To completely remove HubGPT run:
    - **WARNING, this will also erase your indexed data and users**
    - `docker compose -f docker-compose.dev.yml -p danswer-stack down -v`
 

@@ -13,7 +13,7 @@ INDEXING_MODEL_SERVER_PORT = int(
     os.environ.get("INDEXING_MODEL_SERVER_PORT") or MODEL_SERVER_PORT
 )
 
-# Danswer custom Deep Learning Models
+# HubGPT custom Deep Learning Models
 INTENT_MODEL_VERSION = "danswer/intent-model"
 INTENT_MODEL_CONTEXT_SIZE = 256
 

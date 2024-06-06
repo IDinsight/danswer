@@ -1,5 +1,5 @@
 # This file is used to demonstrate how to use the backend APIs directly
-# In this case, the equivalent of asking a question in Danswer Chat in a new chat session
+# In this case, the equivalent of asking a question in HubGPT Chat in a new chat session
 import argparse
 import json
 import os
@@ -67,7 +67,7 @@ if __name__ == "__main__":
         "--danswer-url",
         type=str,
         default="http://localhost:80",
-        help="Danswer URL, should point to Danswer nginx.",
+        help="HubGPT URL, should point to HubGPT nginx.",
     )
     parser.add_argument(
         "--test-question",
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     )
 
     # Not needed if Auth is disabled
-    # Or for Danswer MIT API key must be replaced with session cookie
+    # Or for HubGPT MIT API key must be replaced with session cookie
     api_key = os.environ.get("DANSWER_API_KEY")
 
     args = parser.parse_args()

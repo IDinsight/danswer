@@ -55,7 +55,7 @@ SEARCH_DISTANCE_CUTOFF = 0
 # https://litellm.vercel.app/docs/providers/azure#completion---using-env-variables
 # The provider is the prefix before / in the model argument
 
-# Additionally Danswer supports GPT4All and custom request library based models
+# Additionally HubGPT supports GPT4All and custom request library based models
 # Set GEN_AI_MODEL_PROVIDER to "custom" to use the custom requests approach
 # Set GEN_AI_MODEL_PROVIDER to "gpt4all" to use gpt4all models running locally
 GEN_AI_MODEL_PROVIDER = os.environ.get("GEN_AI_MODEL_PROVIDER") or "openai"

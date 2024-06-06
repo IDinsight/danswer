@@ -190,7 +190,7 @@ def handle_message(
     Returns True if need to respond with an additional message to the user(s) after this
     function is finished. True indicates an unexpected failure that needs to be communicated
     Query thrown out by filters due to config does not count as a failure that should be notified
-    Danswer failing to answer/retrieve docs does count and should be notified
+    HubGPT failing to answer/retrieve docs does count and should be notified
     """
     channel = message_info.channel_to_respond
 
@@ -435,10 +435,10 @@ def handle_message(
                 client=client,
                 channel=channel,
                 receiver_ids=send_to,
-                text="Hello! Danswer has some results for you!",
+                text="Hello! HubGPT has some results for you!",
                 blocks=[
                     SectionBlock(
-                        text="Danswer is down for maintenance.\nWe're working hard on recharging the AI!"
+                        text="HubGPT is down for maintenance.\nWe're working hard on recharging the AI!"
                     )
                 ],
                 thread_ts=message_ts_to_respond_to,
@@ -584,7 +584,7 @@ def handle_message(
             client=client,
             channel=channel,
             receiver_ids=send_to,
-            text="Hello! Danswer has some results for you!",
+            text="Hello! HubGPT has some results for you!",
             blocks=all_blocks,
             thread_ts=message_ts_to_respond_to,
             # don't unfurl, since otherwise we will have 5+ previews which makes the message very long

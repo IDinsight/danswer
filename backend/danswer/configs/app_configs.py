@@ -30,7 +30,7 @@ DISABLE_GENERATIVE_AI = os.environ.get("DISABLE_GENERATIVE_AI", "").lower() == "
 # Web Configs
 #####
 # WEB_DOMAIN is used to set the redirect_uri after login flows
-# NOTE: if you are having problems accessing the Danswer web UI locally (especially
+# NOTE: if you are having problems accessing the HubGPTweb UI locally (especially
 # on Windows, try  setting this to `http://127.0.0.1:3000` instead and see if that
 # fixes it)
 WEB_DOMAIN = os.environ.get("WEB_DOMAIN") or "http://localhost:3000"
@@ -44,7 +44,7 @@ DISABLE_AUTH = AUTH_TYPE == AuthType.DISABLED
 
 # Encryption key secret is used to encrypt connector credentials, api keys, and other sensitive
 # information. This provides an extra layer of security on top of Postgres access controls
-# and is available in Danswer EE
+# and is available in HubGPTEE
 ENCRYPTION_KEY_SECRET = os.environ.get("ENCRYPTION_KEY_SECRET")
 
 # Turn off mask if admin users should see full credentials for data connectors.
@@ -57,7 +57,7 @@ SESSION_EXPIRE_TIME_SECONDS = int(
 )  # 7 days
 
 # set `VALID_EMAIL_DOMAINS` to a comma seperated list of domains in order to
-# restrict access to Danswer to only users with emails from those domains.
+# restrict access to HubGPTto only users with emails from those domains.
 # E.g. `VALID_EMAIL_DOMAINS=example.com,example.org` will restrict Danswer
 # signups to users with either an @example.com or an @example.org email.
 # NOTE: maintaining `VALID_EMAIL_DOMAIN` to keep backwards compatibility

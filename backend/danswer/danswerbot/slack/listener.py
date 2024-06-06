@@ -121,7 +121,7 @@ def prefilter_requests(req: SocketModeRequest, client: SocketModeClient) -> bool
         message_ts = event.get("ts")
         thread_ts = event.get("thread_ts")
         # Pick the root of the thread (if a thread exists)
-        # Can respond in thread if it's an "im" directly to Danswer or @DanswerBot is tagged
+        # Can respond in thread if it's an "im" directly to HubGPT or @DanswerBot is tagged
         if (
             thread_ts
             and message_ts != thread_ts
@@ -387,7 +387,7 @@ def _initialize_socket_client(socket_client: SocketModeClient) -> None:
 
 # Follow the guide (https://docs.danswer.dev/slack_bot_setup) to set up
 # the slack bot in your workspace, and then add the bot to any channels you want to
-# try and answer questions for. Running this file will setup Danswer to listen to all
+# try and answer questions for. Running this file will setup HubGPT to listen to all
 # messages in those channels and attempt to answer them. As of now, it will only respond
 # to messages sent directly in the channel - it will not respond to messages sent within a
 # thread.

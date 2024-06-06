@@ -31,7 +31,7 @@ logger = setup_logger()
 # not using /api to avoid confusion with nginx api path routing
 router = APIRouter(prefix="/danswer-api")
 
-# Assumes this gives admin privileges, basic users should not be allowed to call any Danswer apis
+# Assumes this gives admin privileges, basic users should not be allowed to call any HubGPT apis
 _DANSWER_API_KEY = "danswer_api_key"
 
 
@@ -43,7 +43,7 @@ def get_danswer_api_key(key_len: int = 30, dont_regenerate: bool = False) -> str
         if dont_regenerate:
             return None
 
-    logger.info("Generating Danswer API Key")
+    logger.info("Generating HubGPT API Key")
 
     api_key = "dn_" + secrets.token_urlsafe(key_len)
     kv_store.store(_DANSWER_API_KEY, api_key, encrypt=True)

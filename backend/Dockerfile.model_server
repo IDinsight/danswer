@@ -1,7 +1,7 @@
 FROM python:3.11.7-slim-bookworm
 
 LABEL com.danswer.maintainer="founders@danswer.ai"
-LABEL com.danswer.description="This image is for the Danswer model server which runs all of the \
+LABEL com.danswer.description="This image is for the HubGPTmodel server which runs all of the \
 AI models for Danswer. This container and all the code is MIT Licensed and free for all to use. \
 You can find it at https://hub.docker.com/r/danswer/danswer-model-server. For more details, \
 visit https://github.com/danswer-ai/danswer."
@@ -35,7 +35,7 @@ COPY ./danswer/utils/logger.py /app/danswer/utils/logger.py
 # Place to fetch version information
 COPY ./danswer/__init__.py /app/danswer/__init__.py
 
-# Shared between Danswer Backend and Model Server
+# Shared between HubGPTBackend and Model Server
 COPY ./shared_configs /app/shared_configs
 
 # Model Server main code

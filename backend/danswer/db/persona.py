@@ -37,7 +37,7 @@ def make_persona_private(
 
     # May cause error if someone switches down to MIT from EE
     if group_ids:
-        raise NotImplementedError("Danswer MIT does not support private Personas")
+        raise NotImplementedError("HubGPT MIT does not support private Personas")
 
 
 def create_update_persona(

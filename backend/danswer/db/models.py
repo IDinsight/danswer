@@ -1287,13 +1287,13 @@ class ExternalPermission(Base):
     """Maps user info both internal and external to the name of the external group
     This maps the user to all of their external groups so that the external group name can be
     attached to the ACL list matching during query time. User level permissions can be handled by
-    directly adding the Danswer user to the doc ACL list"""
+    directly adding the HubGPT user to the doc ACL list"""
 
     __tablename__ = "external_permission"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[UUID | None] = mapped_column(ForeignKey("user.id"), nullable=True)
-    # Email is needed because we want to keep track of users not in Danswer to simplify process
+    # Email is needed because we want to keep track of users not in HubGPT to simplify process
     # when the user joins
     user_email: Mapped[str] = mapped_column(String)
     source_type: Mapped[DocumentSource] = mapped_column(
@@ -1304,9 +1304,9 @@ class ExternalPermission(Base):
 
 
 class EmailToExternalUserCache(Base):
-    """A way to map users IDs in the external tool to a user in Danswer or at least an email for
+    """A way to map users IDs in the external tool to a user in HubGPT or at least an email for
     when the user joins. Used as a cache for when fetching external groups which have their own
-    user ids, this can easily be mapped back to users already known in Danswer without needing
+    user ids, this can easily be mapped back to users already known in HubGPT without needing
     to call external APIs to get the user emails.
 
     This way when groups are updated in the external tool and we need to update the mapping of
@@ -1322,7 +1322,7 @@ class EmailToExternalUserCache(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     external_user_id: Mapped[str] = mapped_column(String)
     user_id: Mapped[UUID | None] = mapped_column(ForeignKey("user.id"), nullable=True)
-    # Email is needed because we want to keep track of users not in Danswer to simplify process
+    # Email is needed because we want to keep track of users not in HubGPT to simplify process
     # when the user joins
     user_email: Mapped[str] = mapped_column(String)
     source_type: Mapped[DocumentSource] = mapped_column(

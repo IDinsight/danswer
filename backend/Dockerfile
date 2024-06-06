@@ -34,7 +34,7 @@ RUN pip install --no-cache-dir --upgrade -r /tmp/requirements.txt && \
 # Cleanup for CVEs and size reduction
 # https://github.com/tornadoweb/tornado/issues/3107
 # xserver-common and xvfb included by playwright installation but not needed after
-# perl-base is part of the base Python Debian image but not needed for Danswer functionality
+# perl-base is part of the base Python Debian image but not needed for HubGPTfunctionality
 # perl-base could only be removed with --allow-remove-essential
 RUN apt-get remove -y --allow-remove-essential perl-base xserver-common xvfb cmake \
     libldap-2.5-0 libldap-2.5-0 && \

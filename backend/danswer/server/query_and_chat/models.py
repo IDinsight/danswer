@@ -32,7 +32,7 @@ class SimpleQueryRequest(BaseModel):
 
 
 class ChatSessionCreationRequest(BaseModel):
-    # If not specified, use Danswer default persona
+    # If not specified, use HubGPT default persona
     persona_id: int = 0
     description: str | None = None
 

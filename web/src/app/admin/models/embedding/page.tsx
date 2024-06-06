@@ -157,7 +157,7 @@ function Main() {
               To complete the initial setup, let&apos;s add a connector!
               <br />
               <br />
-              Connectors are the way that Danswer gets data from your
+              Connectors are the way that HubGPT gets data from your
               organization&apos;s various data sources. Once setup, we&apos;ll
               automatically sync data from your apps and docs into Danswer, so
               you can search all through all of them in one place.
@@ -279,7 +279,7 @@ function Main() {
               <br />
               <b>NOTE:</b> not all models listed will work with Danswer, since
               some have unique interfaces or special requirements. If in doubt,
-              reach out to the Danswer team.
+              reach out to the HubGPT team.
             </Text>
 
             <div className="w-full flex">

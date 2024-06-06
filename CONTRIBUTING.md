@@ -18,7 +18,7 @@ Issues marked `good first issue` are an especially great place to start.
 [README.md](https://github.com/danswer-ai/danswer/blob/main/backend/danswer/connectors/README.md).
 
 If you have a new/different contribution in mind, we'd love to hear about it!
-Your input is vital to making sure that Danswer moves in the right direction.
+Your input is vital to making sure that HubGPTmoves in the right direction.
 Before starting on implementation, please raise a GitHub issue.
 
 And always feel free to message us (Chris Weaver / Yuhong Sun) on 
@@ -48,11 +48,11 @@ We would love to see you there!
 
 
 ## Get Started 🚀
-Danswer being a fully functional app, relies on some external pieces of software, specifically:
+HubGPTbeing a fully functional app, relies on some external pieces of software, specifically:
 - [Postgres](https://www.postgresql.org/) (Relational DB)
 - [Vespa](https://vespa.ai/) (Vector DB/Search Engine)
 
-This guide provides instructions to set up the Danswer specific services outside of Docker because it's easier for
+This guide provides instructions to set up the HubGPTspecific services outside of Docker because it's easier for
 development purposes but also feel free to just use the containers and update with local changes by providing the
 `--build` flag.
 
@@ -171,7 +171,7 @@ pre-commit install
 ```
 
 Additionally, we use `mypy` for static type checking.
-Danswer is fully type-annotated, and we would like to keep it that way! 
+HubGPTis fully type-annotated, and we would like to keep it that way! 
 To run the mypy checks manually, run `python -m mypy .` from the `danswer/backend` directory.
 
 
@@ -182,6 +182,6 @@ Please double check that prettier passes before creating a pull request.
 
 
 ### Release Process
-Danswer follows the semver versioning standard.
+HubGPTfollows the semver versioning standard.
 A set of Docker containers will be pushed automatically to DockerHub with every tag.
 You can see the containers [here](https://hub.docker.com/search?q=danswer%2F).
