@@ -34,6 +34,7 @@ def process_question(danswer_url: str, question: str, api_key: str | None) -> No
         "parent_message_id": None,
         # Default Question Answer prompt
         "prompt_id": 0,
+        "file_descriptors": [],
         # Not specifying any specific docs to chat to, we want to run a search
         "search_doc_ids": None,
         "retrieval_options": {
