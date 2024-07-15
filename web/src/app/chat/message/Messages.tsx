@@ -168,7 +168,7 @@ export const AIMessage = ({
             </div>
 
             <div className="font-bold text-emphasis ml-2 my-auto">
-              {personaName || "Danswer"}
+              {personaName || "HubGPT"}
             </div>
 
             {query === undefined &&

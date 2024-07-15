@@ -504,7 +504,7 @@ export function AssistantEditor({
                                   {user?.role !== "admin" && (
                                     <>
                                       If this functionality would be useful,
-                                      reach out to the administrators of Danswer
+                                      reach out to the administrators of HubGPT
                                       for assistance.
                                     </>
                                   )}

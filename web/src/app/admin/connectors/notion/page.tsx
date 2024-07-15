@@ -105,7 +105,7 @@ const Main = () => {
         <>
           <Text>
             To get started you&apos;ll need to create an internal integration in
-            Notion for Danswer. Follow the instructions in the&nbsp;
+            Notion for HubGPT. Follow the instructions in the&nbsp;
             <a
               href="https://developers.notion.com/docs/create-a-notion-integration"
               target="_blank"

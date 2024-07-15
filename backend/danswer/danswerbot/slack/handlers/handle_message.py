@@ -484,7 +484,6 @@ def handle_message(
             "Answer was evaluated to be invalid, throwing it away without responding."
         )
         update_emote_react(
-            emoji=DANSWER_FOLLOWUP_EMOJI,
             channel=message_info.channel_to_respond,
             message_ts=message_info.msg_to_respond,
             remove=False,

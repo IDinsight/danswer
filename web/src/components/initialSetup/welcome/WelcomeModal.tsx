@@ -117,7 +117,7 @@ export function _WelcomeModal({ user }: { user: User | null }) {
               <Text>
                 Connectors are the way that HubGPT gets data from your
                 organization&apos;s various data sources. Once setup, we&apos;ll
-                automatically sync data from your apps and docs into Danswer, so
+                automatically sync data from your apps and docs into HubGPT, so
                 you can search through all of them in one place.
               </Text>
 
@@ -215,11 +215,11 @@ export function _WelcomeModal({ user }: { user: User | null }) {
       );
       break;
     default:
-      title = "🎉 Welcome to Danswer";
+      title = "🎉 Welcome to HubGPT";
       body = (
         <>
           <div>
-            <Text>How are you planning on using Danswer?</Text>
+            <Text>How are you planning on using HubGPT?</Text>
           </div>
           <Divider />
           <UsageTypeSection

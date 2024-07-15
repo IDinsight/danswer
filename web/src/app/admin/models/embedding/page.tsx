@@ -159,7 +159,7 @@ function Main() {
               <br />
               Connectors are the way that HubGPT gets data from your
               organization&apos;s various data sources. Once setup, we&apos;ll
-              automatically sync data from your apps and docs into Danswer, so
+              automatically sync data from your apps and docs into HubGPT, so
               you can search all through all of them in one place.
             </div>
             <div className="flex">
@@ -197,7 +197,7 @@ function Main() {
 
       <Text>
         Embedding models are used to generate embeddings for your documents,
-        which then power Danswer&apos;s search.
+        which then power HubGPT&apos;s search.
       </Text>
 
       {currentModel ? (
@@ -277,7 +277,7 @@ function Main() {
               </a>
               .
               <br />
-              <b>NOTE:</b> not all models listed will work with Danswer, since
+              <b>NOTE:</b> not all models listed will work with HubGPT, since
               some have unique interfaces or special requirements. If in doubt,
               reach out to the HubGPT team.
             </Text>

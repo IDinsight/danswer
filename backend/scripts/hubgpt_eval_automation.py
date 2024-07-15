@@ -1,21 +1,20 @@
 # This file is used to demonstrate how to use the backend APIs directly
 # In this case, the equivalent of asking a question in Danswer Chat in a new chat session
-import argparse
+import datetime
 import json
 import os
 
+import pandas as pd
 import requests
+from slack_sdk import WebClient
 
+CSV_PATH = "/app/scripts/hubgpt_eval.csv"
 
 def create_new_chat_session(danswer_url: str, api_key: str | None) -> int:
     headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
     session_endpoint = danswer_url + "/api/chat/create-chat-session"
 
-    response = requests.post(
-        session_endpoint,
-        headers=headers,
-        json={"persona_id": 0},  # Global default Persona/Assistant ID
-    )
+    response = requests.post(session_endpoint, headers=headers, json={"persona_id": 0})
     response.raise_for_status()
 
     new_session_id = response.json()["chat_session_id"]
@@ -48,7 +47,7 @@ def process_question(danswer_url: str, question: str, api_key: str | None) -> No
 
     with requests.post(message_endpoint, headers=headers, json=data) as response:
         response.raise_for_status()
-
+        response_str = ""
         for packet in response.iter_lines():
             response_text = json.loads(packet.decode())
             # Can also check "top_documents" to capture the streamed search results
@@ -56,31 +55,47 @@ def process_question(danswer_url: str, question: str, api_key: str | None) -> No
             # or check "message_id" to get the message_id used as parent_message_id
             # to create follow-up messages
             new_token = response_text.get("answer_piece")
-
             if new_token:
-                print(new_token, end="", flush=True)
+                response_str += new_token
+        return response_str
 
+
+def upload_to_slack(filename, channel_id):
+    slack_client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
+    size = os.stat(filename).st_size
+    response = slack_client.files_getUploadURLExternal(filename=filename, length=size)
+    upload_url = response.data["upload_url"]
+    file_id = response.data["file_id"]
+    post_response = requests.post(url=upload_url, data=open(filename, "rb"))
+    if post_response.status_code == 200:
+        upload_response = slack_client.files_completeUploadExternal(
+            files=[{"id": file_id, "title": "Monthly Performance Evaluation"}], channel_id=channel_id
+        )
+    return upload_response.status_code
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Sample API Usage")
-    parser.add_argument(
-        "--danswer-url",
-        type=str,
-        default="http://localhost:80",
-        help="Danswer URL, should point to Danswer nginx.",
-    )
-    parser.add_argument(
-        "--test-question",
-        type=str,
-        default="What is Danswer?",
-        help="Test question for new Chat Session.",
-    )
-
-    # Not needed if Auth is disabled
-    # Or for Danswer MIT API key must be replaced with session cookie
-    api_key = os.environ.get("DANSWER_API_KEY")
-
-    args = parser.parse_args()
-    process_question(
-        danswer_url=args.danswer_url, question=args.test_question, api_key=api_key
-    )
+    print("Starting query run")
+    data = pd.read_csv(CSV_PATH)
+    
+    queries_list = data.Query.tolist()
+    
+    responses = []
+    
+    for num, query in enumerate(queries_list):
+        print(f"Query {num+1}/{len(queries_list)}: {query}")
+        response = process_question(
+            # Change to staging for staging testing
+            danswer_url="https://hubgpt.idinsight.io", question=query, api_key=None
+        )
+        responses.append(response)
+        print(response)
+        print("\n ------------------- \n")
+        
+    today_str = str(datetime.date.today())
+    data[today_str] = responses
+    
+    # Record + send info
+    data.to_csv(CSV_PATH, index = False)
+    print("Complete")
+    CHANNEL_ID = os.environ.get("METRICS_CHANNEL_ID")
+    upload_to_slack(CSV_PATH, CHANNEL_ID)

@@ -196,7 +196,7 @@ const Main = () => {
       {popup}
 
       <Text className="mb-2">
-        Setup a Slack bot that connects to Danswer. Once setup, you will be able
+        Setup a Slack bot that connects to HubGPT. Once setup, you will be able
         to ask questions to HubGPT directly from Slack. Additionally, you can:
       </Text>
 

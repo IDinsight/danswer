@@ -54,6 +54,7 @@ nltk.download('punkt', quiet=True);"
 # Set up application files
 WORKDIR /app
 COPY ./danswer /app/danswer
+COPY ./scripts /app/scripts
 COPY ./shared_configs /app/shared_configs
 COPY ./alembic /app/alembic
 COPY ./alembic.ini /app/alembic.ini

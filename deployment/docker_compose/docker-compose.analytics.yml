@@ -17,7 +17,7 @@ services:
     env_file:
       - .env
     environment:
-      - AUTH_TYPE=${AUTH_TYPE:-google_oauth}
+      - AUTH_TYPE=disabled
       - POSTGRES_HOST=relational_db
       - VESPA_HOST=index
       - MODEL_SERVER_HOST=${MODEL_SERVER_HOST:-inference_model_server}
@@ -92,8 +92,6 @@ services:
       - .env
     volumes:
       - db_volume:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     logging:
       driver: json-file
       options:

@@ -50,7 +50,7 @@ export default function Page() {
 
       <Text>
         Connect HubGPT to your organization&apos;s knowledge sources.
-        We&apos;ll automatically sync your data into Danswer, so you can find
+        We&apos;ll automatically sync your data into HubGPT, so you can find
         exactly what you&apos;re looking for in one place.
       </Text>
 
