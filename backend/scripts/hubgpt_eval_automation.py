@@ -62,7 +62,7 @@ def process_question(danswer_url: str, question: str, api_key: str | None) -> No
 
 
 def upload_to_slack(filename, channel_id):
-    slack_client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
+    slack_client = WebClient(token=os.environ.get("METRICS_BOT_TOKEN"))
     size = os.stat(filename).st_size
     response = slack_client.files_getUploadURLExternal(filename=filename, length=size)
     upload_url = response.data["upload_url"]

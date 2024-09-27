@@ -23,7 +23,7 @@ POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "password")
 POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "localhost")
 POSTGRES_PORT = os.environ.get("POSTGRES_PORT", "5432")
 POSTGRES_DB = os.environ.get("POSTGRES_DB", "postgres")
-SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
+METRICS_BOT_TOKEN = os.environ.get("METRICS_BOT_TOKEN")
 GEN_AI_API_KEY = os.environ.get("GEN_AI_API_KEY")
 METRICS_CHANNEL_ID = os.environ.get("METRICS_CHANNEL_ID")
 
@@ -81,7 +81,7 @@ def save_bar_plot(df, filename):
 
 def upload_file_to_slack(filename, channel_id, title, delete_after_upload=False):
     """Upload a file to Slack and optionally delete it locally."""
-    slack_client = WebClient(token=SLACK_BOT_TOKEN)
+    slack_client = WebClient(token=METRICS_BOT_TOKEN)
     size = os.stat(filename).st_size
     response = slack_client.files_getUploadURLExternal(filename=filename, length=size)
     upload_url = response["upload_url"]
@@ -174,7 +174,7 @@ def create_message(last_week_count, classifications):
 def send_message(channel_id, message):
     """Send a message to the specified Slack channel."""
     try:
-        slack_client = WebClient(token=SLACK_BOT_TOKEN)
+        slack_client = WebClient(token=METRICS_BOT_TOKEN)
         slack_client.chat_postMessage(channel=channel_id, text=message)
         logger.info("Message sent to Slack channel")
     except Exception as e:

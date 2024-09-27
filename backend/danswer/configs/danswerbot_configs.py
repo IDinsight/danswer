@@ -20,7 +20,7 @@ DANSWER_BOT_DISABLE_DOCS_ONLY_ANSWER = os.environ.get(
 # When HubGPTis considering a message, what emoji does it react with
 DANSWER_REACT_EMOJI = os.environ.get("DANSWER_REACT_EMOJI") or "eyes"
 # When User needs more help, what should the emoji be
-DANSWER_FOLLOWUP_EMOJI = os.environ.get("DANSWER_FOLLOWUP_EMOJI") or "sos"
+DANSWER_FOLLOWUP_EMOJI = os.environ.get("DANSWER_FOLLOWUP_EMOJI") or "x"
 # What kind of message should be shown when someone gives an AI answer feedback to DanswerBot
 # Defaults to Private if not provided or invalid
 # Private: Only visible to user clicking the feedback

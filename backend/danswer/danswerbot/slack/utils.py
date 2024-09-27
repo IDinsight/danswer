@@ -43,6 +43,7 @@ DANSWER_BOT_APP_ID: str | None = None
 
 def update_emote_react(
     channel: str,
+    emoji: str,
     message_ts: str | None,
     remove: bool,
     client: WebClient,
@@ -53,11 +54,11 @@ def update_emote_react(
 
     func = client.reactions_remove if remove else client.reactions_add
     slack_call = make_slack_api_rate_limited(func)  # type: ignore
-    # slack_call(
-    #     name=emoji,
-    #     channel=channel,
-    #     timestamp=message_ts,
-    # )
+    slack_call(
+        name=emoji,
+        channel=channel,
+        timestamp=message_ts,
+    )
 
 
 def get_danswer_bot_app_id(web_client: WebClient) -> Any:

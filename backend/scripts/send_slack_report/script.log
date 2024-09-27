@@ -154,3 +154,447 @@ Traceback (most recent call last):
 ModuleNotFoundError: No module named 'pandas'
 
 ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
+Traceback (most recent call last):
+  File "/home/ec2-user/danswer/backend/scripts/send_slack_report/send_slack_report.py", line 5, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+
+ERROR conda.cli.main_run:execute(124): `conda run python send_slack_report.py` failed. (See above for error)
